@@ -363,6 +363,7 @@ def synthetic_report() -> str:
         ("Reverse implied expectations", "Reverse placeholder: market-implied growth and margin."),
         ("Monitoring and triggers", "Monitoring placeholder: upgrade and kill triggers."),
         ("Limitations", "Limitation placeholder: human-required items and confidence caps."),
+        ("买入纪律 (buy price)", "Recommended buy price placeholder with margin of safety logic."),
     ]
     body = ["# Self-test delivery report", ""]
     for title, text in sections:
@@ -436,7 +437,7 @@ def delivery_smoke_test(skill: Path, profile: str, td: Path) -> None:
         encoding="utf-8",
     )
     if profile == "trainer":
-        report_text = (skill / "assets/examples/sandisk_v73/Sandisk_SNDK_v7.3_模型报告.md").read_text(encoding="utf-8") + "\n\n## Forward evidence and research synthesis\nInvestor dialogue, independent research, technical papers, source independence clusters, rejected signals and falsification triggers were reviewed.\n"
+        report_text = (skill / "assets/examples/sandisk_v73/Sandisk_SNDK_v7.3_模型报告.md").read_text(encoding="utf-8") + "\n\n## Forward evidence and research synthesis\nInvestor dialogue, independent research, technical papers, source independence clusters, rejected signals and falsification triggers were reviewed.\n\n## 买入纪律\nRecommended buy price derives from the Bear fair value with a stated margin of safety.\n"
         (workspace / "report.md").write_text(report_text, encoding="utf-8")
         (workspace / "model").mkdir(exist_ok=True)
         (workspace / "model/model.xlsx").write_bytes((skill / "assets/examples/sandisk_v73/Sandisk_SNDK_v7.3_五年财务模型.xlsx").read_bytes())

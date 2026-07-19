@@ -59,6 +59,7 @@ REPORT_SECTION_GROUPS = {
     "reverse": ["reverse", "隐含", "反向"],
     "monitoring": ["monitor", "触发", "待验证"],
     "limitations": ["limitation", "限制", "human-required", "可信度"],
+    "buy_discipline": ["recommended buy", "buy price", "买入价", "margin of safety", "安全边际", "买入纪律"],
 }
 
 
@@ -302,6 +303,45 @@ def main() -> int:
                     fail_record(checks, f"workbook:{concept}", f"sheets={names}")
         except Exception as exc:
             fail_record(checks, "workbook:read", str(exc))
+
+    # Red-team findings must bind the numbers: open P0/P1 findings are only
+    # acceptable when the run's readiness target is capped at screen-grade.
+    if red_path.exists():
+        open_p1 = []
+        for line in red_path.read_text(encoding="utf-8").splitlines():
+            if not line.strip().startswith("|") or "RT-" not in line:
+                continue
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if len(cells) < 3:
+                continue
+            severity = next((c.upper() for c in cells if c.upper() in {"P0", "P1"}), None)
+            status = cells[-1].lower()
+            if severity and status not in {"closed", "resolved", "mitigated"}:
+                open_p1.append(cells[0])
+        if open_p1:
+            readiness = str(manifest.get("readiness_target", "")).lower()
+            if readiness in {"screen-grade", "not-decision-ready"}:
+                pass_record(checks, "red-team:open-findings-capped", ",".join(open_p1))
+            else:
+                fail_record(checks, "red-team:open-findings-bind",
+                            f"open P0/P1 findings {','.join(open_p1)} require resolution or readiness_target capped at screen-grade (current: {readiness or 'unset'})",
+                            "error" if args.strict else "warning")
+
+    # The recommended buy price must be derived in the report, not only asserted in the snapshot.
+    if snap_path.exists() and report_path.exists():
+        try:
+            buy = (json.loads(snap_path.read_text(encoding="utf-8")).get("valuation_summary") or {}).get("recommended_buy_price")
+        except Exception:
+            buy = None
+        if isinstance(buy, (int, float)):
+            report_text = report_path.read_text(encoding="utf-8")
+            forms = {f"{buy:.2f}", f"{buy:.1f}", f"{buy:.0f}", f"{int(buy):,}"}
+            if any(f in report_text for f in forms):
+                pass_record(checks, "valuation:buy-price-derived")
+            else:
+                fail_record(checks, "valuation:buy-price-derived",
+                            f"recommended_buy_price {buy} appears in the snapshot but nowhere in report.md - derive it (margin-of-safety logic) in the report",
+                            "error" if args.strict else "warning")
 
     errors = [c for c in checks if not c["passed"] and c["severity"] == "error"]
     warnings = [c for c in checks if not c["passed"] and c["severity"] == "warning"]
