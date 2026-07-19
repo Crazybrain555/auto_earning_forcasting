@@ -7,9 +7,12 @@ def dt(v):
     if len(v)==10:v+='T23:59:59+00:00'
     if v.endswith('Z'):v=v[:-1]+'+00:00'
     x=datetime.fromisoformat(v);return x if x.tzinfo else x.replace(tzinfo=timezone.utc)
+KNOWN_FAMILIES={'official-dialogue','cross-company-official','industry-research','expert-field','sell-side-research','technical-paper-standard','news-event','official-product','measurement','regulatory','official-transaction','anonymous-channel'}
+INDEPENDENT_FAMILIES={'industry-research','expert-field','sell-side-research','technical-paper-standard','news-event','measurement'}
+
 def main():
     p=argparse.ArgumentParser();p.add_argument('--workspace',required=True);p.add_argument('--strict',action='store_true');a=p.parse_args();w=Path(a.workspace);errs=[]
-    manifest=json.loads((w/'run_manifest.json').read_text(encoding='utf-8'));cut=dt(manifest['as_of']);minsig=int(manifest.get('forward_evidence_min_signals',3));mincl=int(manifest.get('forward_evidence_min_independent_clusters',2))
+    manifest=json.loads((w/'run_manifest.json').read_text(encoding='utf-8'));cut=dt(manifest['as_of']);minsig=int(manifest.get('forward_evidence_min_signals',6 if a.strict else 3));mincl=int(manifest.get('forward_evidence_min_independent_clusters',2))
     for name in ['forward_signal_cards.csv','historical_query_log.csv','source_independence_map.csv']:
         if not (w/name).exists() or (w/name).stat().st_size==0:errs.append('missing '+name)
     if errs:print('\n'.join(errs));raise SystemExit(2)
@@ -17,7 +20,12 @@ def main():
     if len(ss)<minsig:errs.append(f'signals {len(ss)}<{minsig}')
     clusters={s.get('independence_cluster','').strip() for s in ss if s.get('independence_cluster','').strip()};families={s.get('source_family','').strip().lower() for s in ss if s.get('source_family')}
     if len(clusters)<mincl:errs.append(f'clusters {len(clusters)}<{mincl}')
-    if len(families)<2:errs.append('source family diversity <2')
+    if a.strict:
+        unknown=sorted(families-KNOWN_FAMILIES)
+        if unknown:errs.append('unknown source_family slug(s) '+','.join(unknown)+' - use the controlled vocabulary: '+', '.join(sorted(KNOWN_FAMILIES)))
+        if len(families&KNOWN_FAMILIES)<3:errs.append('source family diversity <3 (strict)')
+        if not (families&INDEPENDENT_FAMILIES):errs.append('no independent (non-official) evidence family - official sources alone cannot carry the forward layer')
+    elif len(families)<2:errs.append('source family diversity <2')
     base=[s for s in ss if s.get('allowed_use','').lower() in {'base_point','base_driver'}]
     direct={'official-dialogue','cross-company-official','industry-research','official-product','measurement','regulatory','official-transaction'}
     bclusters={s.get('independence_cluster','').strip() for s in base if s.get('independence_cluster')}

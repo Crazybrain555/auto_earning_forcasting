@@ -16,6 +16,8 @@ Use forward-looking evidence without letting optimism, channel noise, copied res
 | Technical paper, standard or patent | Peer-reviewed paper, dated preprint, standards committee, patent | Feasibility, failure boundary and regime probability; not company revenue or share |
 | Anonymous or copied channel claim | Unnamed checks, social media, second-hand notes | Monitoring/search trigger only |
 
+**Machine slugs for `source_family`** (the workspace validator enforces this vocabulary in strict mode): `official-dialogue`, `cross-company-official`, `industry-research`, `expert-field`, `sell-side-research`, `technical-paper-standard`, `news-event`, `official-product`, `measurement`, `regulatory`, `official-transaction`, `anonymous-channel`. A full delivery needs >=6 SignalCards spanning >=3 families, including >=1 independent family (`industry-research`/`expert-field`/`sell-side-research`/`technical-paper-standard`/`news-event`/`measurement`).
+
 ## Evidence roles
 
 Assign each signal exactly one primary role: `fact_anchor`, `state_signal`, `timing_signal`, `capacity_signal`, `adoption_signal`, `failure_boundary`, `perimeter_signal`, `scenario_probability`, or `monitor_trigger`. Split a source into separate SignalCards when claims have different roles.
