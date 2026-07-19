@@ -185,7 +185,7 @@ Do not describe provisional modules as research-grade.
 
 The full procedure is `references/historical-training-loop.md`. The shape of one round:
 
-1. Pick Group A (1–3 training companies with frozen cutoffs) and Group B (2 validation companies, untouched until their turn). Record `round.json` and the base method commit (`git rev-parse HEAD`).
+1. Pick Group A (2 training companies with frozen cutoffs) and Group B (2 validation companies, untouched until their turn) - four companies per round by default. Record `round.json` and the base method commit (`git rev-parse HEAD`).
 2. Run Group A in the sandbox: point-in-time research, sealed forecast (`scripts/freeze_training_forecast.py`) before Actuals, then score (`scripts/score_training_forecast.py`).
 3. Improve on Group A: attribute errors (DATA, PERIMETER, STATE, PARAM, STRUCTURE, TIMING, REGIME, ACCOUNTING, EXOGENOUS), change the reusable mechanism rule — never tune a number to a known actual — and confirm the right-reason: the forecast moved for the cause claimed. Commit locally.
 4. Validate on Group B, sealed before Actuals. No big problem (target error type does not recur, no new systematic bias, intervals not silently widened, one regression spot-check on a previously used non-target company when relevant) → rebuild the live skill with `scripts/build_live_release.py --self-test`, run `scripts/package_self_test.py` and the test suite, commit and push. Released.

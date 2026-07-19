@@ -14,7 +14,8 @@ Improve the forecasting method through historical cases. Git is the only version
 {
   "round_id": "round-3",
   "base_method_commit": "<git sha when the round started>",
-  "group_a": [{"case_id": "MU@2020-01-31", "role": "development"}],
+  "group_a": [{"case_id": "MU@2020-01-31", "role": "development"},
+               {"case_id": "AMD@2020-02-04", "role": "development"}],
   "group_b": [{"case_id": "VRT@2021-06-30", "role": "validation"},
                {"case_id": "NTAP@2019-11-30", "role": "validation"}],
   "status": "training_a | validating_b | swap_training_b | swap_validating_a | pushed | abandoned",
@@ -34,7 +35,7 @@ Improve the forecasting method through historical cases. Git is the only version
 
 ### 1. Pick the groups
 
-Group A = 1–3 training (development) companies with frozen cutoffs; Group B = 2 validation companies, untouched until step 4. Draw candidates from `references/training-curriculum.md` / the user. Prefer B companies that share the mechanism under test but are not the same story as A. Record `round.json` and the base method commit.
+A round is four companies by default: Group A = 2 training (development) companies with frozen cutoffs, Group B = 2 validation companies untouched until step 4. Adjust only with reason (e.g. one very large development case); the validation side stays at 2. Draw candidates from `references/training-curriculum.md` / the user. Prefer B companies that share the mechanism under test but are not the same story as A. Record `round.json` and the base method commit.
 
 ### 2. Run Group A in the sandbox
 

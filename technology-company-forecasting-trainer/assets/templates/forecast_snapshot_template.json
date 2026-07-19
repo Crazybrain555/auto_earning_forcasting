@@ -35,5 +35,19 @@
   "run_mode": "live_forecast",
   "forecast_sealed_before_actuals": false,
   "training_iteration_id": null,
-  "training_case_role": null
+  "training_case_role": null,
+  "valuation_summary": {
+    "current_price": null,
+    "price_currency": "USD",
+    "price_as_of": null,
+    "current_valuation_note": "",
+    "fair_value": {
+      "bear": null,
+      "base": null,
+      "bull": null
+    },
+    "recommended_buy_price": null,
+    "action": "watch",
+    "one_line_thesis": ""
+  }
 }
