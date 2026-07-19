@@ -1,0 +1,29 @@
+{
+  "case_id": "EXAMPLE@2026-07-17",
+  "entity": "Example Corp",
+  "as_of": "2026-07-17T00:00:00Z",
+  "currency": "USD",
+  "fiscal_calendar": "calendar-year",
+  "mechanisms": [
+    {
+      "name": "unit-volume-price-cost",
+      "weight": 1.0,
+      "validation_status": "validated-or-provisional"
+    }
+  ],
+  "company_lenses": [],
+  "horizons": ["FY2027", "FY2028", "FY2029"],
+  "source_ids": [],
+  "assumptions": [],
+  "human_required": [],
+  "forecast": {
+    "one_year": {"point": {}, "interval_80": {}},
+    "two_year": {"scenarios": {}},
+    "three_year": {"distribution": {}, "regime_tail": {}},
+    "long_term": {"normalized": {}}
+  },
+  "validation": {
+    "actuals": {},
+    "notes": "Populate actuals only after the cutoff for backtesting."
+  }
+}

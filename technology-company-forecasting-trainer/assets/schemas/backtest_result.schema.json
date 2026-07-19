@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BacktestResult",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "model_version",
+    "benchmark_id",
+    "generated_at",
+    "metrics",
+    "gate_results",
+    "limitations"
+  ],
+  "properties": {
+    "model_version": {
+      "type": "string"
+    },
+    "benchmark_id": {
+      "type": "string"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "metrics": {
+      "type": "object"
+    },
+    "gate_results": {
+      "type": "object"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

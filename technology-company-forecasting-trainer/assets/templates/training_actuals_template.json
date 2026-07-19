@@ -1,0 +1,23 @@
+{
+  "case_id": "EXAMPLE@2020-01-31",
+  "retrieved_after_seal": false,
+  "retrieved_at": null,
+  "official_source_ids": [],
+  "periods": [
+    {
+      "period": "FY+1",
+      "revenue": null,
+      "profit": null
+    },
+    {
+      "period": "FY+2",
+      "revenue": null,
+      "profit": null
+    },
+    {
+      "period": "FY+3",
+      "revenue": null,
+      "profit": null
+    }
+  ]
+}

@@ -1,0 +1,241 @@
+﻿case_id,company,mechanism,split,evaluation_contract,cutoff,target,horizon,metric,unit,actual,pred,low,high,point_evaluable,confidence,regime,human_required,source_version
+AMD@FY2017,AMD,compute-platforms,calibration,point-and-interval,2018-02-27,FY2018,1,profit,USD bn,0.451,0.42,0.22799999999999998,0.612,True,80%,product-ramp,True,v75
+AMD@FY2017,AMD,compute-platforms,calibration,point-and-interval,2018-02-27,FY2018,1,revenue,USD bn,6.475,6.4,5.888000000000001,6.912000000000001,True,80%,product-ramp,True,v75
+AMD@FY2017,AMD,compute-platforms,calibration,point-and-interval,2018-02-27,FY2019,2,profit,USD bn,0.631,0.6,0.25499999999999995,0.9450000000000001,True,80%,product-ramp,True,v75
+AMD@FY2017,AMD,compute-platforms,calibration,point-and-interval,2018-02-27,FY2019,2,revenue,USD bn,6.731,6.9,5.934,7.866000000000001,True,80%,product-ramp,True,v75
+AMD@FY2017,AMD,compute-platforms,calibration,point-and-interval,2018-02-27,FY2020,3,profit,USD bn,1.369,1.0,0.32799999999999996,1.6720000000000002,True,80%,product-ramp,True,v75
+AMD@FY2017,AMD,compute-platforms,calibration,point-and-interval,2018-02-27,FY2020,3,revenue,USD bn,9.763,8.4,6.5520000000000005,10.248,True,80%,product-ramp,True,v75
+AMD@FY2019,AMD,compute-platforms,holdout,point-and-interval-with-perimeter-tail,2020-02-04,FY2020,1,profit,USD bn,1.369,1.05,0.694,1.4060000000000001,True,80%,platform-ramp-perimeter,True,v75
+AMD@FY2019,AMD,compute-platforms,holdout,point-and-interval-with-perimeter-tail,2020-02-04,FY2020,1,revenue,USD bn,9.763,8.9,8.01,9.790000000000001,True,80%,platform-ramp-perimeter,True,v75
+AMD@FY2019,AMD,compute-platforms,holdout,point-and-interval-with-perimeter-tail,2020-02-04,FY2021,2,profit,USD bn,3.648,3.0,1.864,4.136,True,80%,platform-ramp-perimeter,True,v75
+AMD@FY2019,AMD,compute-platforms,holdout,point-and-interval-with-perimeter-tail,2020-02-04,FY2021,2,revenue,USD bn,16.434,14.2,11.644,16.755999999999997,True,80%,platform-ramp-perimeter,True,v75
+AMD@FY2019,AMD,compute-platforms,holdout,point-and-interval-with-perimeter-tail,2020-02-04,FY2022,3,profit,USD bn,1.264,1.8,-0.6500000000000001,4.25,False,90%,platform-ramp-perimeter,True,v75
+AMD@FY2019,AMD,compute-platforms,holdout,point-and-interval-with-perimeter-tail,2020-02-04,FY2022,3,revenue,USD bn,23.601,17.5,11.549999999999999,23.450000000000003,False,90%,platform-ramp-perimeter,True,v75
+AMD@FY2020,AMD,compute-platform-segments-ma,holdout,point-and-interval,FY2020,FY2021,1,profit,USD bn,3.648,3.4,2.44,4.359999999999999,True,80%,compute-platform-segments-ma,False,v6
+AMD@FY2020,AMD,compute-platform-segments-ma,holdout,point-and-interval,FY2020,FY2021,1,revenue,USD bn,16.434,16.0,14.08,17.92,True,80%,compute-platform-segments-ma,False,v6
+AMD@FY2020,AMD,compute-platform-segments-ma,holdout,point-and-interval,FY2020,FY2022,2,profit,USD bn,1.264,1.4,-1.3599999999999999,4.16,True,80%,compute-platform-segments-ma,False,v6
+AMD@FY2020,AMD,compute-platform-segments-ma,holdout,point-and-interval,FY2020,FY2022,2,revenue,USD bn,23.601,23.0,17.25,28.75,True,80%,compute-platform-segments-ma,False,v6
+AMD@FY2020,AMD,compute-platform-segments-ma,holdout,point-and-interval,FY2020,FY2023,3,profit,USD bn,0.401,0.6,-3.36,4.56,True,80%,compute-platform-segments-ma,False,v6
+AMD@FY2020,AMD,compute-platform-segments-ma,holdout,point-and-interval,FY2020,FY2023,3,revenue,USD bn,22.68,22.0,14.3,29.700000000000003,True,80%,compute-platform-segments-ma,False,v6
+AMD@FY2021,AMD,compute-platforms,holdout,point-and-interval-with-public-acquisition,2022-02-03,FY2022,1,profit,USD bn,1.264,1.8,0.88,2.72,True,80%,acquisition-accounting-normalization,True,v75
+AMD@FY2021,AMD,compute-platforms,holdout,point-and-interval-with-public-acquisition,2022-02-03,FY2022,1,revenue,USD bn,23.601,23.0,21.16,24.840000000000003,True,80%,acquisition-accounting-normalization,True,v75
+AMD@FY2021,AMD,compute-platforms,holdout,point-and-interval-with-public-acquisition,2022-02-03,FY2023,2,profit,USD bn,0.401,0.6,-0.9400000000000001,2.14,True,80%,acquisition-accounting-normalization,True,v75
+AMD@FY2021,AMD,compute-platforms,holdout,point-and-interval-with-public-acquisition,2022-02-03,FY2023,2,revenue,USD bn,22.68,22.0,19.14,24.86,True,80%,acquisition-accounting-normalization,True,v75
+AMD@FY2021,AMD,compute-platforms,holdout,point-and-interval-with-public-acquisition,2022-02-03,FY2024,3,profit,USD bn,1.9,1.6,-0.8999999999999999,4.1,True,80%,acquisition-accounting-normalization,True,v75
+AMD@FY2021,AMD,compute-platforms,holdout,point-and-interval-with-public-acquisition,2022-02-03,FY2024,3,revenue,USD bn,25.785,25.0,20.5,29.5,True,80%,acquisition-accounting-normalization,True,v75
+AWS@FY2016,Amazon AWS,platform-usage-adoption,calibration,point-and-interval,FY2016,FY2017,1,profit,USD bn,4.331,4.3,3.8699999999999997,4.7299999999999995,True,80%,cloud-platform,False,v71
+AWS@FY2016,Amazon AWS,platform-usage-adoption,calibration,point-and-interval,FY2016,FY2017,1,revenue,USD bn,17.459,17.2,15.824,18.576,True,80%,cloud-platform,False,v71
+AWS@FY2016,Amazon AWS,platform-usage-adoption,calibration,point-and-interval,FY2016,FY2018,2,profit,USD bn,7.296,6.916,5.928000000000001,7.904,True,80%,cloud-platform,False,v71
+AWS@FY2016,Amazon AWS,platform-usage-adoption,calibration,point-and-interval,FY2016,FY2018,2,revenue,USD bn,25.655,24.7,21.736,27.664,True,80%,cloud-platform,False,v71
+AWS@FY2016,Amazon AWS,platform-usage-adoption,calibration,point-and-interval,FY2016,FY2019,3,profit,USD bn,9.201,9.063,7.182,10.944,True,80%,cloud-platform,False,v71
+AWS@FY2016,Amazon AWS,platform-usage-adoption,calibration,point-and-interval,FY2016,FY2019,3,revenue,USD bn,35.026,34.2,28.044000000000004,40.356,True,80%,cloud-platform,False,v71
+AWS@FY2018,Amazon AWS,platform-usage-adoption,calibration,point-and-interval,FY2018,FY2019,1,profit,USD bn,9.201,9.328,8.447999999999999,10.208,True,80%,cloud-platform,False,v71
+AWS@FY2018,Amazon AWS,platform-usage-adoption,calibration,point-and-interval,FY2018,FY2019,1,revenue,USD bn,35.026,35.2,32.38400000000001,38.016000000000005,True,80%,cloud-platform,False,v71
+AWS@FY2018,Amazon AWS,platform-usage-adoption,calibration,point-and-interval,FY2018,FY2020,2,profit,USD bn,13.531,13.4225,11.6025,15.2425,True,80%,cloud-platform,False,v71
+AWS@FY2018,Amazon AWS,platform-usage-adoption,calibration,point-and-interval,FY2018,FY2020,2,revenue,USD bn,45.37,45.5,40.04,50.96000000000001,True,80%,cloud-platform,False,v71
+AWS@FY2018,Amazon AWS,platform-usage-adoption,calibration,point-and-interval,FY2018,FY2021,3,profit,USD bn,18.532,17.995,14.64,21.35,True,80%,cloud-platform,False,v71
+AWS@FY2018,Amazon AWS,platform-usage-adoption,calibration,point-and-interval,FY2018,FY2021,3,revenue,USD bn,62.202,61.0,50.02,71.97999999999999,True,80%,cloud-platform,False,v71
+AWS@FY2020,Amazon AWS,platform-usage-adoption,holdout,point-and-interval,FY2020,FY2021,1,profit,USD bn,18.532,18.1425,16.912499999999998,19.3725,True,80%,cloud-platform,True,v71
+AWS@FY2020,Amazon AWS,platform-usage-adoption,holdout,point-and-interval,FY2020,FY2021,1,revenue,USD bn,62.202,61.5,56.580000000000005,66.42,True,80%,cloud-platform,True,v71
+AWS@FY2020,Amazon AWS,platform-usage-adoption,holdout,point-and-interval,FY2020,FY2022,2,profit,USD bn,22.841,22.515,20.145,24.885,True,80%,cloud-platform,True,v71
+AWS@FY2020,Amazon AWS,platform-usage-adoption,holdout,point-and-interval,FY2020,FY2022,2,revenue,USD bn,80.096,79.0,69.52,88.48,True,80%,cloud-platform,True,v71
+AWS@FY2020,Amazon AWS,platform-usage-adoption,holdout,point-and-interval,FY2020,FY2023,3,profit,USD bn,24.631,24.57,20.93,28.21,True,80%,cloud-platform,True,v71
+AWS@FY2020,Amazon AWS,platform-usage-adoption,holdout,point-and-interval,FY2020,FY2023,3,revenue,USD bn,90.757,91.0,74.62,107.38,True,80%,cloud-platform,True,v71
+AWS@FY2022,Amazon AWS,platform-usage-adoption,holdout,point-and-interval-with-regime-tail,FY2022,FY2023,1,profit,USD bn,24.631,24.57,21.84,27.3,True,80%,cloud-platform,True,v71
+AWS@FY2022,Amazon AWS,platform-usage-adoption,holdout,point-and-interval-with-regime-tail,FY2022,FY2023,1,revenue,USD bn,90.757,91.0,83.72,98.28,True,80%,cloud-platform,True,v71
+AWS@FY2022,Amazon AWS,platform-usage-adoption,holdout,point-and-interval-with-regime-tail,FY2022,FY2024,2,profit,USD bn,39.834,33.28,26.0,40.56,True,90%,cloud-platform,True,v71
+AWS@FY2022,Amazon AWS,platform-usage-adoption,holdout,point-and-interval-with-regime-tail,FY2022,FY2024,2,revenue,USD bn,107.556,104.0,85.28,122.72,True,90%,cloud-platform,True,v71
+AWS@FY2022,Amazon AWS,platform-usage-adoption,holdout,point-and-interval-with-regime-tail,FY2022,FY2025,3,profit,USD bn,45.606,40.46,30.94,49.980000000000004,True,90%,cloud-platform,True,v71
+AWS@FY2022,Amazon AWS,platform-usage-adoption,holdout,point-and-interval-with-regime-tail,FY2022,FY2025,3,revenue,USD bn,128.725,119.0,83.3,154.70000000000002,True,90%,cloud-platform,True,v71
+AMKR@FY2020,Amkor Technology,osat-advanced-packaging-utilization,holdout,point-and-interval,FY2020,FY2021,1,profit,USD bn,0.763433,0.72,0.48,0.96,True,80%,osat-advanced-packaging-utilization,False,v6
+AMKR@FY2020,Amkor Technology,osat-advanced-packaging-utilization,holdout,point-and-interval,FY2020,FY2021,1,revenue,USD bn,6.138329,6.0,5.4,6.6000000000000005,True,80%,osat-advanced-packaging-utilization,False,v6
+AMKR@FY2020,Amkor Technology,osat-advanced-packaging-utilization,holdout,point-and-interval,FY2020,FY2022,2,profit,USD bn,0.897186,0.88,0.31999999999999995,1.44,True,80%,osat-advanced-packaging-utilization,False,v6
+AMKR@FY2020,Amkor Technology,osat-advanced-packaging-utilization,holdout,point-and-interval,FY2020,FY2022,2,revenue,USD bn,7.091585,7.0,5.6000000000000005,8.4,True,80%,osat-advanced-packaging-utilization,False,v6
+AMKR@FY2020,Amkor Technology,osat-advanced-packaging-utilization,holdout,point-and-interval,FY2020,FY2023,3,profit,USD bn,0.470287,0.55,-0.24199999999999988,1.342,True,80%,osat-advanced-packaging-utilization,False,v6
+AMKR@FY2020,Amkor Technology,osat-advanced-packaging-utilization,holdout,point-and-interval,FY2020,FY2023,3,revenue,USD bn,6.503065,6.6,4.752,8.448,True,80%,osat-advanced-packaging-utilization,False,v6
+AMAT@FY2019,Applied Materials,diversified-wafer-fab-equipment,calibration,point-and-interval,FY2019,FY2020,1,profit,USD bn,4.365,4.25,3.57,4.93,True,80%,diversified-wafer-fab-equipment,False,v6
+AMAT@FY2019,Applied Materials,diversified-wafer-fab-equipment,calibration,point-and-interval,FY2019,FY2020,1,revenue,USD bn,17.202,17.0,15.3,18.700000000000003,True,80%,diversified-wafer-fab-equipment,False,v6
+AMAT@FY2019,Applied Materials,diversified-wafer-fab-equipment,calibration,point-and-interval,FY2019,FY2021,2,profit,USD bn,6.889,6.2,4.695,7.705,True,80%,diversified-wafer-fab-equipment,False,v6
+AMAT@FY2019,Applied Materials,diversified-wafer-fab-equipment,calibration,point-and-interval,FY2019,FY2021,2,revenue,USD bn,23.063,21.5,17.630000000000003,25.369999999999997,True,80%,diversified-wafer-fab-equipment,False,v6
+AMAT@FY2019,Applied Materials,diversified-wafer-fab-equipment,calibration,point-and-interval,FY2019,FY2022,3,profit,USD bn,7.788,7.1,4.6499999999999995,9.55,True,80%,diversified-wafer-fab-equipment,False,v6
+AMAT@FY2019,Applied Materials,diversified-wafer-fab-equipment,calibration,point-and-interval,FY2019,FY2022,3,revenue,USD bn,25.785,24.5,18.375,30.625,True,80%,diversified-wafer-fab-equipment,False,v6
+ANET@FY2020,Arista Networks,networking-customer-concentration,holdout,point-and-interval,FY2020,FY2021,1,profit,USD bn,0.840854,0.82,0.704,0.9359999999999999,True,80%,networking-customer-concentration,False,v6
+ANET@FY2020,Arista Networks,networking-customer-concentration,holdout,point-and-interval,FY2020,FY2021,1,revenue,USD bn,2.948037,2.9,2.552,3.248,True,80%,networking-customer-concentration,False,v6
+ANET@FY2020,Arista Networks,networking-customer-concentration,holdout,point-and-interval,FY2020,FY2022,2,profit,USD bn,1.352446,1.25,0.922,1.5779999999999998,True,80%,networking-customer-concentration,False,v6
+ANET@FY2020,Arista Networks,networking-customer-concentration,holdout,point-and-interval,FY2020,FY2022,2,revenue,USD bn,4.38131,4.1,3.198,5.002,True,80%,networking-customer-concentration,False,v6
+ANET@FY2020,Arista Networks,networking-customer-concentration,holdout,point-and-interval,FY2020,FY2023,3,profit,USD bn,2.087321,1.8,1.1640000000000001,2.436,True,80%,networking-customer-concentration,False,v6
+ANET@FY2020,Arista Networks,networking-customer-concentration,holdout,point-and-interval,FY2020,FY2023,3,revenue,USD bn,5.860168,5.3,3.7099999999999995,6.89,True,80%,networking-customer-concentration,False,v6
+AVGO@FY2019,Broadcom,hybrid-semiconductor-software-ma,calibration,point-and-interval,FY2019,FY2020,1,profit,USD bn,2.663,2.8,1.3599999999999999,4.24,True,80%,hybrid-semiconductor-software-ma,False,v6
+AVGO@FY2019,Broadcom,hybrid-semiconductor-software-ma,calibration,point-and-interval,FY2019,FY2020,1,revenue,USD bn,23.888,24.0,21.12,26.880000000000003,True,80%,hybrid-semiconductor-software-ma,False,v6
+AVGO@FY2019,Broadcom,hybrid-semiconductor-software-ma,calibration,point-and-interval,FY2019,FY2021,2,profit,USD bn,6.437,5.8,2.56,9.04,True,80%,hybrid-semiconductor-software-ma,False,v6
+AVGO@FY2019,Broadcom,hybrid-semiconductor-software-ma,calibration,point-and-interval,FY2019,FY2021,2,revenue,USD bn,27.45,27.0,20.25,33.75,True,80%,hybrid-semiconductor-software-ma,False,v6
+AVGO@FY2019,Broadcom,hybrid-semiconductor-software-ma,calibration,point-and-interval,FY2019,FY2022,3,profit,USD bn,11.223,9.5,3.92,15.08,True,80%,hybrid-semiconductor-software-ma,False,v6
+AVGO@FY2019,Broadcom,hybrid-semiconductor-software-ma,calibration,point-and-interval,FY2019,FY2022,3,revenue,USD bn,33.203,31.0,20.150000000000002,41.85,True,80%,hybrid-semiconductor-software-ma,False,v6
+ENTG@FY2021,Entegris,semiconductor-materials-content-ma,holdout,point-and-interval,FY2021,FY2022,1,profit,USD bn,0.479981,0.48,0.28200000000000003,0.6779999999999999,True,80%,semiconductor-materials-content-ma,False,v6
+ENTG@FY2021,Entegris,semiconductor-materials-content-ma,holdout,point-and-interval,FY2021,FY2022,1,revenue,USD bn,3.282033,3.3,2.904,3.696,True,80%,semiconductor-materials-content-ma,False,v6
+ENTG@FY2021,Entegris,semiconductor-materials-content-ma,holdout,point-and-interval,FY2021,FY2023,2,profit,USD bn,0.499158,0.5,0.068,0.9319999999999999,True,80%,semiconductor-materials-content-ma,False,v6
+ENTG@FY2021,Entegris,semiconductor-materials-content-ma,holdout,point-and-interval,FY2021,FY2023,2,revenue,USD bn,3.523926,3.6,2.7,4.5,True,80%,semiconductor-materials-content-ma,False,v6
+ENTG@FY2021,Entegris,semiconductor-materials-content-ma,holdout,point-and-interval,FY2021,FY2024,3,profit,USD bn,0.533922,0.52,-0.07399999999999995,1.1139999999999999,True,80%,semiconductor-materials-content-ma,False,v6
+ENTG@FY2021,Entegris,semiconductor-materials-content-ma,holdout,point-and-interval,FY2021,FY2024,3,revenue,USD bn,3.241208,3.3,2.145,4.455,True,80%,semiconductor-materials-content-ma,False,v6
+COHR@FY2021,II-VI / Coherent,optics-materials-ma-integration,calibration,point-and-interval,FY2021,FY2022,1,profit,USD bn,0.234759,0.22,0.02200000000000002,0.418,True,80%,optics-materials-ma-integration,False,v6
+COHR@FY2021,II-VI / Coherent,optics-materials-ma-integration,calibration,point-and-interval,FY2021,FY2022,1,revenue,USD bn,3.316616,3.3,2.904,3.696,True,80%,optics-materials-ma-integration,False,v6
+COHR@FY2021,II-VI / Coherent,optics-materials-ma-integration,calibration,point-and-interval,FY2021,FY2023,2,profit,USD bn,-0.259458,-0.2,-0.8,0.39999999999999997,True,80%,optics-materials-ma-integration,False,v6
+COHR@FY2021,II-VI / Coherent,optics-materials-ma-integration,calibration,point-and-interval,FY2021,FY2023,2,revenue,USD bn,5.1601,5.0,3.75,6.25,True,80%,optics-materials-ma-integration,False,v6
+COHR@FY2021,II-VI / Coherent,optics-materials-ma-integration,calibration,point-and-interval,FY2021,FY2024,3,profit,USD bn,-0.156154,-0.1,-0.964,0.764,True,80%,optics-materials-ma-integration,False,v6
+COHR@FY2021,II-VI / Coherent,optics-materials-ma-integration,calibration,point-and-interval,FY2021,FY2024,3,revenue,USD bn,4.707688,4.8,3.12,6.48,True,80%,optics-materials-ma-integration,False,v6
+INTC@FY2017,Intel,integrated-device-manufacturing,calibration,point-and-interval,2018-01-25,FY2018,1,profit,USD bn,23.316,22.5,20.415,24.585,True,80%,data-centric-expansion,True,v75
+INTC@FY2017,Intel,integrated-device-manufacturing,calibration,point-and-interval,2018-01-25,FY2018,1,revenue,USD bn,70.848,69.5,64.63499999999999,74.36500000000001,True,80%,data-centric-expansion,True,v75
+INTC@FY2017,Intel,integrated-device-manufacturing,calibration,point-and-interval,2018-01-25,FY2019,2,profit,USD bn,22.035,22.2,18.599999999999998,25.8,True,80%,data-centric-expansion,True,v75
+INTC@FY2017,Intel,integrated-device-manufacturing,calibration,point-and-interval,2018-01-25,FY2019,2,revenue,USD bn,71.965,72.0,63.36,80.64000000000001,True,80%,data-centric-expansion,True,v75
+INTC@FY2017,Intel,integrated-device-manufacturing,calibration,point-and-interval,2018-01-25,FY2020,3,profit,USD bn,23.678,22.8,17.48,28.12,True,80%,data-centric-expansion,True,v75
+INTC@FY2017,Intel,integrated-device-manufacturing,calibration,point-and-interval,2018-01-25,FY2020,3,revenue,USD bn,77.867,76.0,62.32000000000001,89.67999999999999,True,80%,data-centric-expansion,True,v75
+INTC@FY2019,Intel,integrated-device-manufacturing,holdout,point-and-interval-with-process-tail,2020-01-23,FY2020,1,profit,USD bn,23.678,23.0,20.705,25.295,True,80%,process-cadence-tail,True,v75
+INTC@FY2019,Intel,integrated-device-manufacturing,holdout,point-and-interval-with-process-tail,2020-01-23,FY2020,1,revenue,USD bn,77.867,76.5,71.145,81.855,True,80%,process-cadence-tail,True,v75
+INTC@FY2019,Intel,integrated-device-manufacturing,holdout,point-and-interval-with-process-tail,2020-01-23,FY2021,2,profit,USD bn,19.456,20.0,16.1,23.9,True,80%,process-cadence-tail,True,v75
+INTC@FY2019,Intel,integrated-device-manufacturing,holdout,point-and-interval-with-process-tail,2020-01-23,FY2021,2,revenue,USD bn,79.024,78.0,68.64,87.36000000000001,True,80%,process-cadence-tail,True,v75
+INTC@FY2019,Intel,integrated-device-manufacturing,holdout,point-and-interval-with-process-tail,2020-01-23,FY2022,3,profit,USD bn,2.334,7.0,-0.4800000000000004,14.48,False,90%,process-cadence-tail,True,v75
+INTC@FY2019,Intel,integrated-device-manufacturing,holdout,point-and-interval-with-process-tail,2020-01-23,FY2022,3,revenue,USD bn,63.054,68.0,51.68,84.32,False,90%,process-cadence-tail,True,v75
+INTC@FY2021,Intel,integrated-device-manufacturing,holdout,point-and-interval-with-idm-transition-tail,2022-01-27,FY2022,1,profit,USD bn,2.334,4.0,0.6999999999999997,7.300000000000001,True,80%,idm-transition-and-impairment-tail,True,v75
+INTC@FY2021,Intel,integrated-device-manufacturing,holdout,point-and-interval-with-idm-transition-tail,2022-01-27,FY2022,1,revenue,USD bn,63.054,66.0,60.06,71.94000000000001,True,80%,idm-transition-and-impairment-tail,True,v75
+INTC@FY2021,Intel,integrated-device-manufacturing,holdout,point-and-interval-with-idm-transition-tail,2022-01-27,FY2023,2,profit,USD bn,0.093,1.0,-3.4800000000000004,5.48,True,80%,idm-transition-and-impairment-tail,True,v75
+INTC@FY2021,Intel,integrated-device-manufacturing,holdout,point-and-interval-with-idm-transition-tail,2022-01-27,FY2023,2,revenue,USD bn,54.228,56.0,47.6,64.39999999999999,True,80%,idm-transition-and-impairment-tail,True,v75
+INTC@FY2021,Intel,integrated-device-manufacturing,holdout,point-and-interval-with-idm-transition-tail,2022-01-27,FY2024,3,profit,USD bn,-11.678,-4.0,-13.719999999999999,5.719999999999999,False,90%,idm-transition-and-impairment-tail,True,v75
+INTC@FY2021,Intel,integrated-device-manufacturing,holdout,point-and-interval-with-idm-transition-tail,2022-01-27,FY2024,3,revenue,USD bn,53.101,54.0,37.8,70.2,False,90%,idm-transition-and-impairment-tail,True,v75
+KLA@FY2019,KLA,process-control-content-intensity,calibration,point-and-interval,FY2019,FY2020,1,profit,USD bn,1.216785,1.25,1.022,1.478,True,80%,process-control-content-intensity,False,v6
+KLA@FY2019,KLA,process-control-content-intensity,calibration,point-and-interval,FY2019,FY2020,1,revenue,USD bn,5.806424,5.7,5.13,6.2700000000000005,True,80%,process-control-content-intensity,False,v6
+KLA@FY2019,KLA,process-control-content-intensity,calibration,point-and-interval,FY2019,FY2021,2,profit,USD bn,2.078292,1.9,1.4309999999999998,2.3689999999999998,True,80%,process-control-content-intensity,False,v6
+KLA@FY2019,KLA,process-control-content-intensity,calibration,point-and-interval,FY2019,FY2021,2,revenue,USD bn,6.918734,6.7,5.494000000000001,7.906,True,80%,process-control-content-intensity,False,v6
+KLA@FY2019,KLA,process-control-content-intensity,calibration,point-and-interval,FY2019,FY2022,3,profit,USD bn,3.321807,2.8,1.9599999999999997,3.6399999999999997,True,80%,process-control-content-intensity,False,v6
+KLA@FY2019,KLA,process-control-content-intensity,calibration,point-and-interval,FY2019,FY2022,3,revenue,USD bn,9.211883,8.4,6.300000000000001,10.5,True,80%,process-control-content-intensity,False,v6
+KLA@FY2020,KLA,process-control,calibration,point-and-interval,FY2020,FY2021,1,profit,USD bn,2.078292,1.9,1.6989999999999998,2.101,True,80%,process-control,False,v62
+KLA@FY2020,KLA,process-control,calibration,point-and-interval,FY2020,FY2021,1,revenue,USD bn,6.918734,6.7,6.164000000000001,7.236000000000001,True,80%,process-control,False,v62
+KLA@FY2020,KLA,process-control,calibration,point-and-interval,FY2020,FY2022,2,profit,USD bn,3.321807,2.9,2.4749999999999996,3.325,True,80%,process-control,False,v62
+KLA@FY2020,KLA,process-control,calibration,point-and-interval,FY2020,FY2022,2,revenue,USD bn,9.211883,8.5,7.31,9.690000000000001,True,80%,process-control,False,v62
+KLA@FY2020,KLA,process-control,calibration,point-and-interval,FY2020,FY2023,3,profit,USD bn,3.387277,3.1,2.365,3.835,True,80%,process-control,False,v62
+KLA@FY2020,KLA,process-control,calibration,point-and-interval,FY2020,FY2023,3,revenue,USD bn,10.496056,9.8,7.840000000000001,11.76,True,80%,process-control,False,v62
+KLA@FY2021,KLA,process-control,holdout,point-and-interval,FY2021,FY2022,1,profit,USD bn,3.321807,3.0,2.7359999999999998,3.2640000000000002,True,80%,process-control,False,v62
+KLA@FY2021,KLA,process-control,holdout,point-and-interval,FY2021,FY2022,1,revenue,USD bn,9.211883,8.8,8.096000000000002,9.504000000000001,True,80%,process-control,False,v62
+KLA@FY2021,KLA,process-control,holdout,point-and-interval,FY2021,FY2023,2,profit,USD bn,3.387277,3.2,2.7,3.7,True,80%,process-control,False,v62
+KLA@FY2021,KLA,process-control,holdout,point-and-interval,FY2021,FY2023,2,revenue,USD bn,10.496056,10.0,8.6,11.400000000000002,True,80%,process-control,False,v62
+KLA@FY2021,KLA,process-control,holdout,point-and-interval,FY2021,FY2024,3,profit,USD bn,2.761896,2.65,1.9375,3.3625,True,80%,process-control,False,v62
+KLA@FY2021,KLA,process-control,holdout,point-and-interval,FY2021,FY2024,3,revenue,USD bn,9.812247,9.5,7.6000000000000005,11.4,True,80%,process-control,False,v62
+KLA@FY2022,KLA,process-control,holdout,point-and-interval,FY2022,FY2023,1,profit,USD bn,3.387277,3.2,2.894,3.5060000000000002,True,80%,process-control,False,v62
+KLA@FY2022,KLA,process-control,holdout,point-and-interval,FY2022,FY2023,1,revenue,USD bn,10.496056,10.2,9.384,11.016,True,80%,process-control,False,v62
+KLA@FY2022,KLA,process-control,holdout,point-and-interval,FY2022,FY2024,2,profit,USD bn,2.761896,2.65,2.175,3.125,True,80%,process-control,False,v62
+KLA@FY2022,KLA,process-control,holdout,point-and-interval,FY2022,FY2024,2,revenue,USD bn,9.812247,9.5,8.17,10.830000000000002,True,80%,process-control,False,v62
+KLA@FY2022,KLA,process-control,holdout,point-and-interval,FY2022,FY2025,3,profit,USD bn,4.061643,3.75,2.8875,4.6125,True,80%,process-control,False,v62
+KLA@FY2022,KLA,process-control,holdout,point-and-interval,FY2022,FY2025,3,revenue,USD bn,12.156162,11.5,9.200000000000001,13.799999999999999,True,80%,process-control,False,v62
+LRCX@FY2020,Lam Research,wafer-fab-equipment,calibration,point-and-interval,FY2020,FY2021,1,profit,USD bn,4.482023,4.05,3.5669999999999997,4.5329999999999995,True,80%,wafer-fab-equipment,False,v62
+LRCX@FY2020,Lam Research,wafer-fab-equipment,calibration,point-and-interval,FY2020,FY2021,1,revenue,USD bn,14.62615,13.8,12.696000000000002,14.904000000000002,True,80%,wafer-fab-equipment,False,v62
+LRCX@FY2020,Lam Research,wafer-fab-equipment,calibration,point-and-interval,FY2020,FY2022,2,profit,USD bn,5.381822,4.8,3.84,5.76,True,80%,wafer-fab-equipment,False,v62
+LRCX@FY2020,Lam Research,wafer-fab-equipment,calibration,point-and-interval,FY2020,FY2022,2,revenue,USD bn,17.227039,16.0,13.6,18.4,True,80%,wafer-fab-equipment,False,v62
+LRCX@FY2020,Lam Research,wafer-fab-equipment,calibration,point-and-interval,FY2020,FY2023,3,profit,USD bn,5.17486,5.0,3.5549999999999997,6.445,True,80%,wafer-fab-equipment,False,v62
+LRCX@FY2020,Lam Research,wafer-fab-equipment,calibration,point-and-interval,FY2020,FY2023,3,revenue,USD bn,17.428516,17.0,13.26,20.74,True,80%,wafer-fab-equipment,False,v62
+LRCX@FY2021,Lam Research,wafer-fab-equipment,holdout,point-and-interval,FY2021,FY2022,1,profit,USD bn,5.381822,5.2,4.6085,5.7915,True,80%,wafer-fab-equipment,False,v62
+LRCX@FY2021,Lam Research,wafer-fab-equipment,holdout,point-and-interval,FY2021,FY2022,1,revenue,USD bn,17.227039,16.9,15.548,18.252,True,80%,wafer-fab-equipment,False,v62
+LRCX@FY2021,Lam Research,wafer-fab-equipment,holdout,point-and-interval,FY2021,FY2023,2,profit,USD bn,5.17486,5.05,4.012,6.088,True,80%,wafer-fab-equipment,False,v62
+LRCX@FY2021,Lam Research,wafer-fab-equipment,holdout,point-and-interval,FY2021,FY2023,2,revenue,USD bn,17.428516,17.3,14.705,19.895,True,80%,wafer-fab-equipment,False,v62
+LRCX@FY2021,Lam Research,wafer-fab-equipment,holdout,point-and-interval,FY2021,FY2024,3,profit,USD bn,4.263913,4.4,3.0825000000000005,5.7175,True,80%,wafer-fab-equipment,False,v62
+LRCX@FY2021,Lam Research,wafer-fab-equipment,holdout,point-and-interval,FY2021,FY2024,3,revenue,USD bn,14.905386,15.5,12.09,18.91,True,80%,wafer-fab-equipment,False,v62
+LRCX@FY2022,Lam Research,wafer-fab-equipment,holdout,point-and-interval,FY2022,FY2023,1,profit,USD bn,5.17486,5.0,4.405,5.595,True,80%,wafer-fab-equipment,False,v62
+LRCX@FY2022,Lam Research,wafer-fab-equipment,holdout,point-and-interval,FY2022,FY2023,1,revenue,USD bn,17.428516,17.0,15.64,18.36,True,80%,wafer-fab-equipment,False,v62
+LRCX@FY2022,Lam Research,wafer-fab-equipment,holdout,point-and-interval,FY2022,FY2024,2,profit,USD bn,4.263913,4.5,3.552,5.448,True,80%,wafer-fab-equipment,False,v62
+LRCX@FY2022,Lam Research,wafer-fab-equipment,holdout,point-and-interval,FY2022,FY2024,2,revenue,USD bn,14.905386,15.8,13.43,18.169999999999998,True,80%,wafer-fab-equipment,False,v62
+LRCX@FY2022,Lam Research,wafer-fab-equipment,holdout,point-and-interval,FY2022,FY2025,3,profit,USD bn,5.900968,5.4,3.9125000000000005,6.8875,True,80%,wafer-fab-equipment,False,v62
+LRCX@FY2022,Lam Research,wafer-fab-equipment,holdout,point-and-interval,FY2022,FY2025,3,revenue,USD bn,18.435591,17.5,13.65,21.349999999999998,True,80%,wafer-fab-equipment,False,v62
+MRVL@FY2020,Marvell Technology,optical-interconnect-custom-silicon,perimeter-break,distribution-only,FY2020,FY2021,1,profit,USD bn,-0.258389,-0.2,-0.6,0.15,False,90%,networking-optics,True,v63
+MRVL@FY2020,Marvell Technology,optical-interconnect-custom-silicon,perimeter-break,distribution-only,FY2020,FY2021,1,revenue,USD bn,2.9689,2.9,2.4,3.5,False,90%,networking-optics,True,v63
+MRVL@FY2020,Marvell Technology,optical-interconnect-custom-silicon,perimeter-break,distribution-only,FY2020,FY2022,2,profit,USD bn,-0.347668,-0.2,-1.1,0.2,False,90%,networking-optics,True,v63
+MRVL@FY2020,Marvell Technology,optical-interconnect-custom-silicon,perimeter-break,distribution-only,FY2020,FY2022,2,revenue,USD bn,4.462383,3.3,2.5,4.8,False,90%,networking-optics,True,v63
+MRVL@FY2020,Marvell Technology,optical-interconnect-custom-silicon,perimeter-break,distribution-only,FY2020,FY2023,3,profit,USD bn,0.238,-0.1,-1.2,0.7,False,90%,networking-optics,True,v63
+MRVL@FY2020,Marvell Technology,optical-interconnect-custom-silicon,perimeter-break,distribution-only,FY2020,FY2023,3,revenue,USD bn,5.9196,3.9,2.8,6.5,False,90%,networking-optics,True,v63
+MRVL@FY2021,Marvell Technology,optical-interconnect-custom-silicon,calibration,point-and-interval,FY2021,FY2022,1,profit,USD bn,-0.347668,-0.4,-0.661,-0.13900000000000007,True,80%,networking-optics,False,v63
+MRVL@FY2021,Marvell Technology,optical-interconnect-custom-silicon,calibration,point-and-interval,FY2021,FY2022,1,revenue,USD bn,4.462383,4.35,3.9149999999999996,4.785,True,80%,networking-optics,False,v63
+MRVL@FY2021,Marvell Technology,optical-interconnect-custom-silicon,calibration,point-and-interval,FY2021,FY2023,2,profit,USD bn,0.238,0.15,-0.3494999999999999,0.6495,True,80%,networking-optics,False,v63
+MRVL@FY2021,Marvell Technology,optical-interconnect-custom-silicon,calibration,point-and-interval,FY2021,FY2023,2,revenue,USD bn,5.9196,5.55,4.662,6.438,True,80%,networking-optics,False,v63
+MRVL@FY2021,Marvell Technology,optical-interconnect-custom-silicon,calibration,point-and-interval,FY2021,FY2024,3,profit,USD bn,-0.5677,-0.45,-1.104,0.20400000000000001,True,80%,networking-optics,False,v63
+MRVL@FY2021,Marvell Technology,optical-interconnect-custom-silicon,calibration,point-and-interval,FY2021,FY2024,3,revenue,USD bn,5.5077,5.45,4.251,6.649,True,80%,networking-optics,False,v63
+MRVL@FY2022,Marvell Technology,optical-interconnect-custom-silicon,holdout,point-and-interval,FY2022,FY2023,1,profit,USD bn,0.238,0.15,-0.13999999999999999,0.43999999999999995,True,80%,networking-optics,False,v63
+MRVL@FY2022,Marvell Technology,optical-interconnect-custom-silicon,holdout,point-and-interval,FY2022,FY2023,1,revenue,USD bn,5.9196,5.8,5.336,6.264,True,80%,networking-optics,False,v63
+MRVL@FY2022,Marvell Technology,optical-interconnect-custom-silicon,holdout,point-and-interval,FY2022,FY2024,2,profit,USD bn,-0.5677,-0.5,-0.9359999999999999,-0.064,True,80%,networking-optics,False,v63
+MRVL@FY2022,Marvell Technology,optical-interconnect-custom-silicon,holdout,point-and-interval,FY2022,FY2024,2,revenue,USD bn,5.5077,5.45,4.687,6.213000000000001,True,80%,networking-optics,False,v63
+MRVL@FY2022,Marvell Technology,optical-interconnect-custom-silicon,holdout,point-and-interval,FY2022,FY2025,3,profit,USD bn,-0.7203,-0.6,-1.18,-0.020000000000000018,True,80%,networking-optics,False,v63
+MRVL@FY2022,Marvell Technology,optical-interconnect-custom-silicon,holdout,point-and-interval,FY2022,FY2025,3,revenue,USD bn,5.7673,5.8,4.64,6.96,True,80%,networking-optics,False,v63
+MRVL@FY2023,Marvell Technology,optical-interconnect-custom-silicon,holdout,point-and-interval-with-regime-tail,FY2023,FY2024,1,profit,USD bn,-0.5677,-0.5,-0.9359999999999999,-0.064,True,80%,networking-optics,False,v63
+MRVL@FY2023,Marvell Technology,optical-interconnect-custom-silicon,holdout,point-and-interval-with-regime-tail,FY2023,FY2024,1,revenue,USD bn,5.5077,5.45,4.905,5.995000000000001,True,80%,networking-optics,False,v63
+MRVL@FY2023,Marvell Technology,optical-interconnect-custom-silicon,holdout,point-and-interval-with-regime-tail,FY2023,FY2025,2,profit,USD bn,-0.7203,-0.5,-1.326,0.3260000000000002,True,80%,networking-optics,False,v63
+MRVL@FY2023,Marvell Technology,optical-interconnect-custom-silicon,holdout,point-and-interval-with-regime-tail,FY2023,FY2025,2,revenue,USD bn,5.7673,5.9,4.720000000000001,7.08,True,80%,networking-optics,False,v63
+MRVL@FY2023,Marvell Technology,optical-interconnect-custom-silicon,holdout,point-and-interval-with-regime-tail,FY2023,FY2026,3,profit,USD bn,1.3229,0.9,-0.6,2.4,True,90%,networking-optics,False,v63
+MRVL@FY2023,Marvell Technology,optical-interconnect-custom-silicon,holdout,point-and-interval-with-regime-tail,FY2023,FY2026,3,revenue,USD bn,8.1946,7.5,5.25,9.75,True,90%,networking-optics,False,v63
+MU@FY2018,Micron,memory-cycle,calibration,point-and-interval,2018-10-15,FY2019,1,profit,USD bn,6.313,7.2,5.2,9.2,True,80%,memory-cycle,False,v74-enhanced
+MU@FY2018,Micron,memory-cycle,calibration,point-and-interval,2018-10-15,FY2019,1,revenue,USD bn,23.406,25.0,22.5,27.500000000000004,True,80%,memory-cycle,False,v74-enhanced
+MU@FY2018,Micron,memory-cycle,calibration,point-and-interval,2018-10-15,FY2020,2,profit,USD bn,2.687,3.5,0.34999999999999964,6.65,True,80%,memory-cycle,False,v74-enhanced
+MU@FY2018,Micron,memory-cycle,calibration,point-and-interval,2018-10-15,FY2020,2,revenue,USD bn,21.435,22.5,18.9,26.099999999999998,True,80%,memory-cycle,False,v74-enhanced
+MU@FY2018,Micron,memory-cycle,calibration,point-and-interval,2018-10-15,FY2021,3,profit,USD bn,5.861,5.2,0.5200000000000005,9.879999999999999,True,80%,memory-cycle,False,v74-enhanced
+MU@FY2018,Micron,memory-cycle,calibration,point-and-interval,2018-10-15,FY2021,3,revenue,USD bn,27.705,26.0,20.28,31.72,True,80%,memory-cycle,False,v74-enhanced
+MU@FY2020,Micron,memory-cycle,holdout,point-and-interval-with-cycle-tail,2020-09-29,FY2021,1,profit,USD bn,5.861,5.3,3.4239999999999995,7.176,True,80%,memory-cycle,False,v74-enhanced
+MU@FY2020,Micron,memory-cycle,holdout,point-and-interval-with-cycle-tail,2020-09-29,FY2021,1,revenue,USD bn,27.705,26.8,24.12,29.480000000000004,True,80%,memory-cycle,False,v74-enhanced
+MU@FY2020,Micron,memory-cycle,holdout,point-and-interval-with-cycle-tail,2020-09-29,FY2022,2,profit,USD bn,8.687,7.8,3.33,12.27,True,80%,memory-cycle,False,v74-enhanced
+MU@FY2020,Micron,memory-cycle,holdout,point-and-interval-with-cycle-tail,2020-09-29,FY2022,2,revenue,USD bn,30.758,29.8,22.648,36.952,True,80%,memory-cycle,False,v74-enhanced
+MU@FY2020,Micron,memory-cycle,holdout,point-and-interval-with-cycle-tail,2020-09-29,FY2023,3,profit,USD bn,-5.833,-1.5,-6.01,3.01,True,90%,memory-cycle,False,v74-enhanced
+MU@FY2020,Micron,memory-cycle,holdout,point-and-interval-with-cycle-tail,2020-09-29,FY2023,3,revenue,USD bn,15.54,20.5,12.299999999999999,28.7,True,90%,memory-cycle,False,v74-enhanced
+NVDA@FY2018,NVIDIA,compute-platforms,calibration,point-and-interval,FY2018,FY2019,1,profit,USD bn,3.804,3.7,3.2975000000000003,4.1025,True,80%,compute-platform,True,v72
+NVDA@FY2018,NVIDIA,compute-platforms,calibration,point-and-interval,FY2018,FY2019,1,revenue,USD bn,11.716,11.5,10.58,12.420000000000002,True,80%,compute-platform,True,v72
+NVDA@FY2018,NVIDIA,compute-platforms,calibration,point-and-interval,FY2018,FY2020,2,profit,USD bn,2.846,2.6,2.0225,3.1775,True,80%,compute-platform,True,v72
+NVDA@FY2018,NVIDIA,compute-platforms,calibration,point-and-interval,FY2018,FY2020,2,revenue,USD bn,10.918,10.5,9.03,11.97,True,80%,compute-platform,True,v72
+NVDA@FY2018,NVIDIA,compute-platforms,calibration,point-and-interval,FY2018,FY2021,3,profit,USD bn,4.532,4.2,3.0375000000000005,5.3625,True,80%,compute-platform,True,v72
+NVDA@FY2018,NVIDIA,compute-platforms,calibration,point-and-interval,FY2018,FY2021,3,revenue,USD bn,16.675,15.5,12.4,18.599999999999998,True,80%,compute-platform,True,v72
+NVDA@FY2019,NVIDIA,compute-platforms,perimeter,distribution-only-perimeter-break,FY2019,FY2020,1,profit,USD bn,2.846,2.8,1.8,3.8,False,90%,compute-platform,True,v72
+NVDA@FY2019,NVIDIA,compute-platforms,perimeter,distribution-only-perimeter-break,FY2019,FY2020,1,revenue,USD bn,10.918,10.8,9.3,12.5,False,90%,compute-platform,True,v72
+NVDA@FY2019,NVIDIA,compute-platforms,perimeter,distribution-only-perimeter-break,FY2019,FY2021,2,profit,USD bn,4.532,3.3,1.5,6.5,False,90%,compute-platform,True,v72
+NVDA@FY2019,NVIDIA,compute-platforms,perimeter,distribution-only-perimeter-break,FY2019,FY2021,2,revenue,USD bn,16.675,12.8,10.0,18.5,False,90%,compute-platform,True,v72
+NVDA@FY2019,NVIDIA,compute-platforms,perimeter,distribution-only-perimeter-break,FY2019,FY2022,3,profit,USD bn,10.041,4.8,1.5,12.5,False,90%,compute-platform,True,v72
+NVDA@FY2019,NVIDIA,compute-platforms,perimeter,distribution-only-perimeter-break,FY2019,FY2022,3,revenue,USD bn,26.914,17.0,11.0,29.0,False,90%,compute-platform,True,v72
+NVDA@FY2020,NVIDIA,compute-platforms,holdout,point-and-interval,FY2020,FY2021,1,profit,USD bn,4.532,4.3,3.7399999999999998,4.859999999999999,True,80%,compute-platform,True,v72
+NVDA@FY2020,NVIDIA,compute-platforms,holdout,point-and-interval,FY2020,FY2021,1,revenue,USD bn,16.675,16.0,14.72,17.28,True,80%,compute-platform,True,v72
+NVDA@FY2020,NVIDIA,compute-platforms,holdout,point-and-interval,FY2020,FY2022,2,profit,USD bn,10.041,9.2,7.824999999999999,10.575,True,80%,compute-platform,True,v72
+NVDA@FY2020,NVIDIA,compute-platforms,holdout,point-and-interval,FY2020,FY2022,2,revenue,USD bn,26.914,25.0,21.5,28.500000000000004,True,80%,compute-platform,True,v72
+NVDA@FY2020,NVIDIA,compute-platforms,holdout,point-and-interval,FY2020,FY2023,3,profit,USD bn,4.224,5.0,2.8,7.2,True,80%,compute-platform,True,v72
+NVDA@FY2020,NVIDIA,compute-platforms,holdout,point-and-interval,FY2020,FY2023,3,revenue,USD bn,26.974,27.5,22.0,33.0,True,80%,compute-platform,True,v72
+NVDA@FY2021,NVIDIA,compute-platforms,holdout,point-and-interval-with-ai-tail,FY2021,FY2022,1,profit,USD bn,10.041,9.5,8.46,10.54,True,80%,compute-platform,True,v72
+NVDA@FY2021,NVIDIA,compute-platforms,holdout,point-and-interval-with-ai-tail,FY2021,FY2022,1,revenue,USD bn,26.914,26.0,23.92,28.080000000000002,True,80%,compute-platform,True,v72
+NVDA@FY2021,NVIDIA,compute-platforms,holdout,point-and-interval-with-ai-tail,FY2021,FY2023,2,profit,USD bn,4.224,5.5,3.34,7.66,True,80%,compute-platform,True,v72
+NVDA@FY2021,NVIDIA,compute-platforms,holdout,point-and-interval-with-ai-tail,FY2021,FY2023,2,revenue,USD bn,26.974,27.0,22.68,31.319999999999997,True,80%,compute-platform,True,v72
+NVDA@FY2021,NVIDIA,compute-platforms,holdout,point-and-interval-with-ai-tail,FY2021,FY2024,3,profit,USD bn,32.972,18.0,2.460000000000001,33.54,False,90%,compute-platform,True,v72
+NVDA@FY2021,NVIDIA,compute-platforms,holdout,point-and-interval-with-ai-tail,FY2021,FY2024,3,revenue,USD bn,60.922,42.0,21.84,62.16,False,90%,compute-platform,True,v72
+NFLX@FY2014,Netflix,subscriber-content-economics,calibration,point-and-interval,FY2014,FY2015,1,profit,USD bn,0.305826,0.32,0.185,0.455,True,80%,subscription-content,True,v72
+NFLX@FY2014,Netflix,subscriber-content-economics,calibration,point-and-interval,FY2014,FY2015,1,revenue,USD bn,6.779511,6.75,6.21,7.290000000000001,True,80%,subscription-content,True,v72
+NFLX@FY2014,Netflix,subscriber-content-economics,calibration,point-and-interval,FY2014,FY2016,2,profit,USD bn,0.379793,0.42,0.16199999999999998,0.6779999999999999,True,80%,subscription-content,True,v72
+NFLX@FY2014,Netflix,subscriber-content-economics,calibration,point-and-interval,FY2014,FY2016,2,revenue,USD bn,8.830669,8.6,7.568,9.632,True,80%,subscription-content,True,v72
+NFLX@FY2014,Netflix,subscriber-content-economics,calibration,point-and-interval,FY2014,FY2017,3,profit,USD bn,0.838679,0.78,0.328,1.232,True,80%,subscription-content,True,v72
+NFLX@FY2014,Netflix,subscriber-content-economics,calibration,point-and-interval,FY2014,FY2017,3,revenue,USD bn,11.692713,11.3,9.266000000000002,13.334,True,80%,subscription-content,True,v72
+NFLX@FY2016,Netflix,subscriber-content-economics,holdout,point-and-interval,FY2016,FY2017,1,profit,USD bn,0.838679,0.78,0.55,1.01,True,80%,subscription-content,True,v72
+NFLX@FY2016,Netflix,subscriber-content-economics,holdout,point-and-interval,FY2016,FY2017,1,revenue,USD bn,11.692713,11.5,10.58,12.420000000000002,True,80%,subscription-content,True,v72
+NFLX@FY2016,Netflix,subscriber-content-economics,holdout,point-and-interval,FY2016,FY2018,2,profit,USD bn,1.605226,1.45,1.075,1.825,True,80%,subscription-content,True,v72
+NFLX@FY2016,Netflix,subscriber-content-economics,holdout,point-and-interval,FY2016,FY2018,2,revenue,USD bn,15.794341,15.0,13.2,16.8,True,80%,subscription-content,True,v72
+NFLX@FY2016,Netflix,subscriber-content-economics,holdout,point-and-interval,FY2016,FY2019,3,profit,USD bn,2.604254,2.35,1.678,3.0220000000000002,True,80%,subscription-content,True,v72
+NFLX@FY2016,Netflix,subscriber-content-economics,holdout,point-and-interval,FY2016,FY2019,3,revenue,USD bn,20.156447,19.2,15.744,22.656,True,80%,subscription-content,True,v72
+NFLX@FY2018,Netflix,subscriber-content-economics,holdout,point-and-interval-with-exogenous-tail,FY2018,FY2019,1,profit,USD bn,2.604254,2.45,2.0540000000000003,2.846,True,80%,subscription-content,True,v72
+NFLX@FY2018,Netflix,subscriber-content-economics,holdout,point-and-interval-with-exogenous-tail,FY2018,FY2019,1,revenue,USD bn,20.156447,19.8,18.216,21.384000000000004,True,80%,subscription-content,True,v72
+NFLX@FY2018,Netflix,subscriber-content-economics,holdout,point-and-interval-with-exogenous-tail,FY2018,FY2020,2,profit,USD bn,4.585289,3.65,1.2999999999999998,6.0,False,90%,subscription-content,True,v72
+NFLX@FY2018,Netflix,subscriber-content-economics,holdout,point-and-interval-with-exogenous-tail,FY2018,FY2020,2,revenue,USD bn,24.996056,23.5,16.919999999999998,30.080000000000002,False,90%,subscription-content,True,v72
+NFLX@FY2018,Netflix,subscriber-content-economics,holdout,point-and-interval-with-exogenous-tail,FY2018,FY2021,3,profit,USD bn,6.194509,5.0,1.2199999999999998,8.780000000000001,False,90%,subscription-content,True,v72
+NFLX@FY2018,Netflix,subscriber-content-economics,holdout,point-and-interval-with-exogenous-tail,FY2018,FY2021,3,revenue,USD bn,29.697844,27.0,17.55,36.45,False,90%,subscription-content,True,v72
+NFLX@FY2019,Netflix,subscriber-content-economics,exogenous,distribution-only-exogenous-shock,FY2019,FY2020,1,profit,USD bn,4.585289,3.8,1.658,5.942,False,90%,subscription-content,True,v72
+NFLX@FY2019,Netflix,subscriber-content-economics,exogenous,distribution-only-exogenous-shock,FY2019,FY2020,1,revenue,USD bn,24.996056,23.8,18.564,29.036,False,90%,subscription-content,True,v72
+NFLX@FY2019,Netflix,subscriber-content-economics,exogenous,distribution-only-exogenous-shock,FY2019,FY2021,2,profit,USD bn,6.194509,5.0,1.7000000000000002,8.3,False,90%,subscription-content,True,v72
+NFLX@FY2019,Netflix,subscriber-content-economics,exogenous,distribution-only-exogenous-shock,FY2019,FY2021,2,revenue,USD bn,29.697844,27.5,19.25,35.75,False,90%,subscription-content,True,v72
+NFLX@FY2019,Netflix,subscriber-content-economics,exogenous,distribution-only-exogenous-shock,FY2019,FY2022,3,profit,USD bn,5.632831,5.6,1.0999999999999996,10.1,False,90%,subscription-content,True,v72
+NFLX@FY2019,Netflix,subscriber-content-economics,exogenous,distribution-only-exogenous-shock,FY2019,FY2022,3,revenue,USD bn,31.61555,30.0,19.5,40.5,False,90%,subscription-content,True,v72
+SMCI@FY2020,Super Micro Computer,server-rack-bom-pass-through,holdout,point-and-interval,FY2020,FY2021,1,profit,USD bn,0.1119,0.11,-0.03199999999999999,0.252,True,80%,server-rack-bom-pass-through,False,v6
+SMCI@FY2020,Super Micro Computer,server-rack-bom-pass-through,holdout,point-and-interval,FY2020,FY2021,1,revenue,USD bn,3.557422,3.55,3.1239999999999997,3.976,True,80%,server-rack-bom-pass-through,False,v6
+SMCI@FY2020,Super Micro Computer,server-rack-bom-pass-through,holdout,point-and-interval,FY2020,FY2022,2,profit,USD bn,0.285163,0.26,-0.14,0.66,True,80%,server-rack-bom-pass-through,False,v6
+SMCI@FY2020,Super Micro Computer,server-rack-bom-pass-through,holdout,point-and-interval,FY2020,FY2022,2,revenue,USD bn,5.196099,5.0,3.75,6.25,True,80%,server-rack-bom-pass-through,False,v6
+SMCI@FY2020,Super Micro Computer,server-rack-bom-pass-through,holdout,point-and-interval,FY2020,FY2023,3,profit,USD bn,0.639998,0.52,-0.2839999999999999,1.3239999999999998,True,80%,server-rack-bom-pass-through,False,v6
+SMCI@FY2020,Super Micro Computer,server-rack-bom-pass-through,holdout,point-and-interval,FY2020,FY2023,3,revenue,USD bn,7.123482,6.7,4.355,9.045000000000002,True,80%,server-rack-bom-pass-through,False,v6
+VRT@FY2020,Vertiv,power-cooling-project-backlog,calibration,point-and-interval,FY2020,FY2021,1,profit,USD bn,1.5227,1.52,1.27,1.77,True,80%,power-cooling-project-backlog,False,v6
+VRT@FY2020,Vertiv,power-cooling-project-backlog,calibration,point-and-interval,FY2020,FY2021,1,revenue,USD bn,4.9981,5.0,4.5,5.5,True,80%,power-cooling-project-backlog,False,v6
+VRT@FY2020,Vertiv,power-cooling-project-backlog,calibration,point-and-interval,FY2020,FY2022,2,profit,USD bn,1.6161,1.65,1.0799999999999998,2.2199999999999998,True,80%,power-cooling-project-backlog,False,v6
+VRT@FY2020,Vertiv,power-cooling-project-backlog,calibration,point-and-interval,FY2020,FY2022,2,revenue,USD bn,5.6915,5.7,4.5600000000000005,6.84,True,80%,power-cooling-project-backlog,False,v6
+VRT@FY2020,Vertiv,power-cooling-project-backlog,calibration,point-and-interval,FY2020,FY2023,3,profit,USD bn,2.4005,2.2,1.2100000000000004,3.19,True,80%,power-cooling-project-backlog,False,v6
+VRT@FY2020,Vertiv,power-cooling-project-backlog,calibration,point-and-interval,FY2020,FY2023,3,revenue,USD bn,6.8632,6.6,4.619999999999999,8.58,True,80%,power-cooling-project-backlog,False,v6

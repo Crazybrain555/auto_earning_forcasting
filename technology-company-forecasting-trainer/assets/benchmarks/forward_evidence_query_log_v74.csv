@@ -1,0 +1,12 @@
+﻿query_id,case_id,searched_at,cutoff,query_text,domains,result_source_ids,future_outcome_terms_used,reviewer,notes
+MU18-Q1,MU@FY2018,2026-07-18T12:00:00Z,2018-10-15,DRAM NAND price inventory outlook 4Q 2018 and 2019 server double booking,"trendforce.com,dramexchange.com",TF_DRAM_20180926;TF_MEMORY_20181009,false,model-reviewer,Reconstructed point-in-time search; dates checked
+MU18-Q2,MU@FY2018,2026-07-18T12:05:00Z,2018-10-15,Micron QLC GDDR6 product production announcement 2018,"micron.com,microninvestors.com",MU_QLC_20180521;MU_GDDR6_20180625,false,model-reviewer,Product options only
+MU20-Q1,MU@FY2020,2026-07-18T12:10:00Z,2020-09-29,server DRAM price inventory procurement outlook September 2020,trendforce.com,TF_SERVER_DRAM_20200916,false,model-reviewer,Inventory and price state
+MU20-Q2,MU@FY2020,2026-07-18T12:15:00Z,2020-09-29,Micron FY2020 earnings call DDR5 HBM AI memory customer demand,"micron.com,transcript archive",MU_Q4_2020_CALL;MU_DDR5_20200106,false,model-reviewer,Transcript below filing unless verified
+MU20-Q3,MU@FY2020,2026-07-18T12:20:00Z,2020-09-29,large language model scaling compute memory constraints papers 2019 2020,"arxiv.org,acm.org",SCALING_LAWS_20200123;MEGATRON_20190917,false,model-reviewer,Papers for tail only
+MRVL20-Q1,MRVL@FY2020,2026-07-18T12:25:00Z,2020-03-23,400G data center interconnect market forecast 2017 2019 hyperscale optics,"lightcounting.com,cignal.ai",LIGHTCOUNTING_20191003;CIGNAL_400G_20170918,false,model-reviewer,Independent market outlook
+MRVL20-Q2,MRVL@FY2020,2026-07-18T12:30:00Z,2020-03-23,Marvell 400G PHY PAM4 cloud data center launch March 2020,marvell.com,MRVL_400G_PHY_20200309,false,model-reviewer,Official product stage
+MRVL20-Q3,MRVL@FY2020,2026-07-18T12:35:00Z,2020-03-23,400G 1.6T coherent PAM4 silicon photonics data center papers before March 2020,"ieee.org,arxiv.org",OPTICAL_PAPERS_PRE_CUTOFF,false,model-reviewer,Inphi not queried
+NVDA20-Q1,NVDA@FY2020,2026-07-18T12:40:00Z,2020-02-20,NVIDIA FY2020 gaming channel data center investor communication,"nvidia.com,sec.gov",NVDA_FY2020_10K_DIALOGUE,false,model-reviewer,Official platform/channel state
+NVDA20-Q2,NVDA@FY2020,2026-07-18T12:45:00Z,2020-02-20,NVIDIA Mellanox acquisition announcement March 2019,nvidia.com,MELLANOX_ANNOUNCEMENT_20190311,false,model-reviewer,Public transaction evidence
+NVDA20-Q3,NVDA@FY2020,2026-07-18T12:50:00Z,2020-02-20,large transformer model scaling model parallel memory constraints before February 2020,arxiv.org,MEGATRON_20190917;SCALING_LAWS_20200123,false,model-reviewer,No later outcome terms

@@ -1,0 +1,532 @@
+[
+  {
+    "case_id": "AMAT@FY2019",
+    "split": "calibration",
+    "company": "Applied Materials",
+    "archetype": "diversified-wafer-fab-equipment",
+    "cutoff": "FY2019",
+    "unit": "USD bn",
+    "profit_metric": "operating_income",
+    "base_revenue": 14.608,
+    "base_profit": 3.35,
+    "targets": [
+      "FY2020",
+      "FY2021",
+      "FY2022"
+    ],
+    "actual_revenue": [
+      17.202,
+      23.063,
+      25.785
+    ],
+    "actual_profit": [
+      4.365,
+      6.889,
+      7.788
+    ],
+    "v5_revenue": [
+      15.5,
+      17.5,
+      19.5
+    ],
+    "v5_profit": [
+      3.7,
+      4.2,
+      4.7
+    ],
+    "v6_revenue": [
+      17.0,
+      21.5,
+      24.5
+    ],
+    "v6_profit": [
+      4.25,
+      6.2,
+      7.1
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "evidence": "AMAT_FY2019_10K;AMAT_FY2021_10K;AMAT_FY2024_10K",
+    "lesson": "拆systems与services，并按foundry/logic、memory WFE和供给约束建模。"
+  },
+  {
+    "case_id": "KLA@FY2019",
+    "split": "calibration",
+    "company": "KLA",
+    "archetype": "process-control-content-intensity",
+    "cutoff": "FY2019",
+    "unit": "USD bn",
+    "profit_metric": "net_income",
+    "base_revenue": 4.568904,
+    "base_profit": 1.175617,
+    "targets": [
+      "FY2020",
+      "FY2021",
+      "FY2022"
+    ],
+    "actual_revenue": [
+      5.806424,
+      6.918734,
+      9.211883
+    ],
+    "actual_profit": [
+      1.216785,
+      2.078292,
+      3.321807
+    ],
+    "v5_revenue": [
+      5.1,
+      5.6,
+      6.2
+    ],
+    "v5_profit": [
+      1.25,
+      1.4,
+      1.55
+    ],
+    "v6_revenue": [
+      5.7,
+      6.7,
+      8.4
+    ],
+    "v6_profit": [
+      1.25,
+      1.9,
+      2.8
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "evidence": "KLA_FY2019_10K;KLA_FY2021_10K;KLA_FY2024_10K",
+    "lesson": "过程控制价值量随节点复杂度和检测步骤增长；并购与服务装机基数需单独桥接。"
+  },
+  {
+    "case_id": "AVGO@FY2019",
+    "split": "calibration",
+    "company": "Broadcom",
+    "archetype": "hybrid-semiconductor-software-ma",
+    "cutoff": "FY2019",
+    "unit": "USD bn",
+    "profit_metric": "net_income_common",
+    "base_revenue": 22.597,
+    "base_profit": 2.695,
+    "targets": [
+      "FY2020",
+      "FY2021",
+      "FY2022"
+    ],
+    "actual_revenue": [
+      23.888,
+      27.45,
+      33.203
+    ],
+    "actual_profit": [
+      2.663,
+      6.437,
+      11.223
+    ],
+    "v5_revenue": [
+      23.5,
+      24.5,
+      26.0
+    ],
+    "v5_profit": [
+      3.0,
+      3.5,
+      4.2
+    ],
+    "v6_revenue": [
+      24.0,
+      27.0,
+      31.0
+    ],
+    "v6_profit": [
+      2.8,
+      5.8,
+      9.5
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "evidence": "AVGO_FY2019_10K;AVGO_FY2021_10K;AVGO_FY2022_10K",
+    "lesson": "先做organic/acquired/perimeter bridge，再拆半导体产品与订阅服务，并显式处理摊销和降杠杆。"
+  },
+  {
+    "case_id": "VRT@FY2020",
+    "split": "calibration",
+    "company": "Vertiv",
+    "archetype": "power-cooling-project-backlog",
+    "cutoff": "FY2020",
+    "unit": "USD bn",
+    "profit_metric": "gross_profit",
+    "base_revenue": 4.3706,
+    "base_profit": 1.4737,
+    "targets": [
+      "FY2021",
+      "FY2022",
+      "FY2023"
+    ],
+    "actual_revenue": [
+      4.9981,
+      5.6915,
+      6.8632
+    ],
+    "actual_profit": [
+      1.5227,
+      1.6161,
+      2.4005
+    ],
+    "v5_revenue": [
+      4.8,
+      5.3,
+      5.8
+    ],
+    "v5_profit": [
+      1.55,
+      1.72,
+      1.9
+    ],
+    "v6_revenue": [
+      5.0,
+      5.7,
+      6.6
+    ],
+    "v6_profit": [
+      1.52,
+      1.65,
+      2.2
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "evidence": "VRT_FY2020_10K;VRT_FY2023_10K",
+    "lesson": "backlog必须经过取消率、项目交付、价格成本时滞和服务收入转化，不能直接等于未来收入。"
+  },
+  {
+    "case_id": "COHR@FY2021",
+    "split": "calibration",
+    "company": "II-VI / Coherent",
+    "archetype": "optics-materials-ma-integration",
+    "cutoff": "FY2021",
+    "unit": "USD bn",
+    "profit_metric": "net_income",
+    "base_revenue": 3.106,
+    "base_profit": 0.298,
+    "targets": [
+      "FY2022",
+      "FY2023",
+      "FY2024"
+    ],
+    "actual_revenue": [
+      3.316616,
+      5.1601,
+      4.707688
+    ],
+    "actual_profit": [
+      0.234759,
+      -0.259458,
+      -0.156154
+    ],
+    "v5_revenue": [
+      3.5,
+      3.9,
+      4.4
+    ],
+    "v5_profit": [
+      0.35,
+      0.45,
+      0.55
+    ],
+    "v6_revenue": [
+      3.3,
+      5.0,
+      4.8
+    ],
+    "v6_profit": [
+      0.22,
+      -0.2,
+      -0.1
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "evidence": "IIVI_FY2021_10K;IIVI_FY2022_10K;COHR_FY2023_10K;COHR_FY2024_10K",
+    "lesson": "并购概率、合并时点、债务利息、摊销、重组、良率和客户设计变更必须单列。"
+  },
+  {
+    "case_id": "ANET@FY2020",
+    "split": "holdout",
+    "company": "Arista Networks",
+    "archetype": "networking-customer-concentration",
+    "cutoff": "FY2020",
+    "unit": "USD bn",
+    "profit_metric": "net_income",
+    "base_revenue": 2.317512,
+    "base_profit": 0.634557,
+    "targets": [
+      "FY2021",
+      "FY2022",
+      "FY2023"
+    ],
+    "actual_revenue": [
+      2.948037,
+      4.38131,
+      5.860168
+    ],
+    "actual_profit": [
+      0.840854,
+      1.352446,
+      2.087321
+    ],
+    "v5_revenue": [
+      2.6,
+      2.9,
+      3.3
+    ],
+    "v5_profit": [
+      0.7,
+      0.78,
+      0.9
+    ],
+    "v6_revenue": [
+      2.9,
+      4.1,
+      5.3
+    ],
+    "v6_profit": [
+      0.82,
+      1.25,
+      1.8
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "evidence": "ANET_FY2020_RESULTS;ANET_FY2022_10K;ANET_FY2024_10K",
+    "lesson": "客户CapEx、云巨头集中度、供应约束、RPO/backlog和产品端口速率升级共同决定收入。"
+  },
+  {
+    "case_id": "SMCI@FY2020",
+    "split": "holdout",
+    "company": "Super Micro Computer",
+    "archetype": "server-rack-bom-pass-through",
+    "cutoff": "FY2020",
+    "unit": "USD bn",
+    "profit_metric": "net_income",
+    "base_revenue": 3.339281,
+    "base_profit": 0.0843,
+    "targets": [
+      "FY2021",
+      "FY2022",
+      "FY2023"
+    ],
+    "actual_revenue": [
+      3.557422,
+      5.196099,
+      7.123482
+    ],
+    "actual_profit": [
+      0.1119,
+      0.285163,
+      0.639998
+    ],
+    "v5_revenue": [
+      3.6,
+      4.0,
+      4.5
+    ],
+    "v5_profit": [
+      0.1,
+      0.13,
+      0.16
+    ],
+    "v6_revenue": [
+      3.55,
+      5.0,
+      6.7
+    ],
+    "v6_profit": [
+      0.11,
+      0.26,
+      0.52
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "evidence": "SMCI_FY2022_10K;SMCI_FY2023_10K;SMCI_FY2024_10K",
+    "lesson": "收入=系统台数×BOM/ASP，但GPU等高价值部件的pass-through会推高收入、压低毛利，并占用营运资金。"
+  },
+  {
+    "case_id": "AMKR@FY2020",
+    "split": "holdout",
+    "company": "Amkor Technology",
+    "archetype": "osat-advanced-packaging-utilization",
+    "cutoff": "FY2020",
+    "unit": "USD bn",
+    "profit_metric": "operating_income",
+    "base_revenue": 5.050589,
+    "base_profit": 0.457245,
+    "targets": [
+      "FY2021",
+      "FY2022",
+      "FY2023"
+    ],
+    "actual_revenue": [
+      6.138329,
+      7.091585,
+      6.503065
+    ],
+    "actual_profit": [
+      0.763433,
+      0.897186,
+      0.470287
+    ],
+    "v5_revenue": [
+      5.8,
+      6.7,
+      7.6
+    ],
+    "v5_profit": [
+      0.62,
+      0.78,
+      0.95
+    ],
+    "v6_revenue": [
+      6.0,
+      7.0,
+      6.6
+    ],
+    "v6_profit": [
+      0.72,
+      0.88,
+      0.55
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "evidence": "AMKR_FY2020_10K;AMKR_FY2021_10K;AMKR_FY2024_10K",
+    "lesson": "先进封装内容量增长不必然提高毛利；材料占比、利用率、折旧、客户集中和无实质backlog必须纳入。"
+  },
+  {
+    "case_id": "ENTG@FY2021",
+    "split": "holdout",
+    "company": "Entegris",
+    "archetype": "semiconductor-materials-content-ma",
+    "cutoff": "FY2021",
+    "unit": "USD bn",
+    "profit_metric": "operating_income",
+    "base_revenue": 2.298893,
+    "base_profit": 0.551768,
+    "targets": [
+      "FY2022",
+      "FY2023",
+      "FY2024"
+    ],
+    "actual_revenue": [
+      3.282033,
+      3.523926,
+      3.241208
+    ],
+    "actual_profit": [
+      0.479981,
+      0.499158,
+      0.533922
+    ],
+    "v5_revenue": [
+      2.7,
+      3.2,
+      3.6
+    ],
+    "v5_profit": [
+      0.65,
+      0.75,
+      0.85
+    ],
+    "v6_revenue": [
+      3.3,
+      3.6,
+      3.3
+    ],
+    "v6_profit": [
+      0.48,
+      0.5,
+      0.52
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "evidence": "ENTG_FY2021_10K;ENTG_FY2024_AR",
+    "lesson": "材料需求=wafer starts×process steps×content per wafer；并购、剥离和摊销必须与organic增长分开。"
+  },
+  {
+    "case_id": "AMD@FY2020",
+    "split": "holdout",
+    "company": "AMD",
+    "archetype": "compute-platform-segments-ma",
+    "cutoff": "FY2020",
+    "unit": "USD bn",
+    "profit_metric": "operating_income",
+    "base_revenue": 9.763,
+    "base_profit": 1.369,
+    "targets": [
+      "FY2021",
+      "FY2022",
+      "FY2023"
+    ],
+    "actual_revenue": [
+      16.434,
+      23.601,
+      22.68
+    ],
+    "actual_profit": [
+      3.648,
+      1.264,
+      0.401
+    ],
+    "v5_revenue": [
+      13.0,
+      16.0,
+      19.0
+    ],
+    "v5_profit": [
+      2.5,
+      3.3,
+      4.0
+    ],
+    "v6_revenue": [
+      16.0,
+      23.0,
+      22.0
+    ],
+    "v6_profit": [
+      3.4,
+      1.4,
+      0.6
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "evidence": "AMD_FY2020_10K;AMD_FY2021_10K;AMD_FY2022_10K;AMD_FY2023_10K",
+    "lesson": "按Data Center/Client/Gaming/Embedded拆分，并建立Xilinx并购时点、摊销和All Other会计桥。"
+  }
+]

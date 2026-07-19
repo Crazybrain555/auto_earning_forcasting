@@ -1,0 +1,89 @@
+{
+  "model_version": "technology-company-forecasting-v7.2",
+  "benchmark": "netflix",
+  "generated_at": "2026-07-18T04:59:11.720449+00:00",
+  "metrics": {
+    "calibration": {
+      "v71": {
+        "cases": 1,
+        "revenue_mape": 0.09207266607902803,
+        "profit_margin_mae_pp": 2.3315888999922736,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.3128595775474725,
+        "profit_interval_score": 0.12393591951571936
+      },
+      "v72": {
+        "cases": 1,
+        "revenue_mape": 0.02135348370540481,
+        "profit_margin_mae_pp": 0.36086557402403296,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.246981131140296,
+        "profit_interval_score": 0.05852390322443083
+      }
+    },
+    "holdout": {
+      "v71": {
+        "cases": 2,
+        "revenue_mape": 0.15684193856707965,
+        "profit_margin_mae_pp": 2.2026129925435556,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 0.25,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.5659919694634719,
+        "profit_interval_score": 0.1018392900588657
+      },
+      "v72": {
+        "cases": 2,
+        "revenue_mape": 0.032977352810383706,
+        "profit_margin_mae_pp": 0.5284433612825965,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.2213452098350629,
+        "profit_interval_score": 0.04819929021025304
+      }
+    },
+    "distribution": {
+      "v71": {
+        "cases": 2,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 0.4,
+        "revenue_interval_score": 0.3439640860796493,
+        "profit_interval_score": 0.2023472077874545
+      },
+      "v72": {
+        "cases": 2,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.5603329951134312,
+        "profit_interval_score": 0.22417780687153765
+      }
+    }
+  },
+  "gate_results": {
+    "revenue_mape_le_8pct": true,
+    "profit_margin_mae_le_5pp": true,
+    "revenue_direction_ge_80pct": true,
+    "profit_sign_ge_90pct": true,
+    "revenue_coverage_ge_80pct": true,
+    "profit_coverage_ge_80pct": true,
+    "revenue_interval_score_improves_30pct": true,
+    "profit_interval_score_improves_30pct": true,
+    "distribution_revenue_coverage_ge_80pct": true,
+    "distribution_profit_coverage_ge_80pct": true,
+    "human_required_present": true
+  },
+  "limitations": [
+    "Retrospective point-in-time simulation, not pre-registered live performance.",
+    "Small company-specific sample.",
+    "Point metrics exclude horizons classified as exogenous, perimeter-break, or regime-tail distribution contracts."
+  ]
+}

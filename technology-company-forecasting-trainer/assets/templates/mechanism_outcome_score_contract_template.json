@@ -1,0 +1,13 @@
+{
+  "protocol_version": "2.1",
+  "metrics": {
+    "required_coverage": {"minimum": 0.8},
+    "activation_accuracy": {"minimum": 1.0},
+    "direction_accuracy": {"minimum": 0.8},
+    "state_accuracy": {"minimum": 0.7, "allow_unavailable": false},
+    "mean_abs_timing_error_periods": {"maximum": 1.0, "allow_unavailable": true},
+    "magnitude_band_coverage": {"minimum": 0.7, "allow_unavailable": true},
+    "financial_line_accuracy": {"minimum": 1.0},
+    "cash_classification_accuracy": {"minimum": 1.0, "allow_unavailable": true}
+  }
+}

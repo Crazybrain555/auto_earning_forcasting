@@ -1,0 +1,66 @@
+{
+  "model_version": "ai-hardware-forecasting-v6.2",
+  "generated_at": "2026-07-18T09:37:48.986854+00:00",
+  "metrics": {
+    "calibration": {
+      "v61": {
+        "cases": 2,
+        "revenue_mape": 0.15039368649791277,
+        "profit_margin_mae_pp": 4.988408031937381,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 0.3333333333333333,
+        "profit_coverage": 0.16666666666666666,
+        "revenue_interval_score": 0.61667236134603,
+        "profit_interval_score": 0.5270476545212613
+      },
+      "v62": {
+        "cases": 2,
+        "revenue_mape": 0.05458474761510424,
+        "profit_margin_mae_pp": 1.1798014471795544,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.2742588553432304,
+        "profit_interval_score": 0.10562447205192398
+      }
+    },
+    "holdout": {
+      "v61": {
+        "cases": 4,
+        "revenue_mape": 0.11271161967909715,
+        "profit_margin_mae_pp": 2.4744480697027,
+        "revenue_direction_accuracy": 0.6666666666666666,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 0.75,
+        "profit_coverage": 0.6666666666666666,
+        "revenue_interval_score": 0.457062664622311,
+        "profit_interval_score": 0.23424584230280387
+      },
+      "v62": {
+        "cases": 4,
+        "revenue_mape": 0.03661733709125043,
+        "profit_margin_mae_pp": 0.5998569530976897,
+        "revenue_direction_accuracy": 0.9166666666666666,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 0.9166666666666666,
+        "revenue_interval_score": 0.28465959442390426,
+        "profit_interval_score": 0.11491842350353353
+      }
+    }
+  },
+  "gate_results": {
+    "revenue_mape_le_10pct": true,
+    "profit_margin_mae_le_5pp": true,
+    "direction_ge_85pct": true,
+    "profit_sign_ge_90pct": true,
+    "revenue_interval_score_improves_30pct": true,
+    "profit_interval_score_improves_30pct": true
+  },
+  "limitations": [
+    "Retrospective point-in-time simulation, not pre-registered live performance.",
+    "Small equipment/process-control sample remains vulnerable to hindsight bias."
+  ]
+}

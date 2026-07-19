@@ -1,0 +1,23 @@
+{
+  "protocol_version": "2.1",
+  "case_id": "REPLACE",
+  "candidate_skill_hash": null,
+  "sealed_before_actuals": false,
+  "outcomes": [
+    {
+      "outcome_id": "MECH-001",
+      "mechanism": "REPLACE",
+      "required": true,
+      "activation": "active",
+      "direction": "up",
+      "state": "REPLACE",
+      "timing_period": 1,
+      "magnitude_low": null,
+      "magnitude_high": null,
+      "financial_line": "revenue",
+      "cash_classification": "operating",
+      "falsification_trigger": "REPLACE",
+      "source_ids": []
+    }
+  ]
+}

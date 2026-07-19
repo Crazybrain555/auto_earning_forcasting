@@ -1,0 +1,11 @@
+﻿source_id,company,period,evidence_tier,source_type,url,use_and_limitations
+AMAT_FY2019_10K,Applied Materials,FY2019,E0/E1,SEC filings and annual reports,https://ir.appliedmaterials.com/financials/sec-filings,Base and actual financials; systems/service and WFE context
+KLA_FY2019_10K,KLA,FY2019,E0/E1,SEC filings and annual reports,https://ir.kla.com/financial-information/sec-filings,Base and actual financials; process-control content
+AVGO_FY2019_10K,Broadcom,FY2019,E0/E1,SEC filings and annual reports,https://investors.broadcom.com/financial-information/sec-filings,Base and actual financials; CA/Symantec perimeter
+VRT_FY2020_10K,Vertiv,FY2020,E0/E1,SEC filings and annual reports,https://investors.vertiv.com/financial-information/sec-filings,"Base, backlog and project revenue"
+IIVI_FY2021_10K,II-VI / Coherent,FY2021,E0/E1,SEC filings and annual reports,https://investors.coherent.com/financial-information/sec-filings,"Base, Coherent acquisition and integration"
+ANET_FY2020_RESULTS,Arista,FY2020,E0/E1,SEC filings and annual reports,https://investors.arista.com/financial-information/sec-filings,Base and actual financials; customer concentration
+SMCI_FY2020_10K,Supermicro,FY2020,E0/E1,SEC filings and annual reports,https://ir.supermicro.com/financials/sec-filings/default.aspx,Base and actual financials; server BOM and working capital
+AMKR_FY2020_10K,Amkor,FY2020,E0/E1,SEC filings and annual reports,https://ir.amkor.com/financial-information/sec-filings,Base and actual financials; packaging utilization
+ENTG_FY2021_10K,Entegris,FY2021,E0/E1,SEC filings and annual reports,https://investor.entegris.com/financials/sec-filings/default.aspx,Base and actual financials; content per wafer and CMC perimeter
+AMD_FY2020_10K,AMD,FY2020,E0/E1,SEC filings and annual reports,https://ir.amd.com/financial-information/sec-filings,Base and actual financials; Xilinx perimeter and segments

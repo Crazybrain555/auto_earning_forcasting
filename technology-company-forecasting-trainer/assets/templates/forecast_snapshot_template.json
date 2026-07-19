@@ -1,0 +1,39 @@
+{
+  "forecast_id": "fcst://technology/EXAMPLE/20260718/v1",
+  "as_of": "2026-07-18T00:00:00Z",
+  "model_version": "method-commit:UNSET",
+  "source_pack_hash": "sha256:REPLACE",
+  "mechanism_weights": {
+    "unit-volume-price-cost": 1.0
+  },
+  "company_lenses": [],
+  "scenario_probabilities": {
+    "bear": 0.2,
+    "base": 0.55,
+    "bull": 0.2,
+    "regime_break": 0.05
+  },
+  "outputs": {
+    "year_1": {},
+    "year_2": {},
+    "year_3_distribution": {},
+    "long_term_normalized": {},
+    "market_implied": {}
+  },
+  "breakpoints": [],
+  "human_required": [],
+  "confidence_and_limits": [
+    "screen-grade until delivery validation and forward evidence"
+  ],
+  "horizon_contracts": {
+    "FY+1": "point-and-interval",
+    "FY+2": "scenario-or-distribution",
+    "FY+3": "distribution-only"
+  },
+  "process_integrity": "pending",
+  "research_sufficiency": "pending",
+  "run_mode": "live_forecast",
+  "forecast_sealed_before_actuals": false,
+  "training_iteration_id": null,
+  "training_case_role": null
+}

@@ -1,0 +1,6 @@
+{"id":"memory-cycle","prompt":"Build a two-year memory forecast from a fixed cutoff.","expected":["universal source pack","unit-volume-price-cost","cycle state","scenario","snapshot"]}
+{"id":"equipment-revenue","prompt":"Backtest equipment revenue and support quality.","expected":["universal source pack","orders-backlog-recognition","installed base","holdout","non-target regression"]}
+{"id":"optical-custom","prompt":"Forecast an optical/custom-silicon supplier.","expected":["program-stage-conversion","product revenue boundary","perimeter bridge","GAAP bridge"]}
+{"id":"cloud-provisional","prompt":"Forecast AWS from a historical cutoff.","expected":["platform-usage-adoption","usage versus price","shared asset allocation","human-required","provisional readiness"]}
+{"id":"content-provisional","prompt":"Forecast Netflix from a historical cutoff.","expected":["subscriber ARPU churn","content amortization versus cash","human-required","provisional readiness"]}
+{"id":"method-change","prompt":"Add or revise a mechanism and prove old cases are not degraded.","expected":["pre-registration","new holdout","legacy regression","non-target regression","versioned snapshot"]}

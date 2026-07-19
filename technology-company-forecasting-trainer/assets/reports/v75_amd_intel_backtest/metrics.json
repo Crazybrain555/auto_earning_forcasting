@@ -1,0 +1,91 @@
+{
+  "model_version": "technology-company-forecasting-v7.5",
+  "metrics": {
+    "calibration": {
+      "v74": {
+        "cases": 2,
+        "revenue_mape": 0.07143967310456366,
+        "profit_margin_mae_pp": 2.234767815473362,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 0.8333333333333334,
+        "profit_coverage": 0.8333333333333334,
+        "revenue_interval_score": 0.3558968517258765,
+        "profit_interval_score": 0.15041670593196474
+      },
+      "v75": {
+        "cases": 2,
+        "revenue_mape": 0.03663153767545752,
+        "profit_margin_mae_pp": 0.7262558904619518,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.2587617314634869,
+        "profit_interval_score": 0.09917144676336763
+      }
+    },
+    "holdout": {
+      "v74": {
+        "cases": 4,
+        "revenue_mape": 0.14383131560832912,
+        "profit_margin_mae_pp": 10.88753730741568,
+        "revenue_direction_accuracy": 0.8888888888888888,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 0.5555555555555556,
+        "profit_coverage": 0.2222222222222222,
+        "revenue_interval_score": 0.7664955156711549,
+        "profit_interval_score": 0.8048781246375114
+      },
+      "v75": {
+        "cases": 4,
+        "revenue_mape": 0.04668182898957635,
+        "profit_margin_mae_pp": 1.447854585993104,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.23591100302389004,
+        "profit_interval_score": 0.11626735182432496
+      }
+    }
+  },
+  "by_case": [
+    {
+      "case_id": "AMD@FY2019",
+      "v74_revenue_mape": 0.2605874598559052,
+      "v75_revenue_mape": 0.11216632535997884,
+      "v74_profit_margin_mae_pp": 6.089199897122961,
+      "v75_profit_margin_mae_pp": 1.647849134283385
+    },
+    {
+      "case_id": "AMD@FY2021",
+      "v74_revenue_mape": 0.0698502164915537,
+      "v75_revenue_mape": 0.028630480868764897,
+      "v74_profit_margin_mae_pp": 16.116242805590876,
+      "v75_profit_margin_mae_pp": 1.4660673284432784
+    },
+    {
+      "case_id": "INTC@FY2019",
+      "v74_revenue_mape": 0.031215831929511044,
+      "v75_revenue_mape": 0.015256832107279236,
+      "v74_profit_margin_mae_pp": 2.1796601571968344,
+      "v75_profit_margin_mae_pp": 0.6817789534332777
+    },
+    {
+      "case_id": "INTC@FY2021",
+      "v74_revenue_mape": 0.25066230371473425,
+      "v75_revenue_mape": 0.039699351682688164,
+      "v74_profit_margin_mae_pp": 16.550693620664454,
+      "v75_profit_margin_mae_pp": 1.986616556587388
+    }
+  ],
+  "gate_results": {
+    "holdout_revenue_improves": true,
+    "holdout_profit_improves": true,
+    "revenue_coverage_ge_80pct": true,
+    "profit_coverage_ge_80pct": true,
+    "all_holdout_cases_revenue_improve": true,
+    "all_holdout_cases_profit_improve": true
+  }
+}

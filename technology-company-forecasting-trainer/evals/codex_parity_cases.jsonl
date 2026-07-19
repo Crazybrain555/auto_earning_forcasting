@@ -1,0 +1,3 @@
+{"prompt":"Build a five-year financial model and valuation for a public technology company using current filings.","expected":["initialize run workspace","freeze source pack","formula-driven xlsx","source-backed report","red-team memo","delivery validation","forecast snapshot"]}
+{"prompt":"Update an existing company model after earnings and explain changes.","expected":["preserve prior snapshot","new source pack version","actual-versus-prior bridge","updated formulas","regression/scope checks","new immutable snapshot"]}
+{"prompt":"Analyze a company with missing segment cash-flow disclosure.","expected":["revenue/OI model may proceed","FCF/ROIC human-required","allocation sensitivity","readiness cap"]}

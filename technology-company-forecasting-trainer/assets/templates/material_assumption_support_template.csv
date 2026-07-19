@@ -1,0 +1,2 @@
+assumption_id,metric,horizon,scenario,materiality_weight,sensitivity_to_output,support_status,evidence_cluster_count,source_ids,allowed_horizon,falsification_trigger,notes
+TBD,TBD,FY+1,Base,0.0,high,analyst_only,0,,FY+1,,

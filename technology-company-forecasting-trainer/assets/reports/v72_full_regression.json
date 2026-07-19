@@ -1,0 +1,214 @@
+{
+  "model_version": "technology-company-forecasting-v7.2",
+  "generated_at": "2026-07-18T05:16:10.417253+00:00",
+  "new_validations": {
+    "netflix": {
+      "calibration": {
+        "v71": {
+          "cases": 1,
+          "revenue_mape": 0.09207266607902803,
+          "profit_margin_mae_pp": 2.3315888999922736,
+          "revenue_direction_accuracy": 1.0,
+          "profit_sign_accuracy": 1.0,
+          "revenue_coverage": 1.0,
+          "profit_coverage": 1.0,
+          "revenue_interval_score": 0.3128595775474725,
+          "profit_interval_score": 0.12393591951571936
+        },
+        "v72": {
+          "cases": 1,
+          "revenue_mape": 0.02135348370540481,
+          "profit_margin_mae_pp": 0.36086557402403296,
+          "revenue_direction_accuracy": 1.0,
+          "profit_sign_accuracy": 1.0,
+          "revenue_coverage": 1.0,
+          "profit_coverage": 1.0,
+          "revenue_interval_score": 0.246981131140296,
+          "profit_interval_score": 0.05852390322443083
+        }
+      },
+      "holdout": {
+        "v71": {
+          "cases": 2,
+          "revenue_mape": 0.15684193856707965,
+          "profit_margin_mae_pp": 2.2026129925435556,
+          "revenue_direction_accuracy": 1.0,
+          "profit_sign_accuracy": 1.0,
+          "revenue_coverage": 0.25,
+          "profit_coverage": 1.0,
+          "revenue_interval_score": 0.5659919694634719,
+          "profit_interval_score": 0.1018392900588657
+        },
+        "v72": {
+          "cases": 2,
+          "revenue_mape": 0.032977352810383706,
+          "profit_margin_mae_pp": 0.5284433612825965,
+          "revenue_direction_accuracy": 1.0,
+          "profit_sign_accuracy": 1.0,
+          "revenue_coverage": 1.0,
+          "profit_coverage": 1.0,
+          "revenue_interval_score": 0.2213452098350629,
+          "profit_interval_score": 0.04819929021025304
+        }
+      },
+      "distribution": {
+        "v71": {
+          "cases": 2,
+          "revenue_coverage": 1.0,
+          "profit_coverage": 0.4,
+          "revenue_interval_score": 0.3439640860796493,
+          "profit_interval_score": 0.2023472077874545
+        },
+        "v72": {
+          "cases": 2,
+          "revenue_coverage": 1.0,
+          "profit_coverage": 1.0,
+          "revenue_interval_score": 0.5603329951134312,
+          "profit_interval_score": 0.22417780687153765
+        }
+      }
+    },
+    "nvidia": {
+      "calibration": {
+        "v71": {
+          "cases": 1,
+          "revenue_mape": 0.12989430988085662,
+          "profit_margin_mae_pp": 5.307279663003597,
+          "revenue_direction_accuracy": 0.6666666666666666,
+          "profit_sign_accuracy": 1.0,
+          "revenue_coverage": 0.6666666666666666,
+          "profit_coverage": 0.6666666666666666,
+          "revenue_interval_score": 0.5565042752175269,
+          "profit_interval_score": 0.44962741687091484
+        },
+        "v72": {
+          "cases": 1,
+          "revenue_mape": 0.042395498087969614,
+          "profit_margin_mae_pp": 0.5604277659240283,
+          "revenue_direction_accuracy": 1.0,
+          "profit_sign_accuracy": 1.0,
+          "revenue_coverage": 1.0,
+          "profit_coverage": 1.0,
+          "revenue_interval_score": 0.26604812288637125,
+          "profit_interval_score": 0.10464278266065756
+        }
+      },
+      "holdout": {
+        "v71": {
+          "cases": 2,
+          "revenue_mape": 0.20017079715553782,
+          "profit_margin_mae_pp": 9.302815380085441,
+          "revenue_direction_accuracy": 1.0,
+          "profit_sign_accuracy": 1.0,
+          "revenue_coverage": 0.2,
+          "profit_coverage": 0.0,
+          "revenue_interval_score": 1.2898800876326333,
+          "profit_interval_score": 0.8004289806537545
+        },
+        "v72": {
+          "cases": 2,
+          "revenue_mape": 0.03320386724253736,
+          "profit_margin_mae_pp": 1.7627063227443933,
+          "revenue_direction_accuracy": 1.0,
+          "profit_sign_accuracy": 1.0,
+          "revenue_coverage": 1.0,
+          "profit_coverage": 1.0,
+          "revenue_interval_score": 0.2592571741461152,
+          "profit_interval_score": 0.113980236944957
+        }
+      },
+      "distribution": {
+        "v71": {
+          "cases": 2,
+          "revenue_coverage": 0.25,
+          "profit_coverage": 0.25,
+          "revenue_interval_score": 4.07833960067973,
+          "profit_interval_score": 2.3468366205284488
+        },
+        "v72": {
+          "cases": 2,
+          "revenue_coverage": 1.0,
+          "profit_coverage": 1.0,
+          "revenue_interval_score": 0.5333664725486875,
+          "profit_interval_score": 0.35047589083850084
+        }
+      }
+    }
+  },
+  "non_target_regressions": {
+    "aws": {
+      "version": "v7.1",
+      "holdout": {
+        "cases": 2,
+        "revenue_mape": 0.023155807728559376,
+        "profit_margin_mae_pp": 1.1756497812031974,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.3031785075751619,
+        "profit_interval_score": 0.0870643262186911
+      },
+      "degradation": 0,
+      "passed": true
+    },
+    "marvell": {
+      "version": "v6.3",
+      "holdout": {
+        "cases": 2,
+        "revenue_mape": 0.025766436743513362,
+        "profit_margin_mae_pp": 2.3339000850062024,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.33205874054713813,
+        "profit_interval_score": 0.2113830749869423
+      },
+      "degradation": 0,
+      "passed": true
+    },
+    "lam_kla": {
+      "version": "v6.2",
+      "holdout": {
+        "revenue_mape": 0.03661733709125043,
+        "profit_margin_mae_pp": 0.5998569530976897,
+        "revenue_direction_accuracy": 0.9166666666666666,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 0.9166666666666666
+      },
+      "degradation": 0,
+      "passed": true
+    },
+    "sandisk": {
+      "locked_metrics": 16,
+      "max_abs_difference": 0,
+      "passed": true
+    },
+    "legacy": {
+      "rows": 96,
+      "missing": 0,
+      "extra": 0,
+      "differences": 0,
+      "passed": true
+    }
+  },
+  "package_validation": {
+    "unit_tests": 24,
+    "unit_tests_passed": 24,
+    "package_self_test": true,
+    "formula_errors_in_audit_workbook": 0
+  },
+  "conclusion": {
+    "new_mechanisms_improved": true,
+    "previously_validated_cases_degraded": false,
+    "release_allowed": true,
+    "readiness": "retrospective research-grade; live forward validation still required"
+  },
+  "limitations": [
+    "All historical forecasts are retrospective point-in-time simulations, not pre-registered live forecasts.",
+    "Company-specific samples remain small.",
+    "Exogenous shocks, perimeter breaks and regime changes are evaluated primarily through distributions, not point accuracy."
+  ]
+}

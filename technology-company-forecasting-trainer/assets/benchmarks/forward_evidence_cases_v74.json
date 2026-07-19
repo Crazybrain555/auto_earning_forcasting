@@ -1,0 +1,376 @@
+[
+  {
+    "case_id": "MU@FY2018",
+    "split": "calibration",
+    "evaluation_contract": "point-and-interval",
+    "company": "Micron",
+    "mechanism": "memory-cycle",
+    "cutoff": "2018-10-15",
+    "base_revenue": 30.391,
+    "profit_metric": "net income",
+    "unit": "USD bn",
+    "targets": [
+      "FY2019",
+      "FY2020",
+      "FY2021"
+    ],
+    "actual_revenue": [
+      23.406,
+      21.435,
+      27.705
+    ],
+    "actual_profit": [
+      6.313,
+      2.687,
+      5.861
+    ],
+    "official_revenue": [
+      28.5,
+      27.0,
+      29.0
+    ],
+    "official_profit": [
+      10.5,
+      7.5,
+      8.0
+    ],
+    "enhanced_revenue": [
+      25.0,
+      22.5,
+      26.0
+    ],
+    "enhanced_profit": [
+      7.2,
+      3.5,
+      5.2
+    ],
+    "official_revenue_half_width": [
+      0.12,
+      0.22,
+      0.3
+    ],
+    "official_profit_margin_band": [
+      0.08,
+      0.16,
+      0.22
+    ],
+    "enhanced_revenue_half_width": [
+      0.1,
+      0.16,
+      0.22
+    ],
+    "enhanced_profit_margin_band": [
+      0.08,
+      0.14,
+      0.18
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "point_evaluable": [
+      true,
+      true,
+      true
+    ],
+    "human_required": false,
+    "forbidden_future_tokens": [
+      "FY2019 actual",
+      "FY2020 actual",
+      "FY2021 actual",
+      "January 2019 price collapse"
+    ],
+    "source_ids": "MU_FY2018_RESULTS / TF_DRAM_20180926 / TF_MEMORY_20181009 / MU_QLC_20180521 / MU_GDDR6_20180625",
+    "point_in_time_note": "Independent price/inventory research indicated the nine-quarter memory upswing was ending. Product innovation remained a long-duration option and did not offset the one-to-two-year ASP correction in Base."
+  },
+  {
+    "case_id": "MU@FY2020",
+    "split": "holdout",
+    "evaluation_contract": "point-and-interval-with-cycle-tail",
+    "company": "Micron",
+    "mechanism": "memory-cycle",
+    "cutoff": "2020-09-29",
+    "base_revenue": 21.435,
+    "profit_metric": "net income",
+    "unit": "USD bn",
+    "targets": [
+      "FY2021",
+      "FY2022",
+      "FY2023"
+    ],
+    "actual_revenue": [
+      27.705,
+      30.758,
+      15.54
+    ],
+    "actual_profit": [
+      5.861,
+      8.687,
+      -5.833
+    ],
+    "official_revenue": [
+      27.2,
+      29.35,
+      21.2
+    ],
+    "official_profit": [
+      5.45,
+      7.2,
+      -1.0
+    ],
+    "enhanced_revenue": [
+      26.8,
+      29.8,
+      20.5
+    ],
+    "enhanced_profit": [
+      5.3,
+      7.8,
+      -1.5
+    ],
+    "official_revenue_half_width": [
+      0.12,
+      0.28,
+      0.38
+    ],
+    "official_profit_margin_band": [
+      0.08,
+      0.2,
+      0.3
+    ],
+    "enhanced_revenue_half_width": [
+      0.1,
+      0.24,
+      0.4
+    ],
+    "enhanced_profit_margin_band": [
+      0.07,
+      0.15,
+      0.22
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "90%"
+    ],
+    "point_evaluable": [
+      true,
+      true,
+      true
+    ],
+    "human_required": false,
+    "forbidden_future_tokens": [
+      "2021 shortage actual",
+      "FY2023 crash",
+      "inventory write-down 2023"
+    ],
+    "source_ids": "MU_FY2020_10K / MU_Q4_2020_CALL / TF_SERVER_DRAM_20200916 / MU_DDR5_20200106 / SCALING_LAWS_20200123 / MEGATRON_20190917",
+    "point_in_time_note": "Market research improved near-term inventory/price timing. Papers and DDR5/HBM evidence only increased the long-duration AI-memory tail; they did not justify forecasting the later FY2023 crash as a point outcome."
+  },
+  {
+    "case_id": "MRVL@FY2020",
+    "split": "perimeter-break",
+    "evaluation_contract": "distribution-only",
+    "company": "Marvell",
+    "mechanism": "optical-interconnect-custom-silicon",
+    "cutoff": "2020-03-23",
+    "base_revenue": 2.699161,
+    "profit_metric": "GAAP operating income",
+    "unit": "USD bn",
+    "targets": [
+      "FY2021",
+      "FY2022",
+      "FY2023"
+    ],
+    "actual_revenue": [
+      2.9689,
+      4.462383,
+      5.9196
+    ],
+    "actual_profit": [
+      -0.258389,
+      -0.347668,
+      0.238
+    ],
+    "official_revenue": [
+      2.9,
+      3.3,
+      3.9
+    ],
+    "official_profit": [
+      -0.2,
+      -0.2,
+      -0.1
+    ],
+    "enhanced_revenue": [
+      2.95,
+      3.5,
+      4.2
+    ],
+    "enhanced_profit": [
+      -0.2,
+      -0.15,
+      0.0
+    ],
+    "official_revenue_intervals": [
+      [
+        2.4,
+        3.5
+      ],
+      [
+        2.5,
+        4.8
+      ],
+      [
+        2.8,
+        6.5
+      ]
+    ],
+    "official_profit_intervals": [
+      [
+        -0.6,
+        0.15
+      ],
+      [
+        -1.1,
+        0.2
+      ],
+      [
+        -1.2,
+        0.7
+      ]
+    ],
+    "enhanced_revenue_intervals": [
+      [
+        2.5,
+        3.4
+      ],
+      [
+        3.0,
+        4.9
+      ],
+      [
+        3.3,
+        6.4
+      ]
+    ],
+    "enhanced_profit_intervals": [
+      [
+        -0.52,
+        0.1
+      ],
+      [
+        -0.85,
+        0.15
+      ],
+      [
+        -0.9,
+        0.6
+      ]
+    ],
+    "confidence": [
+      "90%",
+      "90%",
+      "90%"
+    ],
+    "point_evaluable": [
+      false,
+      false,
+      false
+    ],
+    "human_required": true,
+    "forbidden_future_tokens": [
+      "Inphi",
+      "Innovium acquisition",
+      "Inphi revenue"
+    ],
+    "source_ids": "MRVL_FY2020_10K / MRVL_400G_PHY_20200309 / LIGHTCOUNTING_20191003 / CIGNAL_400G_20170918 / OPTICAL_DCI_PAPERS_PRE_CUTOFF",
+    "point_in_time_note": "Pre-cutoff optical research supported a higher organic networking/400G tail, but the later Inphi transaction was not public. The forecast remained distribution-only and may not name or dimension that transaction."
+  },
+  {
+    "case_id": "NVDA@FY2020",
+    "split": "holdout",
+    "evaluation_contract": "point-and-interval-with-regime-evidence",
+    "company": "NVIDIA",
+    "mechanism": "compute-platforms",
+    "cutoff": "2020-02-20",
+    "base_revenue": 10.918,
+    "profit_metric": "operating income",
+    "unit": "USD bn",
+    "targets": [
+      "FY2021",
+      "FY2022",
+      "FY2023"
+    ],
+    "actual_revenue": [
+      16.675,
+      26.914,
+      26.974
+    ],
+    "actual_profit": [
+      4.532,
+      10.041,
+      4.224
+    ],
+    "official_revenue": [
+      16.0,
+      25.0,
+      27.5
+    ],
+    "official_profit": [
+      4.3,
+      9.2,
+      5.0
+    ],
+    "enhanced_revenue": [
+      16.3,
+      25.8,
+      27.0
+    ],
+    "enhanced_profit": [
+      4.4,
+      9.6,
+      4.5
+    ],
+    "official_revenue_half_width": [
+      0.08,
+      0.14,
+      0.2
+    ],
+    "official_profit_margin_band": [
+      0.035,
+      0.055,
+      0.08
+    ],
+    "enhanced_revenue_half_width": [
+      0.07,
+      0.12,
+      0.18
+    ],
+    "enhanced_profit_margin_band": [
+      0.03,
+      0.05,
+      0.07
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "point_evaluable": [
+      true,
+      true,
+      true
+    ],
+    "human_required": true,
+    "forbidden_future_tokens": [
+      "ChatGPT",
+      "H100",
+      "generative AI boom",
+      "FY2024 Data Center actual"
+    ],
+    "source_ids": "NVDA_FY2020_10K / MELLANOX_ANNOUNCEMENT_20190311 / MEGATRON_20190917 / SCALING_LAWS_20200123 / NVDA_INVESTOR_COMMUNICATIONS_PRE_CUTOFF",
+    "point_in_time_note": "Investor communication and pre-cutoff papers supported a larger accelerated-compute tail and memory/parallelism constraint. They modestly shifted expected values but did not permit the later generative-AI outcome to enter Base."
+  }
+]

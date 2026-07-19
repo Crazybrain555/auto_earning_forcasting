@@ -1,0 +1,39 @@
+{
+  "model_version": "ai-hardware-forecasting-v6.0",
+  "legacy_locked": {
+    "forecast_rows": 96,
+    "revenue_mape": 0.07384398350599973,
+    "profit_margin_mae_pp": 4.2720061655245685,
+    "regression_differences": 0
+  },
+  "new_holdout": {
+    "cases": 5,
+    "forecast_rows": 30,
+    "revenue_mape_v5": 0.19038190178572406,
+    "revenue_mape_v6": 0.030185220583881702,
+    "profit_margin_mae_pp_v5": 6.223917709999294,
+    "profit_margin_mae_pp_v6": 0.6112916166765384,
+    "revenue_direction_v6": 1.0,
+    "profit_sign_v6": 1.0,
+    "revenue_coverage_v6": 1.0,
+    "profit_coverage_v6": 1.0
+  },
+  "combined_holdout": {
+    "revenue_points": 42,
+    "profit_points": 42,
+    "revenue_mape": 0.05825156817667187,
+    "profit_margin_mae_pp": 2.964608112364558,
+    "revenue_direction_accuracy": 0.9761904761904762,
+    "profit_sign_accuracy": 1.0,
+    "revenue_coverage": 1.0,
+    "profit_coverage": 1.0,
+    "revenue_interval_score": 0.4644376584820678,
+    "profit_interval_score": 0.2713904793120017
+  },
+  "status": "retrospective research-grade / forward screen-grade",
+  "limitations": [
+    "Retrospective point-in-time simulation, not pre-registered live performance.",
+    "New forecasts remain vulnerable to hindsight bias.",
+    "Legacy regression is exact because v6 routes only newly added archetypes and leaves locked legacy modules unchanged."
+  ]
+}

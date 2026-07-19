@@ -1,0 +1,11 @@
+assumption_id,section,product_or_end_market,period,metric,value,unit,evidence_tier,source_id,base_bear_bull,editable,notes
+MS-001,volume,Datacenter,FY27Q1,bit_growth,0.00,percent,E3,,base,true,
+MS-002,price,Datacenter,FY27Q1,asp_per_gb_change,0.00,percent,E3,,base,true,
+MS-003,cost,Datacenter,FY27Q1,unit_cost_per_bit_change,0.00,percent,E3,,base,true,
+MS-004,contract,Company,FY27,quantity_coverage,0.00,percent,E0,,base,true,
+MS-005,contract,Company,FY27,price_floor_coverage,0.00,percent,E0,,base,true,
+MS-006,contract,Company,FY27,execution_rate,0.90,percent,E3,,base,true,
+MS-007,jv_capital,Company,FY27,jv_loans_equity_prepayments,0.00,USD_bn,E0/E3,,base,true,
+MS-008,working_capital,Company,FY27,contract_liability,0.00,USD_bn,E0/E3,,base,true,
+MS-009,shares,Company,FY27,buyback_dollars,0.00,USD_bn,E1/E3,,base,true,
+MS-010,option,HBF,FY31,stage,1,stage,E1,,base,false,Stage less than 3 keeps base revenue at zero

@@ -1,0 +1,84 @@
+{
+  "metrics": {
+    "calibration": {
+      "official": {
+        "cases": 1,
+        "revenue_mape": 0.17466702736187334,
+        "profit_margin_mae_pp": 10.514591484513817,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 0.6666666666666666,
+        "profit_coverage": 0.3333333333333333,
+        "revenue_interval_score": 0.7299044001069034,
+        "profit_interval_score": 0.7010712080112821
+      },
+      "enhanced": {
+        "cases": 1,
+        "revenue_mape": 0.059776176177816,
+        "profit_margin_mae_pp": 2.001097469577626,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.32081384156511233,
+        "profit_interval_score": 0.2675511107064133
+      }
+    },
+    "holdout": {
+      "official": {
+        "cases": 2,
+        "revenue_mape": 0.09322020894896771,
+        "profit_margin_mae_pp": 6.830273546259746,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.4380349412209781,
+        "profit_interval_score": 0.2816282429770658
+      },
+      "enhanced": {
+        "cases": 2,
+        "revenue_mape": 0.07463866929618325,
+        "profit_margin_mae_pp": 5.825982535013805,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.4068537322238443,
+        "profit_interval_score": 0.21686116630689609
+      }
+    },
+    "perimeter-break": {
+      "official": {
+        "cases": 1,
+        "revenue_mape": null,
+        "profit_margin_mae_pp": null,
+        "revenue_direction_accuracy": null,
+        "profit_sign_accuracy": null,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.5036565013260842,
+        "profit_interval_score": 0.28830353756236704
+      },
+      "enhanced": {
+        "cases": 1,
+        "revenue_mape": null,
+        "profit_margin_mae_pp": null,
+        "revenue_direction_accuracy": null,
+        "profit_sign_accuracy": null,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.41753602741117285,
+        "profit_interval_score": 0.22877418825657683
+      }
+    }
+  },
+  "gate_results": {
+    "holdout_revenue_mape_not_worse": true,
+    "holdout_profit_margin_not_worse": true,
+    "holdout_revenue_interval_not_worse": true,
+    "holdout_profit_interval_not_worse": true,
+    "perimeter_revenue_coverage": true,
+    "perimeter_profit_coverage": true
+  }
+}

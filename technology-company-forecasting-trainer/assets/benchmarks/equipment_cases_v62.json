@@ -1,0 +1,278 @@
+[
+  {
+    "case_id": "LRCX@FY2020",
+    "split": "calibration",
+    "company": "Lam Research",
+    "archetype": "wafer-fab-equipment",
+    "cutoff": "FY2020",
+    "targets": [
+      "FY2021",
+      "FY2022",
+      "FY2023"
+    ],
+    "base_revenue": 10.044736,
+    "base_profit": 2.673802,
+    "unit": "USD bn",
+    "profit_metric": "operating_income",
+    "actual_revenue": [
+      14.62615,
+      17.227039,
+      17.428516
+    ],
+    "actual_profit": [
+      4.482023,
+      5.381822,
+      5.17486
+    ],
+    "v61_revenue": [
+      12.5,
+      14.5,
+      16.0
+    ],
+    "v61_profit": [
+      3.4,
+      4.1,
+      4.6
+    ],
+    "v62_revenue": [
+      13.8,
+      16.0,
+      17.0
+    ],
+    "v62_profit": [
+      4.05,
+      4.8,
+      5.0
+    ]
+  },
+  {
+    "case_id": "KLA@FY2020",
+    "split": "calibration",
+    "company": "KLA",
+    "archetype": "process-control",
+    "cutoff": "FY2020",
+    "targets": [
+      "FY2021",
+      "FY2022",
+      "FY2023"
+    ],
+    "base_revenue": 5.806424,
+    "base_profit": 1.216785,
+    "unit": "USD bn",
+    "profit_metric": "net_income",
+    "actual_revenue": [
+      6.918734,
+      9.211883,
+      10.496056
+    ],
+    "actual_profit": [
+      2.078292,
+      3.321807,
+      3.387277
+    ],
+    "v61_revenue": [
+      6.5,
+      7.2,
+      8.0
+    ],
+    "v61_profit": [
+      1.55,
+      1.85,
+      2.1
+    ],
+    "v62_revenue": [
+      6.7,
+      8.5,
+      9.8
+    ],
+    "v62_profit": [
+      1.9,
+      2.9,
+      3.1
+    ]
+  },
+  {
+    "case_id": "LRCX@FY2021",
+    "split": "holdout",
+    "company": "Lam Research",
+    "archetype": "wafer-fab-equipment",
+    "cutoff": "FY2021",
+    "targets": [
+      "FY2022",
+      "FY2023",
+      "FY2024"
+    ],
+    "base_revenue": 14.62615,
+    "base_profit": 4.482023,
+    "unit": "USD bn",
+    "profit_metric": "operating_income",
+    "actual_revenue": [
+      17.227039,
+      17.428516,
+      14.905386
+    ],
+    "actual_profit": [
+      5.381822,
+      5.17486,
+      4.263913
+    ],
+    "v61_revenue": [
+      17.0,
+      19.0,
+      20.5
+    ],
+    "v61_profit": [
+      5.3,
+      6.1,
+      6.7
+    ],
+    "v62_revenue": [
+      16.9,
+      17.3,
+      15.5
+    ],
+    "v62_profit": [
+      5.2,
+      5.05,
+      4.4
+    ]
+  },
+  {
+    "case_id": "LRCX@FY2022",
+    "split": "holdout",
+    "company": "Lam Research",
+    "archetype": "wafer-fab-equipment",
+    "cutoff": "FY2022",
+    "targets": [
+      "FY2023",
+      "FY2024",
+      "FY2025"
+    ],
+    "base_revenue": 17.227039,
+    "base_profit": 5.381822,
+    "unit": "USD bn",
+    "profit_metric": "operating_income",
+    "actual_revenue": [
+      17.428516,
+      14.905386,
+      18.435591
+    ],
+    "actual_profit": [
+      5.17486,
+      4.263913,
+      5.900968
+    ],
+    "v61_revenue": [
+      18.2,
+      19.0,
+      20.0
+    ],
+    "v61_profit": [
+      5.6,
+      5.8,
+      6.1
+    ],
+    "v62_revenue": [
+      17.0,
+      15.8,
+      17.5
+    ],
+    "v62_profit": [
+      5.0,
+      4.5,
+      5.4
+    ]
+  },
+  {
+    "case_id": "KLA@FY2021",
+    "split": "holdout",
+    "company": "KLA",
+    "archetype": "process-control",
+    "cutoff": "FY2021",
+    "targets": [
+      "FY2022",
+      "FY2023",
+      "FY2024"
+    ],
+    "base_revenue": 6.918734,
+    "base_profit": 2.078292,
+    "unit": "USD bn",
+    "profit_metric": "net_income",
+    "actual_revenue": [
+      9.211883,
+      10.496056,
+      9.812247
+    ],
+    "actual_profit": [
+      3.321807,
+      3.387277,
+      2.761896
+    ],
+    "v61_revenue": [
+      8.2,
+      9.0,
+      9.7
+    ],
+    "v61_profit": [
+      2.6,
+      2.85,
+      3.0
+    ],
+    "v62_revenue": [
+      8.8,
+      10.0,
+      9.5
+    ],
+    "v62_profit": [
+      3.0,
+      3.2,
+      2.65
+    ]
+  },
+  {
+    "case_id": "KLA@FY2022",
+    "split": "holdout",
+    "company": "KLA",
+    "archetype": "process-control",
+    "cutoff": "FY2022",
+    "targets": [
+      "FY2023",
+      "FY2024",
+      "FY2025"
+    ],
+    "base_revenue": 9.211883,
+    "base_profit": 3.321807,
+    "unit": "USD bn",
+    "profit_metric": "net_income",
+    "actual_revenue": [
+      10.496056,
+      9.812247,
+      12.156162
+    ],
+    "actual_profit": [
+      3.387277,
+      2.761896,
+      4.061643
+    ],
+    "v61_revenue": [
+      10.0,
+      10.6,
+      11.2
+    ],
+    "v61_profit": [
+      3.5,
+      3.7,
+      3.9
+    ],
+    "v62_revenue": [
+      10.2,
+      9.5,
+      11.5
+    ],
+    "v62_profit": [
+      3.2,
+      2.65,
+      3.75
+    ]
+  }
+]

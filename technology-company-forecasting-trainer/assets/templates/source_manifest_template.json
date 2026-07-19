@@ -1,0 +1,36 @@
+{
+  "as_of": "2026-07-18T00:00:00Z",
+  "entity": "Example Corp",
+  "security": "EXAMPLE",
+  "timezone": "UTC",
+  "sources": [
+    {
+      "source_id": "REPLACE_FILING",
+      "source_type": "filing",
+      "publisher": "REPLACE",
+      "published_at": "2026-01-01T00:00:00Z",
+      "retrieved_at": "2026-07-18T00:00:00Z",
+      "period_scope": "REPLACE",
+      "evidence_tier": "E0",
+      "content_hash": "sha256:REPLACE",
+      "location": "REPLACE",
+      "claim_or_fact": "REPLACE",
+      "allowed_use": "historical/base anchor",
+      "limitations": "",
+      "document_depth": "full_document",
+      "word_count": 0,
+      "anchor_count": 0,
+      "coverage_topics": [
+        "historical_financials_and_vintage"
+      ],
+      "original_source_available": true,
+      "page_or_section_anchors": [],
+      "event_at": null,
+      "version_at": "2026-01-01T00:00:00Z",
+      "source_time_status": "eligible_pre_cutoff",
+      "forecast_permission": "eligible"
+    }
+  ],
+  "conflicts": [],
+  "pack_hash": null
+}

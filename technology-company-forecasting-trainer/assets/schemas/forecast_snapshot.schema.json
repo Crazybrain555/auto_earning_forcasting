@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ForecastSnapshot",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["forecast_id", "as_of", "model_version", "source_pack_hash", "mechanism_weights", "scenario_probabilities", "outputs", "breakpoints", "confidence_and_limits"],
+  "properties": {
+    "forecast_id": {"type": "string"},
+    "as_of": {"type": "string", "format": "date-time"},
+    "model_version": {"type": "string"},
+    "source_pack_hash": {"type": "string", "pattern": "^sha256:"},
+    "mechanism_weights": {"type": "object"},
+    "archetype_weights": {"description": "Deprecated compatibility field.", "type": "object"},
+    "company_lenses": {"type": "array", "items": {"type": "string"}},
+    "scenario_probabilities": {"type": "object"},
+    "outputs": {"type": "object"},
+    "breakpoints": {"type": "array"},
+    "human_required": {"type": "array"},
+    "confidence_and_limits": {"type": "array", "items": {"type": "string"}}
+  }
+}

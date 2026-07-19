@@ -1,0 +1,70 @@
+{
+  "model_version": "technology-company-forecasting-v7.1",
+  "generated_at": "2026-07-18T01:04:48.857404+00:00",
+  "metrics": {
+    "calibration": {
+      "v70": {
+        "cases": 2,
+        "revenue_mape": 0.02921211221300395,
+        "profit_margin_mae_pp": 1.1665352665553608,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.35345594972261457,
+        "profit_interval_score": 0.14001784168313458
+      },
+      "v71": {
+        "cases": 2,
+        "revenue_mape": 0.01713319251369722,
+        "profit_margin_mae_pp": 0.2851704270705279,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.2491214404025753,
+        "profit_interval_score": 0.07867302839790276
+      }
+    },
+    "holdout": {
+      "v70": {
+        "cases": 2,
+        "revenue_mape": 0.10166495256397584,
+        "profit_margin_mae_pp": 3.6382166746139553,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 0.6666666666666666,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.44537007789408295,
+        "profit_interval_score": 0.12981676139174755
+      },
+      "v71": {
+        "cases": 2,
+        "revenue_mape": 0.023155807728559376,
+        "profit_margin_mae_pp": 1.1756497812031974,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.3031785075751619,
+        "profit_interval_score": 0.0870643262186911
+      }
+    }
+  },
+  "gate_results": {
+    "revenue_mape_le_8pct": true,
+    "profit_margin_mae_le_4pp": true,
+    "revenue_direction_ge_85pct": true,
+    "profit_sign_ge_90pct": true,
+    "revenue_coverage_ge_80pct": true,
+    "profit_coverage_ge_80pct": true,
+    "revenue_interval_score_improves_30pct": true,
+    "profit_interval_score_improves_30pct": true,
+    "standalone_fcf_roic_human_required": true
+  },
+  "limitations": [
+    "Retrospective point-in-time simulation, not pre-registered live performance.",
+    "Small AWS-only sample.",
+    "Standalone AWS FCF and ROIC remain human-required because segment working capital, leases, cash taxes and capital structure are incomplete."
+  ]
+}

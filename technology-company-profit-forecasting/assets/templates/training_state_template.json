@@ -1,0 +1,23 @@
+{
+  "iteration_id": "ITER-001",
+  "pair_id": "P01",
+  "case_id": null,
+  "case_role": "development",
+  "phase": "forecast",
+  "training_protocol_version": "2.1",
+  "holdout_integrity_grade": null,
+  "experiment_evidence_status": "not_evaluated",
+  "baseline_skill_version": "8.0",
+  "baseline_skill_hash": null,
+  "candidate_skill_version": null,
+  "candidate_skill_hash": null,
+  "forecast_seal_hash": null,
+  "forecast_sealed_at": null,
+  "actuals_retrieved_at": null,
+  "evaluation_path": null,
+  "diagnosis_path": null,
+  "revision_status": "none",
+  "promotion_status": "not_evaluated",
+  "right_reason_status": "not_evaluated",
+  "activation_control_status": "not_evaluated"
+}

@@ -1,0 +1,262 @@
+[
+  {
+    "case_id": "AWS@FY2016",
+    "split": "calibration",
+    "evaluation_contract": "point-and-interval",
+    "company": "Amazon AWS",
+    "mechanism": "platform-usage-adoption",
+    "cutoff": "FY2016",
+    "base_revenue": 12.219,
+    "base_profit": 3.108,
+    "profit_metric": "segment operating income",
+    "unit": "USD bn",
+    "targets": [
+      "FY2017",
+      "FY2018",
+      "FY2019"
+    ],
+    "actual_revenue": [
+      17.459,
+      25.655,
+      35.026
+    ],
+    "actual_profit": [
+      4.331,
+      7.296,
+      9.201
+    ],
+    "v70_revenue": [
+      18.0918731726,
+      25.5210207883,
+      34.2143613974
+    ],
+    "v70_profit": [
+      4.6922714471,
+      6.7466851739,
+      9.2159108317
+    ],
+    "v71_revenue": [
+      17.2,
+      24.7,
+      34.2
+    ],
+    "v71_profit": [
+      4.3,
+      6.916,
+      9.063
+    ],
+    "v71_revenue_half_width": [
+      0.08,
+      0.12,
+      0.18
+    ],
+    "v71_profit_margin_band": [
+      0.025,
+      0.04,
+      0.055
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "human_required": false,
+    "source_ids": "AMZN_2017_10K / AMZN_2018_10K / AMZN_2019_10K",
+    "point_in_time_note": "Usage grew rapidly while effective prices declined. Separate usage, price and product/customer mix."
+  },
+  {
+    "case_id": "AWS@FY2018",
+    "split": "calibration",
+    "evaluation_contract": "point-and-interval",
+    "company": "Amazon AWS",
+    "mechanism": "platform-usage-adoption",
+    "cutoff": "FY2018",
+    "base_revenue": 25.655,
+    "base_profit": 7.296,
+    "profit_metric": "segment operating income",
+    "unit": "USD bn",
+    "targets": [
+      "FY2019",
+      "FY2020",
+      "FY2021"
+    ],
+    "actual_revenue": [
+      35.026,
+      45.37,
+      62.202
+    ],
+    "actual_profit": [
+      9.201,
+      13.531,
+      18.532
+    ],
+    "v70_revenue": [
+      35.9027023226,
+      47.7305853088,
+      60.1139369625
+    ],
+    "v70_profit": [
+      10.3898474093,
+      14.0513596599,
+      17.9974519536
+    ],
+    "v71_revenue": [
+      35.2,
+      45.5,
+      61.0
+    ],
+    "v71_profit": [
+      9.328,
+      13.4225,
+      17.995
+    ],
+    "v71_revenue_half_width": [
+      0.08,
+      0.12,
+      0.18
+    ],
+    "v71_profit_margin_band": [
+      0.025,
+      0.04,
+      0.055
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "human_required": false,
+    "source_ids": "AMZN_2018_10K / AMZN_2020_10K / AMZN_2021_10K",
+    "point_in_time_note": "AWS segment assets, property/equipment additions and depreciation allow an infrastructure proxy, but not standalone FCF."
+  },
+  {
+    "case_id": "AWS@FY2020",
+    "split": "holdout",
+    "evaluation_contract": "point-and-interval",
+    "company": "Amazon AWS",
+    "mechanism": "platform-usage-adoption",
+    "cutoff": "FY2020",
+    "base_revenue": 45.37,
+    "base_profit": 13.531,
+    "profit_metric": "segment operating income",
+    "unit": "USD bn",
+    "targets": [
+      "FY2021",
+      "FY2022",
+      "FY2023"
+    ],
+    "actual_revenue": [
+      62.202,
+      80.096,
+      90.757
+    ],
+    "actual_profit": [
+      18.532,
+      22.841,
+      24.631
+    ],
+    "v70_revenue": [
+      55.592926015,
+      64.2278124129,
+      73.8619842749
+    ],
+    "v70_profit": [
+      16.8578165566,
+      19.7973702502,
+      23.1362857091
+    ],
+    "v71_revenue": [
+      61.5,
+      79.0,
+      91.0
+    ],
+    "v71_profit": [
+      18.1425,
+      22.515,
+      24.57
+    ],
+    "v71_revenue_half_width": [
+      0.08,
+      0.12,
+      0.18
+    ],
+    "v71_profit_margin_band": [
+      0.02,
+      0.03,
+      0.04
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "human_required": true,
+    "source_ids": "AMZN_2020_10K / AMZN_2021_10K / AMZN_2022_10K / AMZN_2023_10K",
+    "point_in_time_note": "Server useful life changed from three to four years. Show reported and normalized operating margin; standalone FCF/ROIC requires a human allocation bridge."
+  },
+  {
+    "case_id": "AWS@FY2022",
+    "split": "holdout",
+    "evaluation_contract": "point-and-interval-with-regime-tail",
+    "company": "Amazon AWS",
+    "mechanism": "platform-usage-adoption",
+    "cutoff": "FY2022",
+    "base_revenue": 80.096,
+    "base_profit": 22.841,
+    "profit_metric": "segment operating income",
+    "unit": "USD bn",
+    "targets": [
+      "FY2023",
+      "FY2024",
+      "FY2025"
+    ],
+    "actual_revenue": [
+      90.757,
+      107.556,
+      128.725
+    ],
+    "actual_profit": [
+      24.631,
+      39.834,
+      45.606
+    ],
+    "v70_revenue": [
+      97.5309478563,
+      112.1605900348,
+      128.98467854
+    ],
+    "v70_profit": [
+      28.300583974,
+      33.1064745203,
+      38.7173690911
+    ],
+    "v71_revenue": [
+      91.0,
+      104.0,
+      119.0
+    ],
+    "v71_profit": [
+      24.57,
+      33.28,
+      40.46
+    ],
+    "v71_revenue_half_width": [
+      0.08,
+      0.18,
+      0.3
+    ],
+    "v71_profit_margin_band": [
+      0.03,
+      0.07,
+      0.08
+    ],
+    "confidence": [
+      "80%",
+      "90%",
+      "90%"
+    ],
+    "human_required": true,
+    "source_ids": "AMZN_2022_10K / AMZN_2023_10K / AMZN_2024_10K / AMZN_2025_10K",
+    "point_in_time_note": "Customer cost optimization was visible. Generative-AI acceleration remained a discrete regime tail, not a deterministic base forecast."
+  }
+]

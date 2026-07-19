@@ -1,0 +1,18 @@
+{
+  "protocol_version": "2.1",
+  "case_id": "REPLACE",
+  "retrieved_after_seal": false,
+  "source_ids": [],
+  "outcomes": [
+    {
+      "outcome_id": "MECH-001",
+      "activation": "active",
+      "direction": "up",
+      "state": "REPLACE",
+      "timing_period": 1,
+      "magnitude": null,
+      "financial_line": "revenue",
+      "cash_classification": "operating"
+    }
+  ]
+}

@@ -1,0 +1,217 @@
+{
+  "all": {
+    "cases": 37,
+    "companies": 17,
+    "revenue_rows": 105,
+    "profit_rows": 105,
+    "revenue_mean": 0.03672637499057703,
+    "revenue_median": 0.026408664962881894,
+    "revenue_trim10": 0.03126986172271715,
+    "revenue_p90": 0.07085514981975466,
+    "revenue_max": 0.3191763191763192,
+    "profit_mean_pp": 1.336446099807515,
+    "profit_median_pp": 0.7692593502952427,
+    "profit_trim10_pp": 0.9098860994121574,
+    "profit_p90_pp": 2.3052407251483316,
+    "profit_max_pp": 30.21831936466083,
+    "revenue_coverage": 1.0,
+    "profit_coverage": 0.9904761904761905,
+    "revenue_interval_score": 0.3235630386016969,
+    "profit_interval_score": 0.14395434117515069
+  },
+  "stable_holdout": {
+    "cases": 22,
+    "companies": 13,
+    "revenue_rows": 60,
+    "profit_rows": 60,
+    "revenue_mean": 0.038112888341275054,
+    "revenue_median": 0.029094383851129307,
+    "revenue_trim10": 0.030579459053906424,
+    "revenue_p90": 0.07155872918225126,
+    "revenue_max": 0.3191763191763192,
+    "profit_mean_pp": 1.5841456903290103,
+    "profit_median_pp": 0.786389418209546,
+    "profit_trim10_pp": 0.9149021135874618,
+    "profit_p90_pp": 2.4755729403919307,
+    "profit_max_pp": 30.21831936466083,
+    "revenue_coverage": 1.0,
+    "profit_coverage": 0.9833333333333333,
+    "revenue_interval_score": 0.3306497248289445,
+    "profit_interval_score": 0.1467056919878294
+  },
+  "company_cluster_bootstrap_95ci": {
+    "revenue_mean": [
+      0.028375413470300693,
+      0.036375383324813854,
+      0.04623999569281096
+    ],
+    "profit_mean_pp": [
+      0.8346936220031819,
+      1.293013868733786,
+      2.1268623136381706
+    ],
+    "revenue_trim10": [
+      0.024713624747226447,
+      0.031242851735668487,
+      0.037821781597523994
+    ],
+    "profit_trim10_pp": [
+      0.6478747573074229,
+      0.9064625500658158,
+      1.206284091529062
+    ]
+  },
+  "loco_overlay": {
+    "original_revenue_mape": 0.03672637499057703,
+    "overlay_revenue_mape": 0.02998878019111071,
+    "original_margin_mae_pp": 1.3364460998075152,
+    "overlay_margin_mae_pp": 1.2723721811626314,
+    "revenue_rows_improved": 0.6761904761904762,
+    "profit_rows_improved": 0.6095238095238096,
+    "default_application": false,
+    "company_deltas": [
+      [
+        "AMD",
+        -0.01691025484465294,
+        -0.09228016616521705
+      ],
+      [
+        "Amazon AWS",
+        -0.0010820431408062605,
+        0.04726306528249413
+      ],
+      [
+        "Amkor Technology",
+        0.007473490557391378,
+        0.14804594664043988
+      ],
+      [
+        "Applied Materials",
+        -0.020532930962242738,
+        -0.33578450580860064
+      ],
+      [
+        "Arista Networks",
+        -0.023125836545589213,
+        -0.2728516570618507
+      ],
+      [
+        "Broadcom",
+        -0.004883112907187141,
+        -0.10842305280912257
+      ],
+      [
+        "Entegris",
+        0.028465666429399267,
+        -0.1570939215517413
+      ],
+      [
+        "II-VI / Coherent",
+        0.005889949829382933,
+        0.20137165725715014
+      ],
+      [
+        "Intel",
+        0.0058380532042829,
+        0.06493740682556595
+      ],
+      [
+        "KLA",
+        -0.021966084393411727,
+        -0.23857839551900403
+      ],
+      [
+        "Lam Research",
+        -0.004704693048018684,
+        -0.19670254512887236
+      ],
+      [
+        "Marvell Technology",
+        -0.0010454041047801685,
+        0.06712388575238368
+      ],
+      [
+        "Micron",
+        0.0028364978866667087,
+        0.0
+      ],
+      [
+        "NVIDIA",
+        -0.008893947598289188,
+        0.0054692510825185
+      ],
+      [
+        "Netflix",
+        -0.019256360536854707,
+        -0.12331053861378612
+      ],
+      [
+        "Super Micro Computer",
+        -0.014199429187421689,
+        -0.13971954664110267
+      ],
+      [
+        "Vertiv",
+        0.00589703576204733,
+        0.03584514037099614
+      ]
+    ]
+  },
+  "new_sample_improvement": {
+    "holdout_cases": 4,
+    "revenue_mean_improvement": 0.10414070549324826,
+    "profit_mean_improvement_pp": 8.78837112695695,
+    "revenue_bootstrap_95ci": [
+      0.028589367722510306,
+      0.10414070549324826,
+      0.17969204326398622
+    ],
+    "profit_bootstrap_95ci": [
+      2.969615983301566,
+      8.78837112695695,
+      14.607126270612332
+    ],
+    "all_cases_improve_revenue": true,
+    "all_cases_improve_profit": true,
+    "one_sided_sign_test_p": 0.0625,
+    "largest_case_revenue_share": 0.5064373028607037,
+    "largest_case_profit_share": 0.4167488851321516,
+    "case_details": [
+      {
+        "case_id": "AMD@FY2019",
+        "revenue_improvement": 0.14842113449592637,
+        "profit_improvement_pp": 4.441350762839575
+      },
+      {
+        "case_id": "AMD@FY2021",
+        "revenue_improvement": 0.0412197356227888,
+        "profit_improvement_pp": 14.650175477147597
+      },
+      {
+        "case_id": "INTC@FY2019",
+        "revenue_improvement": 0.01595899982223181,
+        "profit_improvement_pp": 1.4978812037635567
+      },
+      {
+        "case_id": "INTC@FY2021",
+        "revenue_improvement": 0.21096295203204607,
+        "profit_improvement_pp": 14.564077064077066
+      }
+    ]
+  },
+  "gate_results": {
+    "sample_companies_ge_12": true,
+    "sample_cases_ge_32": true,
+    "median_revenue_le_8pct": true,
+    "trimmed_revenue_le_8pct": true,
+    "p90_revenue_le_15pct": true,
+    "median_profit_le_3pp": true,
+    "trimmed_profit_le_5pp": true,
+    "p90_profit_le_8pp": true,
+    "coverage_ge_80pct": true,
+    "company_pass_rate_ge_80pct": true,
+    "new_holdout_improves": true,
+    "automatic_global_prior_allowed": false
+  },
+  "readiness": "retrospective-research-grade; global statistical prior remains provisional"
+}

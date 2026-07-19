@@ -1,0 +1,89 @@
+{
+  "model_version": "ai-hardware-forecasting-v6.3",
+  "generated_at": "2026-07-17T17:53:03.334997+00:00",
+  "metrics": {
+    "calibration": {
+      "v62": {
+        "cases": 1,
+        "revenue_mape": 0.20639774037699646,
+        "profit_margin_mae_pp": 6.652565766585319,
+        "revenue_direction_accuracy": 0.6666666666666666,
+        "profit_sign_accuracy": 0.3333333333333333,
+        "revenue_coverage": 0.3333333333333333,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.9363664785851596,
+        "profit_interval_score": 0.2818959228935176
+      },
+      "v63": {
+        "cases": 1,
+        "revenue_mape": 0.032699139774361605,
+        "profit_margin_mae_pp": 1.5908882691005626,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.3101246066119953,
+        "profit_interval_score": 0.17440832051051045
+      }
+    },
+    "holdout": {
+      "v62": {
+        "cases": 2,
+        "revenue_mape": 0.10862507605517545,
+        "profit_margin_mae_pp": 12.853824174479927,
+        "revenue_direction_accuracy": 0.6666666666666666,
+        "profit_sign_accuracy": 0.16666666666666666,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 0.6666666666666666,
+        "revenue_interval_score": 0.608766490337905,
+        "profit_interval_score": 0.42049556636706464
+      },
+      "v63": {
+        "cases": 2,
+        "revenue_mape": 0.025766436743513362,
+        "profit_margin_mae_pp": 2.3339000850062024,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.33205874054713813,
+        "profit_interval_score": 0.2113830749869423
+      }
+    },
+    "perimeter_break": {
+      "v62": {
+        "cases": 1,
+        "point_metrics_not_gated": true,
+        "revenue_coverage": 0.3333333333333333,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 2.1677002873734357,
+        "profit_interval_score": 0.2430874854566646
+      },
+      "v63": {
+        "cases": 1,
+        "point_metrics_not_gated": true,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.5036565013260842,
+        "profit_interval_score": 0.28830353756236704
+      }
+    }
+  },
+  "gate_results": {
+    "revenue_mape_le_8pct": true,
+    "profit_margin_mae_le_5pp": true,
+    "revenue_direction_ge_85pct": true,
+    "profit_sign_ge_90pct": true,
+    "revenue_coverage_ge_80pct": true,
+    "profit_coverage_ge_80pct": true,
+    "revenue_interval_score_improves_30pct": true,
+    "profit_interval_score_improves_30pct": true,
+    "perimeter_break_revenue_coverage": true,
+    "perimeter_break_profit_coverage": true
+  },
+  "limitations": [
+    "Retrospective point-in-time simulation, not pre-registered live performance.",
+    "Small Marvell-only sample.",
+    "FY2020 perimeter-break is distribution-only."
+  ]
+}

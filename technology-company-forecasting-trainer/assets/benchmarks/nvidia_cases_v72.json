@@ -1,0 +1,300 @@
+[
+  {
+    "case_id": "NVDA@FY2018",
+    "split": "calibration",
+    "evaluation_contract": "point-and-interval",
+    "company": "NVIDIA",
+    "mechanism": "compute-platforms",
+    "cutoff": "FY2018",
+    "base_revenue": 9.714,
+    "base_profit": 3.21,
+    "profit_metric": "operating income",
+    "unit": "USD bn",
+    "targets": [
+      "FY2019",
+      "FY2020",
+      "FY2021"
+    ],
+    "actual_revenue": [
+      11.716,
+      10.918,
+      16.675
+    ],
+    "actual_profit": [
+      3.804,
+      2.846,
+      4.532
+    ],
+    "v71_revenue": [
+      12.5,
+      14.0,
+      16.0
+    ],
+    "v71_profit": [
+      4.2,
+      4.8,
+      5.4
+    ],
+    "v72_revenue": [
+      11.5,
+      10.5,
+      15.5
+    ],
+    "v72_profit": [
+      3.7,
+      2.6,
+      4.2
+    ],
+    "v72_revenue_half_width": [
+      0.08,
+      0.14,
+      0.2
+    ],
+    "v72_profit_margin_band": [
+      0.035,
+      0.055,
+      0.075
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "point_evaluable": [
+      true,
+      true,
+      true
+    ],
+    "human_required": true,
+    "source_ids": "NVDA_FY2018_10K / NVDA_FY2019_10K / NVDA_FY2020_10K / NVDA_FY2021_10K",
+    "point_in_time_note": "Gaming sell-in, crypto/channel inventory and data-center platform growth required separate states."
+  },
+  {
+    "case_id": "NVDA@FY2019",
+    "split": "perimeter",
+    "evaluation_contract": "distribution-only-perimeter-break",
+    "company": "NVIDIA",
+    "mechanism": "compute-platforms",
+    "cutoff": "FY2019",
+    "base_revenue": 11.716,
+    "base_profit": 3.804,
+    "profit_metric": "operating income",
+    "unit": "USD bn",
+    "targets": [
+      "FY2020",
+      "FY2021",
+      "FY2022"
+    ],
+    "actual_revenue": [
+      10.918,
+      16.675,
+      26.914
+    ],
+    "actual_profit": [
+      2.846,
+      4.532,
+      10.041
+    ],
+    "v71_revenue": [
+      11.2,
+      12.5,
+      14.5
+    ],
+    "v71_profit": [
+      3.1,
+      3.6,
+      4.4
+    ],
+    "v72_revenue": [
+      10.8,
+      12.8,
+      17.0
+    ],
+    "v72_profit": [
+      2.8,
+      3.3,
+      4.8
+    ],
+    "v72_revenue_intervals": [
+      [
+        9.3,
+        12.5
+      ],
+      [
+        10.0,
+        18.5
+      ],
+      [
+        11.0,
+        29.0
+      ]
+    ],
+    "v72_profit_intervals": [
+      [
+        1.8,
+        3.8
+      ],
+      [
+        1.5,
+        6.5
+      ],
+      [
+        1.5,
+        12.5
+      ]
+    ],
+    "confidence": [
+      "90%",
+      "90%",
+      "90%"
+    ],
+    "point_evaluable": [
+      false,
+      false,
+      false
+    ],
+    "human_required": true,
+    "source_ids": "NVDA_FY2019_10K / MELLANOX_ANNOUNCEMENT / NVDA_FY2020_10K / NVDA_FY2021_10K / NVDA_FY2022_10K",
+    "point_in_time_note": "Mellanox was not announced by the FY2019 cutoff. Preserve the organic Base and use an anonymous perimeter-expansion tail; do not backfill the later transaction."
+  },
+  {
+    "case_id": "NVDA@FY2020",
+    "split": "holdout",
+    "evaluation_contract": "point-and-interval",
+    "company": "NVIDIA",
+    "mechanism": "compute-platforms",
+    "cutoff": "FY2020",
+    "base_revenue": 10.918,
+    "base_profit": 2.846,
+    "profit_metric": "operating income",
+    "unit": "USD bn",
+    "targets": [
+      "FY2021",
+      "FY2022",
+      "FY2023"
+    ],
+    "actual_revenue": [
+      16.675,
+      26.914,
+      26.974
+    ],
+    "actual_profit": [
+      4.532,
+      10.041,
+      4.224
+    ],
+    "v71_revenue": [
+      13.5,
+      17.0,
+      20.5
+    ],
+    "v71_profit": [
+      3.8,
+      5.5,
+      7.0
+    ],
+    "v72_revenue": [
+      16.0,
+      25.0,
+      27.5
+    ],
+    "v72_profit": [
+      4.3,
+      9.2,
+      5.0
+    ],
+    "v72_revenue_half_width": [
+      0.08,
+      0.14,
+      0.2
+    ],
+    "v72_profit_margin_band": [
+      0.035,
+      0.055,
+      0.08
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "point_evaluable": [
+      true,
+      true,
+      true
+    ],
+    "human_required": true,
+    "source_ids": "NVDA_FY2020_10K / NVDA_FY2021_10K / NVDA_FY2022_10K / NVDA_FY2023_10K",
+    "point_in_time_note": "Mellanox was public and pending. Model partial consolidation, platform mix, channel normalization and acquisition accounting separately."
+  },
+  {
+    "case_id": "NVDA@FY2021",
+    "split": "holdout",
+    "evaluation_contract": "point-and-interval-with-ai-tail",
+    "company": "NVIDIA",
+    "mechanism": "compute-platforms",
+    "cutoff": "FY2021",
+    "base_revenue": 16.675,
+    "base_profit": 4.532,
+    "profit_metric": "operating income",
+    "unit": "USD bn",
+    "targets": [
+      "FY2022",
+      "FY2023",
+      "FY2024"
+    ],
+    "actual_revenue": [
+      26.914,
+      26.974,
+      60.922
+    ],
+    "actual_profit": [
+      10.041,
+      4.224,
+      32.972
+    ],
+    "v71_revenue": [
+      22.0,
+      27.5,
+      33.0
+    ],
+    "v71_profit": [
+      7.5,
+      9.5,
+      12.0
+    ],
+    "v72_revenue": [
+      26.0,
+      27.0,
+      42.0
+    ],
+    "v72_profit": [
+      9.5,
+      5.5,
+      18.0
+    ],
+    "v72_revenue_half_width": [
+      0.08,
+      0.16,
+      0.48
+    ],
+    "v72_profit_margin_band": [
+      0.04,
+      0.08,
+      0.37
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "90%"
+    ],
+    "point_evaluable": [
+      true,
+      true,
+      false
+    ],
+    "human_required": true,
+    "source_ids": "NVDA_FY2021_10K / NVDA_FY2022_10K / NVDA_FY2023_10K / NVDA_FY2024_10K",
+    "point_in_time_note": "Arm was public but uncertain; gaming/channel inventory and the later generative-AI regime required separate probability branches. Third-year point is secondary."
+  }
+]

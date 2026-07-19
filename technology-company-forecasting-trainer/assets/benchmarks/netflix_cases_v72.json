@@ -1,0 +1,282 @@
+[
+  {
+    "case_id": "NFLX@FY2014",
+    "split": "calibration",
+    "evaluation_contract": "point-and-interval",
+    "company": "Netflix",
+    "mechanism": "subscriber-content-economics",
+    "cutoff": "FY2014",
+    "base_revenue": 5.504656,
+    "base_profit": 0.402648,
+    "profit_metric": "operating income",
+    "unit": "USD bn",
+    "targets": [
+      "FY2015",
+      "FY2016",
+      "FY2017"
+    ],
+    "actual_revenue": [
+      6.779511,
+      8.830669,
+      11.692713
+    ],
+    "actual_profit": [
+      0.305826,
+      0.379793,
+      0.838679
+    ],
+    "v71_revenue": [
+      6.7,
+      8.0,
+      9.7
+    ],
+    "v71_profit": [
+      0.45,
+      0.6,
+      0.85
+    ],
+    "v72_revenue": [
+      6.75,
+      8.6,
+      11.3
+    ],
+    "v72_profit": [
+      0.32,
+      0.42,
+      0.78
+    ],
+    "v72_revenue_half_width": [
+      0.08,
+      0.12,
+      0.18
+    ],
+    "v72_profit_margin_band": [
+      0.02,
+      0.03,
+      0.04
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "point_evaluable": [
+      true,
+      true,
+      true
+    ],
+    "human_required": true,
+    "source_ids": "NFLX_2014_10K / NFLX_2015_10K / NFLX_2016_10K / NFLX_2017_10K",
+    "point_in_time_note": "Domestic and international cohorts had different maturity and contribution economics. Net additions alone were insufficient; content cash exceeded amortization."
+  },
+  {
+    "case_id": "NFLX@FY2016",
+    "split": "holdout",
+    "evaluation_contract": "point-and-interval",
+    "company": "Netflix",
+    "mechanism": "subscriber-content-economics",
+    "cutoff": "FY2016",
+    "base_revenue": 8.830669,
+    "base_profit": 0.379793,
+    "profit_metric": "operating income",
+    "unit": "USD bn",
+    "targets": [
+      "FY2017",
+      "FY2018",
+      "FY2019"
+    ],
+    "actual_revenue": [
+      11.692713,
+      15.794341,
+      20.156447
+    ],
+    "actual_profit": [
+      0.838679,
+      1.605226,
+      2.604254
+    ],
+    "v71_revenue": [
+      10.6,
+      12.7,
+      15.0
+    ],
+    "v71_profit": [
+      0.6,
+      0.95,
+      1.4
+    ],
+    "v72_revenue": [
+      11.5,
+      15.0,
+      19.2
+    ],
+    "v72_profit": [
+      0.78,
+      1.45,
+      2.35
+    ],
+    "v72_revenue_half_width": [
+      0.08,
+      0.12,
+      0.18
+    ],
+    "v72_profit_margin_band": [
+      0.02,
+      0.025,
+      0.035
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "point_evaluable": [
+      true,
+      true,
+      true
+    ],
+    "human_required": true,
+    "source_ids": "NFLX_2016_10K / NFLX_2017_10K / NFLX_2018_10K / NFLX_2019_10K",
+    "point_in_time_note": "International contribution economics were approaching inflection while content payments, obligations and debt still constrained cash economics."
+  },
+  {
+    "case_id": "NFLX@FY2018",
+    "split": "holdout",
+    "evaluation_contract": "point-and-interval-with-exogenous-tail",
+    "company": "Netflix",
+    "mechanism": "subscriber-content-economics",
+    "cutoff": "FY2018",
+    "base_revenue": 15.794341,
+    "base_profit": 1.605226,
+    "profit_metric": "operating income",
+    "unit": "USD bn",
+    "targets": [
+      "FY2019",
+      "FY2020",
+      "FY2021"
+    ],
+    "actual_revenue": [
+      20.156447,
+      24.996056,
+      29.697844
+    ],
+    "actual_profit": [
+      2.604254,
+      4.585289,
+      6.194509
+    ],
+    "v71_revenue": [
+      18.5,
+      21.5,
+      24.5
+    ],
+    "v71_profit": [
+      2.2,
+      3.0,
+      3.8
+    ],
+    "v72_revenue": [
+      19.8,
+      23.5,
+      27.0
+    ],
+    "v72_profit": [
+      2.45,
+      3.65,
+      5.0
+    ],
+    "v72_revenue_half_width": [
+      0.08,
+      0.28,
+      0.35
+    ],
+    "v72_profit_margin_band": [
+      0.02,
+      0.1,
+      0.14
+    ],
+    "confidence": [
+      "80%",
+      "90%",
+      "90%"
+    ],
+    "point_evaluable": [
+      true,
+      false,
+      false
+    ],
+    "human_required": true,
+    "source_ids": "NFLX_2018_10K / NFLX_2019_10K / NFLX_2020_10K / NFLX_2021_10K",
+    "point_in_time_note": "2019 remained a normal forecast year. Pandemic demand pull-forward and production delays in 2020-2021 were exogenous tails rather than deterministic Base inputs."
+  },
+  {
+    "case_id": "NFLX@FY2019",
+    "split": "exogenous",
+    "evaluation_contract": "distribution-only-exogenous-shock",
+    "company": "Netflix",
+    "mechanism": "subscriber-content-economics",
+    "cutoff": "FY2019",
+    "base_revenue": 20.156447,
+    "base_profit": 2.604254,
+    "profit_metric": "operating income",
+    "unit": "USD bn",
+    "targets": [
+      "FY2020",
+      "FY2021",
+      "FY2022"
+    ],
+    "actual_revenue": [
+      24.996056,
+      29.697844,
+      31.61555
+    ],
+    "actual_profit": [
+      4.585289,
+      6.194509,
+      5.632831
+    ],
+    "v71_revenue": [
+      23.5,
+      27.0,
+      30.5
+    ],
+    "v71_profit": [
+      3.4,
+      4.2,
+      5.1
+    ],
+    "v72_revenue": [
+      23.8,
+      27.5,
+      30.0
+    ],
+    "v72_profit": [
+      3.8,
+      5.0,
+      5.6
+    ],
+    "v72_revenue_half_width": [
+      0.22,
+      0.3,
+      0.35
+    ],
+    "v72_profit_margin_band": [
+      0.09,
+      0.12,
+      0.15
+    ],
+    "confidence": [
+      "90%",
+      "90%",
+      "90%"
+    ],
+    "point_evaluable": [
+      false,
+      false,
+      false
+    ],
+    "human_required": true,
+    "source_ids": "NFLX_2019_10K / NFLX_2020_10K / NFLX_2021_10K / NFLX_2022_10K",
+    "point_in_time_note": "COVID-related demand acceleration and production/payment delays were not knowable at the FY2019 cutoff. Evaluate distribution coverage and cash-content resilience, not point accuracy."
+  }
+]

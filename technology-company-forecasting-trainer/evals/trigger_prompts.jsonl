@@ -1,0 +1,8 @@
+{"prompt": "回测Lam Research在2022年时对未来三年的收入预测，并诊断误差根因。", "should_trigger": true}
+{"prompt": "用AWS 2018年的信息做一个historical_train训练案例，封存后再对Actual打分。", "should_trigger": true}
+{"prompt": "上一轮NVIDIA预测偏差很大，帮我做误差归因并提出可泛化的方法修订。", "should_trigger": true}
+{"prompt": "这轮改进在验证的两家公司上效果不好，做一次左脚踩右脚的换组训练验证，看看两版规则差得远不远。", "should_trigger": true}
+{"prompt": "这轮验证没啥大问题，重建live生产版skill然后commit push。", "should_trigger": true}
+{"prompt": "请按点时点方法预测美光未来两年收入和利润，并拆HBM、DRAM和NAND。", "should_trigger": false}
+{"prompt": "给Vertiv做订单、backlog、交付和毛利率模型。", "should_trigger": false}
+{"prompt": "帮我写一首关于芯片的诗。", "should_trigger": false}

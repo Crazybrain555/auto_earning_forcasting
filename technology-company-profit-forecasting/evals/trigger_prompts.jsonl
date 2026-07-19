@@ -1,0 +1,8 @@
+{"prompt": "请按点时点方法预测美光未来两年收入和利润，并拆HBM、DRAM和NAND。", "should_trigger": true}
+{"prompt": "Google TPU和NVIDIA机柜会给企业级SSD带来多少需求？", "should_trigger": true}
+{"prompt": "给Vertiv做订单、backlog、交付和毛利率模型。", "should_trigger": true}
+{"prompt": "分析NVIDIA、AMD和Intel未来三年的分部收入、供应约束和估值。", "should_trigger": true}
+{"prompt": "Build a five-year revenue, GAAP profit and valuation model for Marvell with scenario analysis.", "should_trigger": true}
+{"prompt": "回测Lam Research在2022年时对未来三年的收入预测，并诊断误差根因。", "should_trigger": false}
+{"prompt": "跑一轮历史训练迭代，改进预测skill的方法并做holdout验证。", "should_trigger": false}
+{"prompt": "帮我写一首关于芯片的诗。", "should_trigger": false}

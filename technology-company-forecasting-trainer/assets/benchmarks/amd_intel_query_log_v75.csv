@@ -1,0 +1,7 @@
+﻿query_id,case_id,searched_at,cutoff,query_text,domains,result_source_ids,future_outcome_terms_used,reviewer,notes
+AMD17-Q1,AMD@FY2017,2026-07-18T14:00:00Z,2018-02-27,AMD FY2017 results Ryzen EPYC launch,"amd.com,sec.gov",AMD_FY2017_RESULTS;AMD_EPYC_20170620,false,reviewer,Use cutoff-known figures
+AMD19-Q1,AMD@FY2019,2026-07-18T14:05:00Z,2020-02-04,AMD FY2019 10-K Rome EPYC platform public information,"amd.com,sec.gov",AMD_FY2019_10K;AMD_CES_20190109,false,reviewer,Xilinx excluded
+AMD21-Q1,AMD@FY2021,2026-07-18T14:10:00Z,2022-02-03,AMD FY2021 filing Xilinx public transaction purchase accounting,"amd.com,sec.gov",AMD_FY2021_10K;AMD_XILINX_ANNOUNCEMENT_20201027,false,reviewer,Public perimeter only
+INTC17-Q1,INTC@FY2017,2026-07-18T14:15:00Z,2018-01-25,Intel FY2017 results data centric manufacturing,"intel.com,sec.gov",INTC_FY2018_10K,false,reviewer,Actual source after cutoff only for validation
+INTC19-Q1,INTC@FY2019,2026-07-18T14:20:00Z,2020-01-23,Intel FY2019 results 2020 outlook 7nm roadmap 2021,"intel.com,sec.gov",INTC_FY2019_RESULTS;INTC_2019_INVESTOR_MEETING,false,reviewer,Later 7nm delay excluded
+INTC21-Q1,INTC@FY2021,2026-07-18T14:25:00Z,2022-01-27,Intel FY2021 IDM 2.0 foundry capital strategy,"intel.com,sec.gov",INTC_IDM2_ANNOUNCEMENT_20210323;INTC_FY2021_10K,false,reviewer,Exact 2024 impairment excluded

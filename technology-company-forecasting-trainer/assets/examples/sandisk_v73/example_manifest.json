@@ -1,0 +1,11 @@
+{
+  "example": "Sandisk v7.3",
+  "as_of": "2026-07-18",
+  "purpose": "gold-standard full-company model and report example",
+  "files": [
+    "Sandisk_SNDK_v7.3_五年财务模型.xlsx",
+    "Sandisk_SNDK_v7.3_模型报告.md"
+  ],
+  "allowed_use": "structure, evidence discipline, model depth, output completeness",
+  "prohibited_use": "copying company assumptions, forecast values, probabilities, or valuation multiples into another company"
+}

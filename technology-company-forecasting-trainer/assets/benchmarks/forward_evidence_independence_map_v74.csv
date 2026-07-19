@@ -1,0 +1,15 @@
+﻿cluster_id,original_source_id,derived_source_id,relationship,independence_weight,notes
+TF_MEMORY_2018,TF_DRAM_20180926,TF_MEMORY_20181009,same_research_organization,0.5,Count as one cluster
+MU_PRODUCT_2018,MU_QLC_20180521,MU_GDDR6_20180625,same_company_product_announcements,0.5,Official but incentive correlated
+MU_IR_2018,MU_FY2018_RESULTS,,official_dialogue_cluster,1.0,Independent of TrendForce
+TF_SERVER_2020,TF_SERVER_DRAM_20200916,,original_industry_measurement,1.0,Independent industry state source
+MU_IR_2020,MU_Q4_2020_CALL,,official_dialogue_cluster,1.0,Management incentive reviewed
+MU_DDR5_2020,MU_DDR5_20200106,,official_product_cluster,1.0,Product stage not revenue proof
+LLM_SCALING_2020,SCALING_LAWS_20200123,MEGATRON_20190917,related_research_theme,0.7,Technical regime evidence only
+LLM_SCALING_2020_INDEPENDENT,SCALING_LAWS_20200123,,independent_technical_cluster,1.0,Separate from company dialogue
+OPTICS_MARKET_2019,LIGHTCOUNTING_20191003,,independent_market_research,1.0,Market demand and shipment
+OPTICS_MARKET_2017,CIGNAL_400G_20170918,,independent_market_research,1.0,Separate organization/date
+MRVL_PRODUCT_2020,MRVL_400G_PHY_20200309,,official_product_cluster,1.0,Product launch/stage
+OPTICS_TECH_2020,OPTICAL_PAPERS_PRE_CUTOFF,,technical_literature_cluster,1.0,Feasibility only
+NVDA_MNA_2019,MELLANOX_ANNOUNCEMENT_20190311,,public_transaction_announcement,1.0,Allowed before cutoff
+NVDA_IR_2020,NVDA_FY2020_10K_DIALOGUE,,official_dialogue_cluster,1.0,Official platform/channel

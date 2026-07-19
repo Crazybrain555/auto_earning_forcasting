@@ -1,0 +1,61 @@
+{
+  "version": "1.0",
+  "minimum_official_sources": 6,
+  "required_source_types": [
+    "filing",
+    "earnings"
+  ],
+  "required_report_sections": [
+    "Information cutoff",
+    "Conclusion",
+    "Base forecast",
+    "Drivers",
+    "Cash",
+    "Scenarios",
+    "Valuation",
+    "Reverse-implied",
+    "Monitoring",
+    "Limitations"
+  ],
+  "required_workbook_concepts": [
+    "summary",
+    "sources",
+    "history",
+    "quarterly",
+    "drivers",
+    "financials",
+    "cash",
+    "scenarios",
+    "valuation",
+    "monitoring",
+    "manifest"
+  ],
+  "minimum_red_team_findings": 5,
+  "formula_error_tolerance": 0,
+  "scenario_probability_tolerance": 0.0001,
+  "unresolved_p0_policy": "readiness-cap-and-disclose",
+  "minimum_accepted_research_words": 12000,
+  "minimum_substantial_sources": 8,
+  "minimum_historical_filing_periods": 3,
+  "maximum_unsupported_materiality_ratio": 0.35,
+  "required_research_artifacts": [
+    "research_coverage_matrix.csv",
+    "company_quality_moat_register.csv",
+    "technology_commercialization_register.csv",
+    "product_customer_driver_schedule.csv",
+    "material_assumption_support.csv",
+    "research_completeness.json"
+  ],
+  "research_parity_dimensions": [
+    "source depth and original anchors",
+    "products and revenue units",
+    "customers/channels/demand",
+    "competition and market structure",
+    "supply/capacity/cost",
+    "technology/IP/papers/patents/standards",
+    "management/governance/capital allocation",
+    "company quality and moat",
+    "accounting/cash/economic capital",
+    "material assumption evidence support"
+  ]
+}

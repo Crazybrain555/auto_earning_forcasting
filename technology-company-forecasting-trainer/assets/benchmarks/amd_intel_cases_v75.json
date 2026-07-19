@@ -1,0 +1,476 @@
+[
+  {
+    "case_id": "AMD@FY2017",
+    "company": "AMD",
+    "mechanism": "compute-platforms",
+    "split": "calibration",
+    "evaluation_contract": "point-and-interval",
+    "cutoff": "2018-02-27",
+    "base_revenue": 5.329,
+    "base_profit": 0.204,
+    "targets": [
+      "FY2018",
+      "FY2019",
+      "FY2020"
+    ],
+    "actual_revenue": [
+      6.475,
+      6.731,
+      9.763
+    ],
+    "actual_profit": [
+      0.451,
+      0.631,
+      1.369
+    ],
+    "v74_revenue": [
+      6.2,
+      6.8,
+      7.5
+    ],
+    "v74_profit": [
+      0.35,
+      0.55,
+      0.75
+    ],
+    "v75_revenue": [
+      6.4,
+      6.9,
+      8.4
+    ],
+    "v75_profit": [
+      0.42,
+      0.6,
+      1.0
+    ],
+    "v74_revenue_half_width": [
+      0.1,
+      0.18,
+      0.25
+    ],
+    "v74_profit_margin_band": [
+      0.04,
+      0.07,
+      0.1
+    ],
+    "v75_revenue_half_width": [
+      0.08,
+      0.14,
+      0.22
+    ],
+    "v75_profit_margin_band": [
+      0.03,
+      0.05,
+      0.08
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "point_evaluable": [
+      true,
+      true,
+      true
+    ],
+    "regime": "product-ramp",
+    "human_required": true,
+    "source_ids": "AMD_FY2017_RESULTS / AMD_EPYC_20170620 / AMD_FY2019_10K / AMD_FY2020_10K",
+    "point_in_time_note": "Use the FY2017 values known at the cutoff, not later recast comparatives. Ryzen and EPYC supported a product-platform ramp, but server share and channel sell-through remained uncertain."
+  },
+  {
+    "case_id": "AMD@FY2019",
+    "company": "AMD",
+    "mechanism": "compute-platforms",
+    "split": "holdout",
+    "evaluation_contract": "point-and-interval-with-perimeter-tail",
+    "cutoff": "2020-02-04",
+    "base_revenue": 6.731,
+    "base_profit": 0.631,
+    "targets": [
+      "FY2020",
+      "FY2021",
+      "FY2022"
+    ],
+    "actual_revenue": [
+      9.763,
+      16.434,
+      23.601
+    ],
+    "actual_profit": [
+      1.369,
+      3.648,
+      1.264
+    ],
+    "v74_revenue": [
+      8.2,
+      10.5,
+      13.0
+    ],
+    "v74_profit": [
+      0.8,
+      1.5,
+      2.2
+    ],
+    "v75_revenue": [
+      8.9,
+      14.2,
+      17.5
+    ],
+    "v75_profit": [
+      1.05,
+      3.0,
+      1.8
+    ],
+    "v74_revenue_half_width": [
+      0.12,
+      0.22,
+      0.35
+    ],
+    "v74_profit_margin_band": [
+      0.05,
+      0.1,
+      0.16
+    ],
+    "v75_revenue_half_width": [
+      0.1,
+      0.18,
+      0.34
+    ],
+    "v75_profit_margin_band": [
+      0.04,
+      0.08,
+      0.14
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "90%"
+    ],
+    "point_evaluable": [
+      true,
+      true,
+      false
+    ],
+    "regime": "platform-ramp-perimeter",
+    "human_required": true,
+    "source_ids": "AMD_FY2019_10K / AMD_CES_20190109 / AMD_EPYC_ROME_2019 / AMD_FY2020_10K / AMD_FY2021_10K",
+    "point_in_time_note": "Rome and Ryzen supported a larger organic ramp. Xilinx was not public at cutoff; FY2022 therefore retains an anonymous perimeter tail and is not scored as a point forecast."
+  },
+  {
+    "case_id": "AMD@FY2021",
+    "company": "AMD",
+    "mechanism": "compute-platforms",
+    "split": "holdout",
+    "evaluation_contract": "point-and-interval-with-public-acquisition",
+    "cutoff": "2022-02-03",
+    "base_revenue": 16.434,
+    "base_profit": 3.648,
+    "targets": [
+      "FY2022",
+      "FY2023",
+      "FY2024"
+    ],
+    "actual_revenue": [
+      23.601,
+      22.68,
+      25.785
+    ],
+    "actual_profit": [
+      1.264,
+      0.401,
+      1.9
+    ],
+    "v74_revenue": [
+      24.5,
+      25.5,
+      27.0
+    ],
+    "v74_profit": [
+      5.5,
+      5.2,
+      5.4
+    ],
+    "v75_revenue": [
+      23.0,
+      22.0,
+      25.0
+    ],
+    "v75_profit": [
+      1.8,
+      0.6,
+      1.6
+    ],
+    "v74_revenue_half_width": [
+      0.1,
+      0.16,
+      0.22
+    ],
+    "v74_profit_margin_band": [
+      0.05,
+      0.08,
+      0.11
+    ],
+    "v75_revenue_half_width": [
+      0.08,
+      0.13,
+      0.18
+    ],
+    "v75_profit_margin_band": [
+      0.04,
+      0.07,
+      0.1
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "point_evaluable": [
+      true,
+      true,
+      true
+    ],
+    "regime": "acquisition-accounting-normalization",
+    "human_required": true,
+    "source_ids": "AMD_FY2021_10K / AMD_XILINX_ANNOUNCEMENT_20201027 / AMD_FY2022_10K / AMD_FY2023_RESULTS / AMD_FY2024_10K",
+    "point_in_time_note": "The Xilinx transaction was public and could enter a perimeter bridge. GAAP amortization, purchase accounting and integration effects must be separated from adjusted product economics."
+  },
+  {
+    "case_id": "INTC@FY2017",
+    "company": "Intel",
+    "mechanism": "integrated-device-manufacturing",
+    "split": "calibration",
+    "evaluation_contract": "point-and-interval",
+    "cutoff": "2018-01-25",
+    "base_revenue": 62.761,
+    "base_profit": 18.05,
+    "targets": [
+      "FY2018",
+      "FY2019",
+      "FY2020"
+    ],
+    "actual_revenue": [
+      70.848,
+      71.965,
+      77.867
+    ],
+    "actual_profit": [
+      23.316,
+      22.035,
+      23.678
+    ],
+    "v74_revenue": [
+      67.0,
+      70.0,
+      73.0
+    ],
+    "v74_profit": [
+      19.5,
+      20.5,
+      21.0
+    ],
+    "v75_revenue": [
+      69.5,
+      72.0,
+      76.0
+    ],
+    "v75_profit": [
+      22.5,
+      22.2,
+      22.8
+    ],
+    "v74_revenue_half_width": [
+      0.08,
+      0.14,
+      0.2
+    ],
+    "v74_profit_margin_band": [
+      0.035,
+      0.055,
+      0.08
+    ],
+    "v75_revenue_half_width": [
+      0.07,
+      0.12,
+      0.18
+    ],
+    "v75_profit_margin_band": [
+      0.03,
+      0.05,
+      0.07
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "80%"
+    ],
+    "point_evaluable": [
+      true,
+      true,
+      true
+    ],
+    "regime": "data-centric-expansion",
+    "human_required": true,
+    "source_ids": "INTC_FY2017_10K / INTC_FY2018_10K / INTC_FY2019_RESULTS / INTC_FY2021_10K",
+    "point_in_time_note": "Data-centric growth and high utilization supported the expansion, but product cadence, manufacturing economics and PC mix required separate bridges."
+  },
+  {
+    "case_id": "INTC@FY2019",
+    "company": "Intel",
+    "mechanism": "integrated-device-manufacturing",
+    "split": "holdout",
+    "evaluation_contract": "point-and-interval-with-process-tail",
+    "cutoff": "2020-01-23",
+    "base_revenue": 71.965,
+    "base_profit": 22.035,
+    "targets": [
+      "FY2020",
+      "FY2021",
+      "FY2022"
+    ],
+    "actual_revenue": [
+      77.867,
+      79.024,
+      63.054
+    ],
+    "actual_profit": [
+      23.678,
+      19.456,
+      2.334
+    ],
+    "v74_revenue": [
+      75.0,
+      77.0,
+      79.0
+    ],
+    "v74_profit": [
+      22.5,
+      22.0,
+      21.5
+    ],
+    "v75_revenue": [
+      76.5,
+      78.0,
+      68.0
+    ],
+    "v75_profit": [
+      23.0,
+      20.0,
+      7.0
+    ],
+    "v74_revenue_half_width": [
+      0.08,
+      0.14,
+      0.22
+    ],
+    "v74_profit_margin_band": [
+      0.035,
+      0.06,
+      0.1
+    ],
+    "v75_revenue_half_width": [
+      0.07,
+      0.12,
+      0.24
+    ],
+    "v75_profit_margin_band": [
+      0.03,
+      0.05,
+      0.11
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "90%"
+    ],
+    "point_evaluable": [
+      true,
+      true,
+      false
+    ],
+    "regime": "process-cadence-tail",
+    "human_required": true,
+    "source_ids": "INTC_FY2019_RESULTS / INTC_2019_INVESTOR_MEETING / INTC_FY2021_10K / INTC_FY2022_10K",
+    "point_in_time_note": "At cutoff Intel guided 2020 growth and still expected 7nm in 2021. The later 7nm delay and 2022 PC collapse were not public, so FY2022 remains a distribution tail."
+  },
+  {
+    "case_id": "INTC@FY2021",
+    "company": "Intel",
+    "mechanism": "integrated-device-manufacturing",
+    "split": "holdout",
+    "evaluation_contract": "point-and-interval-with-idm-transition-tail",
+    "cutoff": "2022-01-27",
+    "base_revenue": 79.024,
+    "base_profit": 19.456,
+    "targets": [
+      "FY2022",
+      "FY2023",
+      "FY2024"
+    ],
+    "actual_revenue": [
+      63.054,
+      54.228,
+      53.101
+    ],
+    "actual_profit": [
+      2.334,
+      0.093,
+      -11.678
+    ],
+    "v74_revenue": [
+      74.0,
+      72.0,
+      70.0
+    ],
+    "v74_profit": [
+      14.0,
+      13.0,
+      12.0
+    ],
+    "v75_revenue": [
+      66.0,
+      56.0,
+      54.0
+    ],
+    "v75_profit": [
+      4.0,
+      1.0,
+      -4.0
+    ],
+    "v74_revenue_half_width": [
+      0.1,
+      0.18,
+      0.28
+    ],
+    "v74_profit_margin_band": [
+      0.05,
+      0.09,
+      0.15
+    ],
+    "v75_revenue_half_width": [
+      0.09,
+      0.15,
+      0.3
+    ],
+    "v75_profit_margin_band": [
+      0.05,
+      0.08,
+      0.18
+    ],
+    "confidence": [
+      "80%",
+      "80%",
+      "90%"
+    ],
+    "point_evaluable": [
+      true,
+      true,
+      false
+    ],
+    "regime": "idm-transition-and-impairment-tail",
+    "human_required": true,
+    "source_ids": "INTC_FY2021_10K / INTC_IDM2_ANNOUNCEMENT_20210323 / INTC_FY2022_10K / INTC_FY2023_ANNUAL / INTC_FY2024_10K",
+    "point_in_time_note": "IDM 2.0 and rising foundry/manufacturing investment were public. The exact 2024 impairment and accelerated-depreciation loss were not predictable and remain distribution-only."
+  }
+]

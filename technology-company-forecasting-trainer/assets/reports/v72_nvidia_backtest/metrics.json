@@ -1,0 +1,89 @@
+{
+  "model_version": "technology-company-forecasting-v7.2",
+  "benchmark": "nvidia",
+  "generated_at": "2026-07-18T04:59:32.938204+00:00",
+  "metrics": {
+    "calibration": {
+      "v71": {
+        "cases": 1,
+        "revenue_mape": 0.12989430988085662,
+        "profit_margin_mae_pp": 5.307279663003597,
+        "revenue_direction_accuracy": 0.6666666666666666,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 0.6666666666666666,
+        "profit_coverage": 0.6666666666666666,
+        "revenue_interval_score": 0.5565042752175269,
+        "profit_interval_score": 0.44962741687091484
+      },
+      "v72": {
+        "cases": 1,
+        "revenue_mape": 0.042395498087969614,
+        "profit_margin_mae_pp": 0.5604277659240283,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.26604812288637125,
+        "profit_interval_score": 0.10464278266065756
+      }
+    },
+    "holdout": {
+      "v71": {
+        "cases": 2,
+        "revenue_mape": 0.20017079715553782,
+        "profit_margin_mae_pp": 9.302815380085441,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 0.2,
+        "profit_coverage": 0.0,
+        "revenue_interval_score": 1.2898800876326333,
+        "profit_interval_score": 0.8004289806537545
+      },
+      "v72": {
+        "cases": 2,
+        "revenue_mape": 0.03320386724253736,
+        "profit_margin_mae_pp": 1.7627063227443933,
+        "revenue_direction_accuracy": 1.0,
+        "profit_sign_accuracy": 1.0,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.2592571741461152,
+        "profit_interval_score": 0.113980236944957
+      }
+    },
+    "distribution": {
+      "v71": {
+        "cases": 2,
+        "revenue_coverage": 0.25,
+        "profit_coverage": 0.25,
+        "revenue_interval_score": 4.07833960067973,
+        "profit_interval_score": 2.3468366205284488
+      },
+      "v72": {
+        "cases": 2,
+        "revenue_coverage": 1.0,
+        "profit_coverage": 1.0,
+        "revenue_interval_score": 0.5333664725486875,
+        "profit_interval_score": 0.35047589083850084
+      }
+    }
+  },
+  "gate_results": {
+    "revenue_mape_le_8pct": true,
+    "profit_margin_mae_le_5pp": true,
+    "revenue_direction_ge_80pct": true,
+    "profit_sign_ge_90pct": true,
+    "revenue_coverage_ge_80pct": true,
+    "profit_coverage_ge_80pct": true,
+    "revenue_interval_score_improves_30pct": true,
+    "profit_interval_score_improves_30pct": true,
+    "distribution_revenue_coverage_ge_80pct": true,
+    "distribution_profit_coverage_ge_80pct": true,
+    "human_required_present": true
+  },
+  "limitations": [
+    "Retrospective point-in-time simulation, not pre-registered live performance.",
+    "Small company-specific sample.",
+    "Point metrics exclude horizons classified as exogenous, perimeter-break, or regime-tail distribution contracts."
+  ]
+}
