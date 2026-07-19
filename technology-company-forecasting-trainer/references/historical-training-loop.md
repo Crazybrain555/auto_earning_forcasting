@@ -7,7 +7,8 @@ Improve the forecasting method through historical cases. Git is the only version
 ## Setup
 
 - The two skills live in one git repository (the installed `.claude/skills/` directory, or wherever the user keeps them). The method version of any run is `git rev-parse HEAD` of that repository; record it as `method_commit` in the run manifest and snapshot.
-- Case workspaces live outside the skill directories, e.g. `<repo>/training-runs/<round-id>/<case-id>/`. Keep `training-runs/` in `.gitignore`: actuals and evaluation files must never enter the method tree, and committing them would leak answers into future method context.
+- Case workspaces live outside the skill directories, in the project's canonical runs root `training-runs/<round-id>/<case-id>/` (for this system: `/Users/yuye/programs/quant/AI_stock_framework/training-runs/`). The dashboard web app reads this tree, so keep the layout and file names stable. Keep `training-runs/` gitignored: actuals and evaluation files must never enter the method tree, and committing them would leak answers into future method context.
+- Dashboard contract: before starting each new case (and between fold phases), read `training-runs/control.json` if it exists. `{"auto_training": "pause"}` means finish the current step, record the pause in `round.json`, and stop until it returns to `"run"`. The dashboard owns and writes that one file; the trainer only reads it. Everything else the dashboard consumes (`run_manifest.json`, `forecast_snapshot.json`, `forecast_seal.json`, `evaluation.json`, `delivery_validation.json`, `round.json`, `report.md`, `model/model.xlsx`) it reads from the case workspaces as-is - do not rename or reshape these artifacts casually.
 - Round bookkeeping is one small file, `training-runs/<round-id>/round.json`:
 
 ```json
