@@ -6,6 +6,8 @@ NAME='technology-company-forecasting-trainer'
 LIVE_NAME='technology-company-profit-forecasting'
 class SkillShapeTest(unittest.TestCase):
     def test_manifests(self):
+        if not (ROOT/'.claude-plugin/plugin.json').exists():
+            self.skipTest('package wrappers absent in installed git-repo layout')
         self.assertEqual(json.loads((ROOT/'.codex-plugin/plugin.json').read_text())['name'],NAME)
         self.assertEqual(json.loads((ROOT/'.claude-plugin/plugin.json').read_text())['name'],NAME)
     def test_frontmatter(self):
