@@ -14,9 +14,36 @@
     "regime_break": 0.05
   },
   "outputs": {
-    "year_1": {},
-    "year_2": {},
-    "year_3_distribution": {},
+    "year_1": {
+      "period": null,
+      "revenue_point": null,
+      "revenue_low": null,
+      "revenue_high": null,
+      "profit_point": null,
+      "profit_low": null,
+      "profit_high": null,
+      "point_evaluable": true
+    },
+    "year_2": {
+      "period": null,
+      "revenue_point": null,
+      "revenue_low": null,
+      "revenue_high": null,
+      "profit_point": null,
+      "profit_low": null,
+      "profit_high": null,
+      "point_evaluable": true
+    },
+    "year_3_distribution": {
+      "period": null,
+      "revenue_point": null,
+      "revenue_low": null,
+      "revenue_high": null,
+      "profit_point": null,
+      "profit_low": null,
+      "profit_high": null,
+      "point_evaluable": false
+    },
     "long_term_normalized": {},
     "market_implied": {}
   },

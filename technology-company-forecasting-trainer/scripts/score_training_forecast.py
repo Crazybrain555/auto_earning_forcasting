@@ -68,8 +68,12 @@ def main() -> int:
         period = act["period"]
         o = output_for(snap, period)
         rev, profit = float(act["revenue"]), float(act["profit"])
-        rp = val(o, "revenue_point", "revenue"); rl = val(o, "revenue_low"); rh = val(o, "revenue_high")
-        pp = val(o, "profit_point", "net_income", "profit"); pl = val(o, "profit_low"); ph = val(o, "profit_high")
+        rp = val(o, "revenue_point", "revenue", "revenue_base", "revenue_M", "revenue_base_M")
+        rl = val(o, "revenue_low", "revenue_bear", "revenue_low_M", "revenue_bear_M")
+        rh = val(o, "revenue_high", "revenue_bull", "revenue_high_M", "revenue_bull_M")
+        pp = val(o, "profit_point", "net_income", "profit", "profit_base", "net_income_M", "profit_M")
+        pl = val(o, "profit_low", "profit_bear", "net_income_bear_M")
+        ph = val(o, "profit_high", "profit_bull", "net_income_bull_M")
         point = bool(o.get("point_evaluable", period != "FY+3"))
         alpha = 0.2 if point else 0.1
         rec = {"period": period, "point_evaluable": point, "actual_revenue": rev,

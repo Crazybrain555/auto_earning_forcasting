@@ -154,7 +154,7 @@ Use `scripts/freeze_snapshot.py`. Published snapshots are immutable. New evidenc
 
 ## Full-company artifact standard
 
-For a full forecast, the required hero artifacts are a formula-driven `.xlsx` model and a source-backed `.md` report. Supporting manifests, assumptions, red-team findings, and the immutable snapshot are mandatory audit artifacts. Use the gold model template in `assets/examples/generic_v80/` as a structure and sheet-layout reference only after the new company's Source Pack is frozen. Never copy template or example assumptions into a company model.
+For a full forecast, the required hero artifacts are a formula-driven `.xlsx` model and a source-backed `.md` report. Supporting manifests, assumptions, red-team findings, and the immutable snapshot are mandatory audit artifacts. Use the gold model template in `assets/examples/generic_v80/` as a structure and sheet-layout reference only after the new company's Source Pack is frozen. Never copy template or example assumptions into a company model. In `forecast_snapshot.json`, every `outputs` block carries the canonical evaluable keys `revenue_point/revenue_low/revenue_high` and `profit_point/profit_low/profit_high` (GAAP net income) plus `point_evaluable` - for scenario periods map base→point, bear→low, bull→high; additional metrics (segments, margins, EPS, FCF) are welcome as extra keys. SignalCards use the controlled `source_family` slugs from `references/forward-evidence-and-signal-validation.md`; a full delivery needs at least six cards across three families including one independent (non-official) family.
 
 ## Module validation status
 

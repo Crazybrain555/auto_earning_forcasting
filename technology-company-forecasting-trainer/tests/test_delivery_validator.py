@@ -20,6 +20,7 @@ class DeliveryValidatorTest(unittest.TestCase):
             manifest=json.loads((workspace/'run_manifest.json').read_text(encoding='utf-8'))
             manifest['fiscal_calendar']='calendar year'
             manifest['research_completeness_required']=False
+            manifest['forward_evidence_min_signals']=3
             manifest['selected_mechanisms']=['unit-volume-price-cost']
             manifest['phase_status']={k:'complete' for k in manifest['phase_status']}
             (workspace/'run_manifest.json').write_text(json.dumps(manifest,indent=2),encoding='utf-8')
