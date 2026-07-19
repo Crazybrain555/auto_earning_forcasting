@@ -21,6 +21,7 @@ class DeliveryValidatorTest(unittest.TestCase):
             manifest['fiscal_calendar']='calendar year'
             manifest['research_completeness_required']=False
             manifest['forward_evidence_min_signals']=3
+            manifest['workbook_formula_min']=0
             manifest['selected_mechanisms']=['unit-volume-price-cost']
             manifest['phase_status']={k:'complete' for k in manifest['phase_status']}
             (workspace/'run_manifest.json').write_text(json.dumps(manifest,indent=2),encoding='utf-8')
@@ -30,7 +31,7 @@ class DeliveryValidatorTest(unittest.TestCase):
                 sources.append({
                     'source_id':f'SRC{i}','source_type':'filing' if i==0 else ('earnings' if i==1 else 'official-product'),
                     'publisher':'Example Corp','published_at':f'2026-0{min(i+1,6)}-01T00:00:00Z','retrieved_at':'2026-07-18T00:00:00Z',
-                    'period_scope':'FY2026','evidence_tier':'E0' if i==0 else 'E1','content_hash':f'sha256:{i}',
+                    'period_scope':'FY2026','evidence_tier':'E0' if i==0 else 'E1','content_hash':f'unhashed:test-fixture-{i}',
                     'location':f'https://example.com/{i}','claim_or_fact':'official fact','allowed_use':'base anchor','limitations':''
                 })
             source_manifest=json.loads((workspace/'source_manifest.json').read_text(encoding='utf-8'))
@@ -58,7 +59,7 @@ class DeliveryValidatorTest(unittest.TestCase):
             red='''# Red-team review\n\n| ID | Severity | Area | Finding | Evidence | Model impact | Required action | Status |\n|---|---|---|---|---|---|---|---|\n| RT-001 | P1 | double counting | Double-count capex and COGS test | SRC0 | FCF | reconcile | closed |\n| RT-002 | P1 | valuation | Normalization and terminal valuation challenge | SRC0 | value | stress | closed |\n| RT-003 | P1 | demand | Base demand share unsupported | SRC1 | revenue | cap share | closed |\n| RT-004 | P1 | supply | Capacity constraint omitted | SRC2 | revenue | add supply | closed |\n| RT-005 | P1 | accounting | GAAP cash bridge incomplete | SRC0 | profit | bridge | closed |\n| RT-006 | P1 | source independence | Repeated reports may share one original source cluster | SIG1/SIG2 | Base | map source chains | closed |\n'''
             (workspace/'red_team.md').write_text(red,encoding='utf-8')
             report=(SKILL/'assets/examples/sandisk_v73/Sandisk_SNDK_v7.3_模型报告.md').read_text(encoding='utf-8')
-            report+='\n\n## Forward evidence and research synthesis\nInvestor dialogue, independent research, technical papers, source independence clusters, rejected signals and falsification triggers were reviewed.\n'
+            report+='\n\n## Forward evidence and research synthesis\nInvestor dialogue, independent research, technical papers, source independence clusters, rejected signals and falsification triggers were reviewed.\n\n## 买入纪律\nRecommended buy price derives from Bear fair value with margin of safety.\n\n## 一致性检查\nArithmetic consistency: implied tax rate, segment sums, EPS x shares reconcile.\n'
             (workspace/'report.md').write_text(report,encoding='utf-8')
             (workspace/'model').mkdir(exist_ok=True)
             (workspace/'model/model.xlsx').write_bytes((SKILL/'assets/examples/sandisk_v73/Sandisk_SNDK_v7.3_五年财务模型.xlsx').read_bytes())

@@ -60,6 +60,7 @@ REPORT_SECTION_GROUPS = {
     "monitoring": ["monitor", "触发", "待验证"],
     "limitations": ["limitation", "限制", "human-required", "可信度"],
     "buy_discipline": ["recommended buy", "buy price", "买入价", "margin of safety", "安全边际", "买入纪律"],
+    "arithmetic_check": ["arithmetic", "consistency check", "一致性检查", "勾稽", "自洽检查"],
 }
 
 
@@ -79,6 +80,24 @@ def workbook_sheet_names(path: Path) -> list[str]:
     root = ET.fromstring(xml)
     ns = {"m": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
     return [node.attrib.get("name", "") for node in root.findall(".//m:sheets/m:sheet", ns)]
+
+
+def workbook_formula_stats(path: Path) -> dict:
+    """Count real formulas and cached error values without external deps.
+
+    A 'formula-driven workbook' with zero <f> elements is hardcoded output;
+    #REF!/#NAME? cached values mean broken references shipped."""
+    formulas = 0
+    errors = {"#REF!": 0, "#NAME?": 0, "#DIV/0!": 0, "#VALUE!": 0}
+    with zipfile.ZipFile(path) as zf:
+        for name in zf.namelist():
+            if not name.startswith("xl/worksheets/"):
+                continue
+            data = zf.read(name)
+            formulas += len(re.findall(rb"<f[ >]", data))
+            for token in errors:
+                errors[token] += data.count(token.encode())
+    return {"formulas": formulas, "errors": errors}
 
 
 def contains_any(text: str, needles: list[str]) -> bool:
@@ -303,6 +322,26 @@ def main() -> int:
                     fail_record(checks, f"workbook:{concept}", f"sheets={names}")
         except Exception as exc:
             fail_record(checks, "workbook:read", str(exc))
+        # formula-driven enforcement + broken-reference scan
+        try:
+            stats = workbook_formula_stats(model_path)
+            formula_min = int(manifest.get("workbook_formula_min", 30))
+            if stats["formulas"] >= formula_min:
+                pass_record(checks, "workbook:formula-driven", f"{stats['formulas']} formulas")
+            else:
+                fail_record(checks, "workbook:formula-driven",
+                            f"only {stats['formulas']} formulas (< {formula_min}) - a hardcoded-values workbook is not a formula-driven model",
+                            "error" if args.strict else "warning")
+            broken = stats["errors"]["#REF!"] + stats["errors"]["#NAME?"]
+            if broken:
+                fail_record(checks, "workbook:broken-references", f"#REF!/#NAME? occurrences: {broken}")
+            else:
+                pass_record(checks, "workbook:broken-references")
+            soft = stats["errors"]["#DIV/0!"] + stats["errors"]["#VALUE!"]
+            if soft:
+                fail_record(checks, "workbook:error-values", f"#DIV/0!/#VALUE! occurrences: {soft}", "warning")
+        except Exception as exc:
+            fail_record(checks, "workbook:formula-scan", str(exc), "warning")
 
     # Red-team findings must bind the numbers: open P0/P1 findings are only
     # acceptable when the run's readiness target is capped at screen-grade.
@@ -326,6 +365,45 @@ def main() -> int:
                 fail_record(checks, "red-team:open-findings-bind",
                             f"open P0/P1 findings {','.join(open_p1)} require resolution or readiness_target capped at screen-grade (current: {readiness or 'unset'})",
                             "error" if args.strict else "warning")
+
+    # Cross-artifact reconciliation: headline snapshot numbers must appear in the report.
+    if snap_path.exists() and report_path.exists():
+        try:
+            snap_obj = json.loads(snap_path.read_text(encoding="utf-8"))
+        except Exception:
+            snap_obj = {}
+        report_text_full = report_path.read_text(encoding="utf-8")
+        def number_in_report(value, label):
+            if not isinstance(value, (int, float)):
+                return
+            forms = {f"{value:.2f}", f"{value:.1f}", f"{value:.0f}", f"{int(value):,}"}
+            if any(f in report_text_full for f in forms):
+                pass_record(checks, f"reconcile:{label}")
+            else:
+                fail_record(checks, f"reconcile:{label}",
+                            f"snapshot {label}={value} does not appear in report.md - artifacts disagree",
+                            "error" if args.strict else "warning")
+        vs = snap_obj.get("valuation_summary") or {}
+        number_in_report((vs.get("fair_value") or {}).get("base"), "fair-value-base")
+        y1 = (snap_obj.get("outputs") or {}).get("year_1") or {}
+        number_in_report(y1.get("revenue_point"), "fy1-revenue-point")
+
+    # Provenance honesty: hashes are either real or explicitly absent - never invented.
+    if source_path.exists():
+        try:
+            fake = []
+            for s in json.loads(source_path.read_text(encoding="utf-8")).get("sources", []):
+                h = str(s.get("content_hash", "") or "")
+                if h and not (re.fullmatch(r"sha256:[0-9a-f]{64}", h) or h.startswith("unhashed:")):
+                    fake.append(s.get("source_id", "UNKNOWN"))
+            if fake:
+                fail_record(checks, "sources:content-hash-honesty",
+                            "content_hash must be a real sha256:<64hex> or 'unhashed:<reason>' - fabricated-looking hashes: " + ",".join(fake[:8]),
+                            "error" if args.strict else "warning")
+            else:
+                pass_record(checks, "sources:content-hash-honesty")
+        except Exception:
+            pass
 
     # The recommended buy price must be derived in the report, not only asserted in the snapshot.
     if snap_path.exists() and report_path.exists():

@@ -122,6 +122,19 @@ def main() -> int:
     # Source-depth validation.
     sources = source_manifest.get("sources", []) if isinstance(source_manifest, dict) else []
     accepted = [s for s in sources if str(s.get("decision_status", "accepted")).lower() not in {"rejected", "not_material"}]
+
+    ISSUER_WORDS = ("filing", "press", "earnings", "call", "transcript", "announcement", "8-k", "8k", "10-q", "10-k", "proxy", "official-product", "official_product", "company")
+    INDEP_WORDS = ("industry", "research", "market", "expert", "paper", "standard", "patent", "news", "measurement", "third")
+
+    def is_independent(stype: str) -> bool:
+        s = stype.lower()
+        if any(w in s for w in ("cross", "customer", "supplier", "competitor")):
+            return True
+        if any(w in s for w in ISSUER_WORDS):
+            return False
+        return any(w in s for w in INDEP_WORDS)
+
+    independent_accepted = sum(1 for s in accepted if is_independent(str(s.get("source_type", ""))))
     total_words = 0
     substantial_sources = 0
     substantial_official = 0
@@ -170,6 +183,7 @@ def main() -> int:
 
     metrics.update({
         "accepted_sources": len(accepted),
+        "independent_accepted_sources": independent_accepted,
         "accepted_source_words": total_words,
         "substantial_sources": substantial_sources,
         "substantial_official_sources": substantial_official,
@@ -189,6 +203,9 @@ def main() -> int:
         errors.append(f"full/substantial accepted sources {substantial_sources} < 8")
     if total_words < 12000:
         errors.append(f"accepted research corpus {total_words} words < 12000 minimum")
+    min_independent = int(manifest.get("research_min_independent_sources", 2))
+    if independent_accepted < min_independent:
+        errors.append(f"independent (non-issuer) accepted sources {independent_accepted} < {min_independent} - an issuer-only evidence base cannot carry a forecast (add industry research / market data / cross-company / expert / papers)")
     if dialogue_sources < 1:
         errors.append("no substantial formal investor-dialogue/transcript source")
     if product_technical_sources < 2:
@@ -286,11 +303,16 @@ def main() -> int:
                 errors.append("no material product/customer driver rows")
             if not modeled:
                 errors.append("no material product/customer driver schedule is modeled")
+            unquantified = []
             for r in modeled:
                 required = ["revenue_unit", "payer_or_customer", "volume_usage_or_deployment_driver", "price_arpu_or_asp", "mix_share_or_attach", "cost_and_capacity_constraint", "evidence_source_ids", "consolidation_link"]
                 miss = [k for k in required if not str(r.get(k, "")).strip()]
                 if miss:
                     errors.append(f"modeled driver {r.get('segment_or_product','UNKNOWN')} missing " + "/".join(miss))
+                elif not (re.search(r"\d", str(r.get("volume_usage_or_deployment_driver", ""))) and re.search(r"\d", str(r.get("price_arpu_or_asp", "")))):
+                    unquantified.append(str(r.get("segment_or_product", "UNKNOWN")))
+            if unquantified and not truthy(manifest.get("driver_quantification_relaxed")):
+                errors.append("driver schedule rows lack numeric volume/ASP quantification: " + ", ".join(unquantified[:6]) + " - a mechanism is numbers per year, not prose")
         except Exception as exc:
             errors.append(f"invalid product_customer_driver_schedule.csv: {exc}")
 

@@ -364,6 +364,7 @@ def synthetic_report() -> str:
         ("Monitoring and triggers", "Monitoring placeholder: upgrade and kill triggers."),
         ("Limitations", "Limitation placeholder: human-required items and confidence caps."),
         ("买入纪律 (buy price)", "Recommended buy price placeholder with margin of safety logic."),
+        ("一致性检查 (arithmetic)", "Arithmetic consistency check placeholder: implied tax rate, segment sums, EPS x shares."),
     ]
     body = ["# Self-test delivery report", ""]
     for title, text in sections:
@@ -381,6 +382,7 @@ def delivery_smoke_test(skill: Path, profile: str, td: Path) -> None:
     manifest["fiscal_calendar"] = "calendar year"
     manifest["research_completeness_required"] = False
     manifest["forward_evidence_min_signals"] = 3  # smoke exercises plumbing, not research policy
+    manifest["workbook_formula_min"] = 0  # synthetic/legacy example workbooks carry no formulas
     manifest["selected_mechanisms"] = ["unit-volume-price-cost"]
     manifest["phase_status"] = {key: "complete" for key in manifest["phase_status"]}
     (workspace / "run_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
@@ -394,7 +396,7 @@ def delivery_smoke_test(skill: Path, profile: str, td: Path) -> None:
             "retrieved_at": "2026-07-18T00:00:00Z",
             "period_scope": "FY2026",
             "evidence_tier": "E0" if i == 0 else "E1",
-            "content_hash": f"sha256:{i}",
+            "content_hash": f"unhashed:smoke-fixture-{i}",
             "location": f"https://example.com/{i}",
             "claim_or_fact": "official fact",
             "allowed_use": "base anchor",
@@ -437,7 +439,7 @@ def delivery_smoke_test(skill: Path, profile: str, td: Path) -> None:
         encoding="utf-8",
     )
     if profile == "trainer":
-        report_text = (skill / "assets/examples/sandisk_v73/Sandisk_SNDK_v7.3_模型报告.md").read_text(encoding="utf-8") + "\n\n## Forward evidence and research synthesis\nInvestor dialogue, independent research, technical papers, source independence clusters, rejected signals and falsification triggers were reviewed.\n\n## 买入纪律\nRecommended buy price derives from the Bear fair value with a stated margin of safety.\n"
+        report_text = (skill / "assets/examples/sandisk_v73/Sandisk_SNDK_v7.3_模型报告.md").read_text(encoding="utf-8") + "\n\n## Forward evidence and research synthesis\nInvestor dialogue, independent research, technical papers, source independence clusters, rejected signals and falsification triggers were reviewed.\n\n## 买入纪律\nRecommended buy price derives from the Bear fair value with a stated margin of safety.\n\n## 一致性检查\nArithmetic consistency check: implied tax rate, segment sums, EPS x shares reconcile.\n"
         (workspace / "report.md").write_text(report_text, encoding="utf-8")
         (workspace / "model").mkdir(exist_ok=True)
         (workspace / "model/model.xlsx").write_bytes((skill / "assets/examples/sandisk_v73/Sandisk_SNDK_v7.3_五年财务模型.xlsx").read_bytes())

@@ -93,7 +93,7 @@ class ResearchCompletenessTest(unittest.TestCase):
                             [['Core','critical','production','S6','S5','S4','benchmark','qualified','production','revenue','alternative','cost','base','medium','reviewer'],
                              ['Next','high','qualification','S6','S5','S4','prototype','evaluation','pilot','none','alternative','yield','scenario','low','reviewer']])
             self._write_csv(w/'product_customer_driver_schedule.csv',['segment_or_product','materiality','revenue_unit','payer_or_customer','end_user','volume_usage_or_deployment_driver','price_arpu_or_asp','mix_share_or_attach','cost_and_capacity_constraint','program_stage','evidence_source_ids','confidence','schedule_status','consolidation_link','human_required'],
-                            [['Core','critical','units','enterprise customers','operators','installed units','ASP','mix/share','capacity/cost','production','S0;S4','medium','modeled','total revenue','false']])
+                            [['Core','critical','units','enterprise customers','operators','installed units 1.2M/yr +8%','ASP $4500 -3%/yr','mix 60/40 share 25%','capacity 1.5M cost $3200','production','S0;S4','medium','modeled','total revenue','false']])
             self._write_csv(w/'material_assumption_support.csv',['assumption_id','metric','horizon','scenario','materiality_weight','sensitivity_to_output','support_status','evidence_cluster_count','source_ids','allowed_horizon','falsification_trigger','notes'],
                             [['A1','volume','FY+1','Base',0.35,'high','hard_anchor',2,'S0;S4','FY+1','actual volume',''],
                              ['A2','price','FY+2','Base',0.25,'high','corroborated',2,'S1;S5','FY+2','price',''],
