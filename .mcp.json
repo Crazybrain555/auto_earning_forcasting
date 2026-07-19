@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "edgartools": {
+      "type": "stdio",
+      "command": "/bin/bash",
+      "args": [
+        "/Users/yuye/programs/quant/AI_stock_framework/scripts/mcp/edgartools.sh"
+      ],
+      "env": {
+        "EDGAR_IDENTITY": "${EDGAR_IDENTITY:-}"
+      }
+    },
+    "arxiv": {
+      "type": "stdio",
+      "command": "/bin/bash",
+      "args": [
+        "/Users/yuye/programs/quant/AI_stock_framework/scripts/mcp/arxiv.sh"
+      ]
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0",
+  "snapshot_id": "SNDK_2026-07-17T122300-0400_v1",
+  "generated_at": "2026-07-18T00:59:17+08:00",
+  "status": "screen-grade",
+  "entity": "SanDisk Corporation",
+  "security": "NASDAQ:SNDK",
+  "currency": "USD",
+  "information_cutoff": "2026-07-17T12:23:00-04:00",
+  "market": {
+    "price_per_share": 1470.63,
+    "price_type": "intraday",
+    "basic_shares_millions": 148.089758,
+    "market_capitalization_usd_millions": 217785.240808,
+    "reported_cash_enterprise_value_usd_millions": 214050.240808,
+    "nanya_cash_only_pro_forma_enterprise_value_usd_millions": 215022.240808
+  },
+  "fy2026e": {
+    "status": "nine-month actual plus Q4 guidance midpoint",
+    "revenue_usd_millions": 19283.0,
+    "gross_profit_usd_millions": 13282.0,
+    "operating_income_usd_millions": 11203.5,
+    "net_income_usd_millions": 9462.5655,
+    "diluted_shares_millions": 156.0,
+    "diluted_eps": 60.657471
+  },
+  "scenarios": {
+    "Bear": {
+      "probability": 0.3,
+      "years": ["FY2027E", "FY2028E", "FY2029E", "FY2030E"],
+      "revenue_usd_millions": [21596.96, 15031.48416, 13444.827499, 14013.351633],
+      "net_income_usd_millions": [8226.5788, 2048.028461, 585.620675, 1531.940304],
+      "diluted_eps": [52.066954, 12.962205, 3.730068, 9.82013],
+      "fair_value_per_share": 217.264849
+    },
+    "Base": {
+      "probability": 0.5,
+      "years": ["FY2027E", "FY2028E", "FY2029E", "FY2030E"],
+      "revenue_usd_millions": [33205.326, 31118.13408, 28006.320672, 27539.548661],
+      "net_income_usd_millions": [18973.650054, 13186.754924, 8659.313233, 7393.620559],
+      "diluted_eps": [123.20552, 86.754967, 57.346445, 49.290804],
+      "fair_value_per_share": 1054.680874
+    },
+    "Bull": {
+      "probability": 0.2,
+      "years": ["FY2027E", "FY2028E", "FY2029E", "FY2030E"],
+      "revenue_usd_millions": [42743.983333, 52455.416347, 58812.301548, 62004.969346],
+      "net_income_usd_millions": [27025.908667, 31261.537796, 30786.662994, 27964.444918],
+      "diluted_eps": [176.639926, 211.226607, 213.796271, 199.746035],
+      "fair_value_per_share": 3322.312037
+    }
+  },
+  "valuation": {
+    "probability_weighted_fair_value_per_share": 1256.982299,
+    "upside_downside_to_intraday_price": -0.145276311,
+    "reverse_valuation": {
+      "normalized_pe": 14.0,
+      "diluted_shares_millions": 158.0,
+      "implied_normalized_eps": 105.045,
+      "implied_normalized_net_income_usd_millions": 16597.11,
+      "implied_revenue_at_35_percent_net_margin_usd_millions": 47420.314286,
+      "implied_revenue_at_40_percent_net_margin_usd_millions": 41492.775
+    }
+  },
+  "verification": {
+    "workbook_sheets": 9,
+    "workbook_formulas": 326,
+    "external_workbook_links": 0,
+    "formula_errors": 0,
+    "unit_tests_passed": 8,
+    "recalculation_engine": "LibreOfficeDev 26.8.0.0.alpha0",
+    "recalculation_method": "headless XLSX open-save conversion",
+    "recalculation_note": "The bundled engine saved a fully recalculated workbook before a shutdown-time exception; the saved file was reopened with openpyxl and passed all cached-value and formula-error tests."
+  },
+  "sha256": {
+    "research_contract.json": "c9d0e4dd6d4e3907dcc2f9906c59f28eac88a17c5dd91bde2fae2804bee97c6f",
+    "source_manifest.csv": "8722bc3feec5397682a16da355441188f72d29c8eb90f38e7146ef79920c73e7",
+    "model_inputs.json": "3a60c11d1a1b1144498006c85613a03448067071a6a823eb8b74178d1aad0fb8",
+    "assumption_register.csv": "1e5e5621f8f92ba4ef70c1a20c2c414c6c01fa1f2b87c9e1d35a9314845dee0d",
+    "build_model.py": "28dab402c0eed2234724019ee0428a0f222e659a1d1bd0bb3e8cb3c50ef597d5",
+    "SanDisk_financial_model_2026-07-17.xlsx": "103158eebb7aab34fdbecdc74ea338ceee7a5fc830de1f091b88efdbb32db9cd",
+    "REPORT_zh.md": "c66cd89cb18ff93f347861c76d1ec862f11265c2563178bddbb457b531293985",
+    "tests/test_sandisk_model.py": "595b0d798e7d79168fd5db863f48e18f74383b2420c7b6326ef6cdba9de7b239"
+  }
+}

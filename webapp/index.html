@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>科技公司预测系统</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-title">科技公司预测系统</span>
+    <span class="brand-sub">投资研究作战台</span>
+  </div>
+  <div class="topbar-chips">
+    <span class="chip" id="chip-method" title="方法版本 = skills 仓库当前 git 提交">方法版本 —</span>
+    <span class="chip" id="chip-control">自动优化 —</span>
+    <span class="chip chip-muted" id="chip-refresh">未刷新</span>
+  </div>
+</header>
+
+<nav class="tabs">
+  <a href="#/portfolio" data-tab="portfolio">投资看板</a>
+  <a href="#/training" data-tab="training">自训练</a>
+  <a href="#/method" data-tab="method">方法</a>
+</nav>
+
+<main id="view"></main>
+
+<footer class="foot">本地服务 · 折叠看结论,展开看理由 · 与托管版 Sites 共享同一数据口径</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

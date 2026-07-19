@@ -1,0 +1,30 @@
+.DS_Store
+.env
+.venv/
+.cache/
+__pycache__/
+*.py[cod]
+output/
+.pytest_cache/
+
+# Nested git checkout of the skills repo (lives on the main branch of the same
+# remote) — must not be committed into this branch as a gitlink.
+.claude/skills/
+
+# Personal per-machine Claude Code settings
+.claude/settings.local.json
+
+# Agent tool state / scratch workspaces
+.agents/
+.codex/
+codex-work/
+
+# Runtime data (see CLAUDE.md): training case workspaces and backend job logs
+training-runs/
+backend/jobs/
+
+# Local junk
+pkcs11.txt
+
+# Office temp lock files
+.~lock.*#

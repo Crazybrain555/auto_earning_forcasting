@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "deny": [
+      "mcp__arxiv__semantic_search",
+      "mcp__arxiv__reindex",
+      "mcp__arxiv__citation_graph",
+      "mcp__arxiv__watch_topic",
+      "mcp__arxiv__check_alerts"
+    ]
+  }
+}

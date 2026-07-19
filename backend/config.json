@@ -1,0 +1,49 @@
+{
+  "project_root": "..",
+  "runs_root": "training-runs",
+  "skills_repo": ".claude/skills",
+  "jobs_dir": "jobs",
+  "engines": {
+    "claude": {
+      "available": true,
+      "cmd": [
+        "/Users/yuye/.local/bin/claude",
+        "-p",
+        "{prompt}",
+        "--permission-mode",
+        "bypassPermissions"
+      ],
+      "note": "Headless Claude Code. Skills auto-load from .claude/skills; project CLAUDE.md supplies the operating notes. Tighten --permission-mode to acceptEdits if full autonomy is not wanted."
+    },
+    "codex": {
+      "available": false,
+      "cmd": [
+        "/opt/homebrew/bin/codex",
+        "exec",
+        "--full-auto",
+        "{prompt}"
+      ],
+      "env": {
+        "http_proxy": "http://127.0.0.1:10808",
+        "https_proxy": "http://127.0.0.1:10808",
+        "all_proxy": "socks5h://127.0.0.1:10808",
+        "HTTP_PROXY": "http://127.0.0.1:10808",
+        "HTTPS_PROXY": "http://127.0.0.1:10808",
+        "ALL_PROXY": "socks5h://127.0.0.1:10808"
+      },
+      "note": "Reserved slot: flip available to true once the Codex skill port is finalized and installed under .agents/skills. The user's interactive shell wraps codex with v2rayN proxy env (port 10808); the env block replicates it, so v2rayN must be running. Verify the exec arguments against the installed Codex CLI before enabling."
+    }
+  },
+  "prompts": {
+    "live_forecast": "Use the technology-company-profit-forecasting skill. Run a complete live_forecast delivery for {entity} ({security}) with as_of={as_of}. Create the run workspace at {workspace} using the skill's scripts/scaffold_delivery.py, then follow the mandatory full-model execution contract end to end: point-in-time Source Pack, forward-evidence SignalCards, mechanism-based model, formula-driven workbook at model/model.xlsx, source-backed report.md, independent red team, research-completeness and strict delivery validators, immutable snapshot. Finish only when validate_delivery.py --strict passes, or deliver not-decision-ready with every failed gate listed. Before freezing the snapshot, fill forecast_snapshot.json's valuation_summary block: current_price (with price_as_of and currency), current_valuation_note, fair_value bear/base/bull, recommended_buy_price, action (buy/hold/watch/avoid), and one_line_thesis - the dashboard reads these fields. Obey the project CLAUDE.md operating notes. {extra}",
+    "training_case": "Use the technology-company-forecasting-trainer skill. Execute one historical training case: entity={entity} ({security}), as_of={as_of}, round_id={round_id}, case_role={case_role}, workspace={workspace}. Scaffold with the skill's scripts/scaffold_training_run.py, research strictly inside the time sandbox (only sources published at or before as_of, no answer-bearing queries), seal with freeze_training_forecast.py BEFORE retrieving any target actuals, then retrieve actuals and score with score_training_forecast.py. Keep {runs_root}/{round_id}/round.json honest. Check {runs_root}/control.json before starting; if auto_training is pause, stop cleanly and say so. Populate valuation_summary in the snapshot when price data at the as_of date is available. Do not modify the skills repo in this run. {extra}",
+    "training_round": "Use the technology-company-forecasting-trainer skill. Run one full training round exactly per references/historical-training-loop.md. round_id={round_id}; Group A (training) = {group_a}; Group B (untouched validation) = {group_b}; workspaces under {runs_root}/{round_id}/. Record round.json with the base method commit before starting. The sandbox is absolute: seal every forecast before its actuals. Train on A with mechanism-level rule changes only, validate on B; on a clean pass rebuild the live skill with build_live_release.py --self-test, run the test suite, commit and push; on failure run the swap fold (retrain on B, re-validate on A, compare closeness); if still inconsistent, revert to the base commit and record the round abandoned. Check {runs_root}/control.json before each case and between fold phases; pause means finish the current step and stop. {extra}",
+    "plan_round": "Use the technology-company-forecasting-trainer skill. You are the training planner - plan only, do not run any forecast. Read the curriculum at assets/benchmarks/training_curriculum_v80.csv (waves of development/untouched_holdout pairs) and the existing rounds under {runs_root}. Propose the next round as four companies: pick two unused pairs from the earliest unfinished wave - the two development cases become Group A (training), the two untouched holdouts become Group B (validation). Skip companies already exposed in finished or abandoned rounds. Write {runs_root}/<round-id>/round.json (round-id: use {round_id} if given, otherwise the next free round-N) with status planned, base_method_commit (git rev-parse HEAD of the skills repo), group_a and group_b entries (entity, security, as_of from proposed_as_of, case_id security@as_of, role), and notes explaining why these four and what mechanism the round stresses. Then print the plan as JSON in your final message. {extra}"
+  },
+  "quotes": {
+    "enabled": true,
+    "proxy": null,
+    "ttl_seconds": 300,
+    "note": "Set proxy to e.g. http://127.0.0.1:10808 if Yahoo is unreachable directly."
+  }
+}

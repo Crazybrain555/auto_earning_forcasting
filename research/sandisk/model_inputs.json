@@ -1,0 +1,768 @@
+{
+  "schema_version": "1.0",
+  "contract_id": "SNDK_2026-07-17T122300-0400",
+  "entity": "SanDisk Corporation",
+  "ticker": "NASDAQ:SNDK",
+  "units": {
+    "currency": "USD",
+    "financial_statements": "USD millions except per-share data",
+    "shares": "millions",
+    "margins_and_growth": "decimal",
+    "indexes": "index points"
+  },
+  "sign_convention": {
+    "other_income_expense": "positive is income; negative is expense",
+    "cash_flow_capex": "positive value represents cash spent on purchases of property, plant and equipment",
+    "losses": "negative"
+  },
+  "historicals": {
+    "FY2023": {
+      "status": "actual",
+      "period_end": "2023-06-30",
+      "weeks": 52,
+      "revenue": 6086,
+      "cost_of_revenue": 5656,
+      "gross_profit": 430,
+      "gross_margin": 0.070654,
+      "research_and_development": 1167,
+      "selling_general_and_administrative": 558,
+      "goodwill_impairment": 671,
+      "separation_costs": 0,
+      "total_operating_expenses": 2465,
+      "operating_income": -2035,
+      "other_income_expense": 33,
+      "income_before_tax": -2002,
+      "income_tax_expense": 141,
+      "net_income": -2143,
+      "diluted_eps": -14.78,
+      "diluted_shares": 145,
+      "cash_from_operations": -713,
+      "gross_capex": 219,
+      "property_sale_proceeds": 0,
+      "ending_cash": 292,
+      "end_markets": {
+        "Datacenter": 500,
+        "Edge": 3637,
+        "Consumer": 1949,
+        "original_labels": {
+          "Datacenter": "Cloud",
+          "Edge": "Client",
+          "Consumer": "Consumer"
+        }
+      },
+      "source_ids": [
+        "S001",
+        "S004"
+      ]
+    },
+    "FY2024": {
+      "status": "actual",
+      "period_end": "2024-06-28",
+      "weeks": 52,
+      "revenue": 6663,
+      "cost_of_revenue": 5591,
+      "gross_profit": 1072,
+      "gross_margin": 0.160888,
+      "research_and_development": 1061,
+      "selling_general_and_administrative": 455,
+      "goodwill_impairment": 0,
+      "separation_costs": 0,
+      "total_operating_expenses": 1540,
+      "operating_income": -468,
+      "other_income_expense": -35,
+      "income_before_tax": -503,
+      "income_tax_expense": 169,
+      "net_income": -672,
+      "diluted_eps": -4.63,
+      "diluted_shares": 145,
+      "cash_from_operations": -309,
+      "gross_capex": 166,
+      "property_sale_proceeds": 137,
+      "net_capex_company_fcf_definition": 29,
+      "ending_cash": 328,
+      "end_markets": {
+        "Datacenter": 325,
+        "Edge": 4069,
+        "Consumer": 2269,
+        "original_labels": {
+          "Datacenter": "Cloud",
+          "Edge": "Client",
+          "Consumer": "Consumer"
+        }
+      },
+      "non_gaap": {
+        "adjusted_gross_margin": 0.158,
+        "adjusted_operating_income": -309,
+        "adjusted_net_income": -502,
+        "adjusted_diluted_eps": -3.46
+      },
+      "source_ids": [
+        "S002",
+        "S004",
+        "S006"
+      ]
+    },
+    "FY2025": {
+      "status": "actual",
+      "period_end": "2025-06-27",
+      "weeks": 52,
+      "revenue": 7355,
+      "cost_of_revenue": 5143,
+      "gross_profit": 2212,
+      "gross_margin": 0.300748,
+      "research_and_development": 1132,
+      "selling_general_and_administrative": 573,
+      "goodwill_impairment": 1830,
+      "separation_costs": 67,
+      "total_operating_expenses": 3589,
+      "operating_income": -1377,
+      "other_income_expense": -102,
+      "income_before_tax": -1479,
+      "income_tax_expense": 162,
+      "net_income": -1641,
+      "diluted_eps": -11.32,
+      "diluted_shares": 145,
+      "cash_from_operations": 84,
+      "gross_capex": 204,
+      "property_sale_proceeds": 0,
+      "ending_cash": 1481,
+      "end_markets": {
+        "Datacenter": 960,
+        "Edge": 4127,
+        "Consumer": 2268,
+        "original_labels": {
+          "Datacenter": "Cloud",
+          "Edge": "Client",
+          "Consumer": "Consumer"
+        }
+      },
+      "non_gaap": {
+        "adjusted_gross_margin": 0.303,
+        "adjusted_operating_income": 689,
+        "adjusted_net_income": 440,
+        "adjusted_diluted_eps": 2.99
+      },
+      "source_ids": [
+        "S003",
+        "S004",
+        "S006"
+      ]
+    }
+  },
+  "quarterly": {
+    "FY2026Q1": {
+      "status": "actual",
+      "period_end": "2025-10-03",
+      "weeks": 14,
+      "revenue": 2308,
+      "cost_of_revenue": 1621,
+      "gross_profit": 687,
+      "gross_margin": 0.29766,
+      "total_operating_expenses": 511,
+      "operating_income": 176,
+      "other_income_expense": -52,
+      "income_before_tax": 124,
+      "income_tax_expense": 12,
+      "net_income": 112,
+      "diluted_eps": 0.75,
+      "diluted_shares": 149,
+      "cash_from_operations": 488,
+      "gross_capex": 50,
+      "free_cash_flow_company_definition": 438,
+      "end_markets": {
+        "Datacenter": 269,
+        "Edge": 1387,
+        "Consumer": 652
+      },
+      "non_gaap": {
+        "adjusted_gross_margin": 0.299,
+        "adjusted_operating_income": 245,
+        "adjusted_net_income": 181,
+        "adjusted_diluted_eps": 1.22
+      },
+      "source_ids": [
+        "S007",
+        "S008"
+      ]
+    },
+    "FY2026Q2": {
+      "status": "actual",
+      "period_end": "2026-01-02",
+      "weeks": 13,
+      "revenue": 3025,
+      "cost_of_revenue": 1484,
+      "gross_profit": 1541,
+      "gross_margin": 0.509421,
+      "total_operating_expenses": 476,
+      "operating_income": 1065,
+      "other_income_expense": -128,
+      "income_before_tax": 937,
+      "income_tax_expense": 134,
+      "net_income": 803,
+      "diluted_eps": 5.15,
+      "diluted_shares": 156,
+      "cash_from_operations": 1019,
+      "gross_capex": 39,
+      "free_cash_flow_company_definition": 980,
+      "end_markets": {
+        "Datacenter": 440,
+        "Edge": 1678,
+        "Consumer": 907
+      },
+      "non_gaap": {
+        "adjusted_gross_margin": 0.511,
+        "adjusted_operating_income": 1133,
+        "adjusted_net_income": 967,
+        "adjusted_diluted_eps": 6.2
+      },
+      "source_ids": [
+        "S009",
+        "S010"
+      ]
+    },
+    "FY2026Q3": {
+      "status": "actual",
+      "period_end": "2026-04-03",
+      "weeks": 13,
+      "revenue": 5950,
+      "cost_of_revenue": 1288,
+      "gross_profit": 4662,
+      "gross_margin": 0.783529,
+      "total_operating_expenses": 551,
+      "operating_income": 4111,
+      "other_income_expense": -4,
+      "income_before_tax": 4107,
+      "income_tax_expense": 492,
+      "net_income": 3615,
+      "diluted_eps": 23.03,
+      "diluted_shares": 157,
+      "cash_from_operations": 3038,
+      "gross_capex": 45,
+      "free_cash_flow_company_definition": 2993,
+      "end_markets": {
+        "Datacenter": 1467,
+        "Edge": 3663,
+        "Consumer": 820
+      },
+      "operating_kpis": {
+        "total_asp_per_gb_yoy": 2.48,
+        "total_exabytes_yoy": 0.0,
+        "datacenter_asp_yoy": 1.86,
+        "datacenter_exabytes_yoy": 1.6,
+        "edge_asp_yoy": 3.43,
+        "edge_exabytes_yoy": -0.1,
+        "consumer_asp_yoy": 1.39,
+        "consumer_exabytes_yoy": -0.4,
+        "top_ten_customer_revenue_share": 0.46,
+        "customers_above_ten_percent": 1
+      },
+      "non_gaap": {
+        "adjusted_gross_profit": 4666,
+        "adjusted_gross_margin": 0.784,
+        "adjusted_operating_income": 4218,
+        "adjusted_net_income": 3675,
+        "adjusted_diluted_eps": 23.41
+      },
+      "source_ids": [
+        "S011",
+        "S012",
+        "S013"
+      ]
+    },
+    "FY2026_9M": {
+      "status": "actual",
+      "period_end": "2026-04-03",
+      "weeks": 40,
+      "revenue": 11283,
+      "cost_of_revenue": 4393,
+      "gross_profit": 6890,
+      "gross_margin": 0.610636,
+      "total_operating_expenses": 1538,
+      "operating_income": 5352,
+      "other_income_expense": -184,
+      "income_before_tax": 5168,
+      "income_tax_expense": 638,
+      "net_income": 4530,
+      "diluted_eps": 29.42,
+      "diluted_shares": 154,
+      "cash_from_operations": 4545,
+      "gross_capex": 134,
+      "free_cash_flow_company_definition": 4411,
+      "flash_ventures_net_activity": -165,
+      "adjusted_free_cash_flow": 4246,
+      "end_markets": {
+        "Datacenter": 2176,
+        "Datacenter_share": 0.192857,
+        "Edge": 6728,
+        "Edge_share": 0.596295,
+        "Consumer": 2379,
+        "Consumer_share": 0.210848
+      },
+      "operating_kpis": {
+        "total_asp_per_gb_yoy": 0.76,
+        "total_exabytes_yoy": 0.18
+      },
+      "non_gaap": {
+        "adjusted_gross_profit": 6903,
+        "adjusted_gross_margin": 0.6118,
+        "adjusted_operating_income": 5596,
+        "adjusted_net_income": 4823,
+        "adjusted_diluted_eps": 31.32
+      },
+      "source_ids": [
+        "S014",
+        "S017"
+      ]
+    }
+  },
+  "fy26e_inputs": {
+    "status": "estimate",
+    "method": "FY2026 nine-month GAAP actual plus the midpoint of company FY2026 Q4 guidance",
+    "period_end": "2026-07-03",
+    "weeks": 53,
+    "q4_guidance": {
+      "revenue_low": 7750,
+      "revenue_high": 8250,
+      "gaap_gross_margin_low": 0.789,
+      "gaap_gross_margin_high": 0.809,
+      "gaap_operating_expenses_low": 523,
+      "gaap_operating_expenses_high": 558,
+      "gaap_other_income_low": 12,
+      "gaap_other_income_high": 32,
+      "non_gaap_tax_expense_low": 775,
+      "non_gaap_tax_expense_high": 875,
+      "non_gaap_diluted_eps_low": 30,
+      "non_gaap_diluted_eps_high": 33,
+      "guided_diluted_shares": 158,
+      "source_ids": [
+        "S020"
+      ]
+    },
+    "q4_midpoint": {
+      "revenue": 8000,
+      "gross_margin": 0.799,
+      "gross_profit": 6392,
+      "cost_of_revenue": 1608,
+      "total_operating_expenses": 540.5,
+      "operating_income": 5851.5,
+      "other_income_expense": 22,
+      "income_before_tax": 5873.5,
+      "tax_expense_model_bridge": 940.9345,
+      "net_income_model_bridge": 4932.5655,
+      "note": "Q4 tax and net income are model bridges required to produce the specified 14.3% FY2026E full-year tax rate; they are not company guidance"
+    },
+    "annual_estimate": {
+      "revenue": 19283,
+      "cost_of_revenue": 6001,
+      "gross_profit": 13282,
+      "gross_margin": 0.6887932376,
+      "total_operating_expenses": 2078.5,
+      "operating_income": 11203.5,
+      "other_income_expense": -162,
+      "income_before_tax": 11041.5,
+      "effective_tax_rate": 0.143,
+      "income_tax_expense": 1578.9345,
+      "net_income": 9462.5655,
+      "diluted_shares": 156,
+      "diluted_eps": 60.65747115
+    },
+    "reference_indexes": {
+      "asp_index_q3_fy2026": 100,
+      "asp_index_fy2026_annual_average": 75,
+      "cost_index_q3_fy2026": 100,
+      "cost_index_fy2026_annual_average": 100
+    }
+  },
+  "balance_sheet": {
+    "as_of": "2026-04-03",
+    "cash_and_cash_equivalents": 3735,
+    "accounts_receivable": 2726,
+    "inventory": 2238,
+    "inventory_detail": {
+      "raw_materials": 1492,
+      "work_in_process": 332,
+      "finished_goods": 414,
+      "days_inventory_outstanding": 158,
+      "prior_year_days_inventory_outstanding": 150
+    },
+    "current_assets": 9168,
+    "property_plant_and_equipment_net": 649,
+    "total_assets": 17075,
+    "current_debt": 0,
+    "long_term_debt": 0,
+    "total_liabilities": 3298,
+    "shareholders_equity": 13777,
+    "basic_shares_outstanding": 148,
+    "revolver_capacity": 1500,
+    "revolver_drawn": 0,
+    "term_loan_repayment_march_2026": 1900,
+    "term_loan_repayment_loss": 46,
+    "contract_liabilities": 511,
+    "remaining_performance_obligations": 41600,
+    "remaining_performance_obligations_unbilled": 41200,
+    "remaining_performance_obligations_expected_next_12_months_share": 0.15,
+    "commitments": {
+      "total": 12793,
+      "flash_ventures": 6543,
+      "purchase_and_other": 4970,
+      "nanya_investment": 972,
+      "operating_leases": 308
+    },
+    "subsequent_events": {
+      "nanya_cash_payment_date": "2026-04-08",
+      "nanya_cash_payment": 972,
+      "nanya_ownership_approximate": 0.039,
+      "nanya_lockup_years": 3,
+      "share_repurchase_authorization_date": "2026-04-30",
+      "share_repurchase_authorization": 6000,
+      "share_repurchase_executed_by_cutoff": null
+    },
+    "source_ids": [
+      "S015",
+      "S016",
+      "S018",
+      "S019"
+    ]
+  },
+  "market": {
+    "as_of": "2026-07-17T12:23:00-04:00",
+    "price": 1470.63,
+    "price_type": "intraday",
+    "basic_shares": 148.089758,
+    "market_capitalization": 217785.24080754,
+    "cash_at_latest_balance_sheet": 3735,
+    "debt_at_latest_balance_sheet": 0,
+    "nanya_post_balance_sheet_cash_outflow": 972,
+    "pro_forma_excess_cash": 2763,
+    "enterprise_value": 215022.24080754,
+    "calculation_notes": {
+      "market_capitalization": "price multiplied by basic shares",
+      "pro_forma_excess_cash": "latest cash less Nanya cash outflow; no value is assigned to the Nanya equity stake",
+      "enterprise_value": "market capitalization plus debt less pro-forma excess cash"
+    },
+    "source_ids": [
+      "S015",
+      "S019",
+      "S030"
+    ]
+  },
+  "forecast_methodology": {
+    "annual_revenue_formula": "revenue_t = revenue_t_minus_1 * (1 + bit_growth_t) * (asp_index_t / asp_index_t_minus_1)",
+    "gross_profit_formula": "gross_profit_t = revenue_t * gross_margin_t",
+    "operating_income_formula": "operating_income_t = gross_profit_t - operating_expenses_t",
+    "pretax_income_formula": "pretax_income_t = operating_income_t + other_income_t",
+    "net_income_formula": "net_income_t = pretax_income_t * (1 - tax_rate_t)",
+    "diluted_eps_formula": "diluted_eps_t = net_income_t / diluted_shares_t",
+    "edge_share_formula": "edge_share_t = 1 - datacenter_share_t - consumer_share_t",
+    "annual_starting_point": {
+      "period": "FY2026E",
+      "revenue": 19283,
+      "asp_index": 75,
+      "cost_index": 100
+    },
+    "valuation_formula": "scenario_value_per_share = transition_weight * transition_PE * FY2027E_EPS + normalized_weight * normalized_PE * average(FY2029E_EPS, FY2030E_EPS) + excess_cash_per_share",
+    "probability_weighted_value_formula": "sum(scenario_probability * scenario_value_per_share)"
+  },
+  "scenario_probabilities": {
+    "Bear": 0.3,
+    "Base": 0.5,
+    "Bull": 0.2
+  },
+  "scenarios": {
+    "Bear": {
+      "probability": 0.3,
+      "annual": {
+        "FY2027": {
+          "bit_growth": 0.12,
+          "asp_index": 75,
+          "cost_index": 98,
+          "gross_margin": 0.55,
+          "operating_expenses": 2300,
+          "other_income": 100,
+          "tax_rate": 0.15,
+          "diluted_shares": 158,
+          "datacenter_share": 0.3,
+          "consumer_share": 0.17,
+          "edge_share": 0.53,
+          "derived_revenue_check": 21596.96
+        },
+        "FY2028": {
+          "bit_growth": 0.16,
+          "asp_index": 45,
+          "cost_index": 89,
+          "gross_margin": 0.3,
+          "operating_expenses": 2200,
+          "other_income": 100,
+          "tax_rate": 0.15,
+          "diluted_shares": 158,
+          "datacenter_share": 0.33,
+          "consumer_share": 0.16,
+          "edge_share": 0.51,
+          "derived_revenue_check": 15031.48416
+        },
+        "FY2029": {
+          "bit_growth": 0.15,
+          "asp_index": 35,
+          "cost_index": 82,
+          "gross_margin": 0.2,
+          "operating_expenses": 2100,
+          "other_income": 100,
+          "tax_rate": 0.15,
+          "diluted_shares": 157,
+          "datacenter_share": 0.36,
+          "consumer_share": 0.15,
+          "edge_share": 0.49,
+          "derived_revenue_check": 13444.827499
+        },
+        "FY2030": {
+          "bit_growth": 0.14,
+          "asp_index": 32,
+          "cost_index": 76,
+          "gross_margin": 0.28,
+          "operating_expenses": 2200,
+          "other_income": 100,
+          "tax_rate": 0.16,
+          "diluted_shares": 156,
+          "datacenter_share": 0.39,
+          "consumer_share": 0.14,
+          "edge_share": 0.47,
+          "derived_revenue_check": 14013.351633
+        }
+      },
+      "quarterly_fy27": {
+        "Q1": {
+          "input_revenue_rounded": 6500,
+          "revenue_for_model": 6500,
+          "gross_margin": 0.68
+        },
+        "Q2": {
+          "input_revenue_rounded": 5700,
+          "revenue_for_model": 5700,
+          "gross_margin": 0.58
+        },
+        "Q3": {
+          "input_revenue_rounded": 5000,
+          "revenue_for_model": 5000,
+          "gross_margin": 0.48
+        },
+        "Q4": {
+          "input_revenue_rounded": 4400,
+          "revenue_for_model": 4396.96,
+          "gross_margin": 0.42
+        },
+        "annual_formula_revenue": 21596.96,
+        "rounded_input_sum": 21600,
+        "q4_reconciliation_adjustment": -3.04
+      },
+      "valuation": {
+        "transition_pe": 8,
+        "normalized_pe": 10,
+        "excess_cash_per_share": 10
+      }
+    },
+    "Base": {
+      "probability": 0.5,
+      "annual": {
+        "FY2027": {
+          "bit_growth": 0.23,
+          "asp_index": 105,
+          "cost_index": 90,
+          "gross_margin": 0.74,
+          "operating_expenses": 2450,
+          "other_income": 200,
+          "tax_rate": 0.15,
+          "diluted_shares": 154,
+          "datacenter_share": 0.35,
+          "consumer_share": 0.15,
+          "edge_share": 0.5,
+          "derived_revenue_check": 33205.326
+        },
+        "FY2028": {
+          "bit_growth": 0.23,
+          "asp_index": 80,
+          "cost_index": 79,
+          "gross_margin": 0.58,
+          "operating_expenses": 2650,
+          "other_income": 300,
+          "tax_rate": 0.16,
+          "diluted_shares": 152,
+          "datacenter_share": 0.44,
+          "consumer_share": 0.13,
+          "edge_share": 0.43,
+          "derived_revenue_check": 31118.13408
+        },
+        "FY2029": {
+          "bit_growth": 0.2,
+          "asp_index": 60,
+          "cost_index": 70,
+          "gross_margin": 0.46,
+          "operating_expenses": 2850,
+          "other_income": 400,
+          "tax_rate": 0.17,
+          "diluted_shares": 151,
+          "datacenter_share": 0.49,
+          "consumer_share": 0.12,
+          "edge_share": 0.39,
+          "derived_revenue_check": 28006.320672
+        },
+        "FY2030": {
+          "bit_growth": 0.18,
+          "asp_index": 50,
+          "cost_index": 62,
+          "gross_margin": 0.42,
+          "operating_expenses": 3050,
+          "other_income": 500,
+          "tax_rate": 0.18,
+          "diluted_shares": 150,
+          "datacenter_share": 0.53,
+          "consumer_share": 0.11,
+          "edge_share": 0.36,
+          "derived_revenue_check": 27539.548661
+        }
+      },
+      "quarterly_fy27": {
+        "Q1": {
+          "input_revenue_rounded": 8600,
+          "revenue_for_model": 8600,
+          "gross_margin": 0.8
+        },
+        "Q2": {
+          "input_revenue_rounded": 8800,
+          "revenue_for_model": 8800,
+          "gross_margin": 0.79
+        },
+        "Q3": {
+          "input_revenue_rounded": 8300,
+          "revenue_for_model": 8300,
+          "gross_margin": 0.72
+        },
+        "Q4": {
+          "input_revenue_rounded": 7510,
+          "revenue_for_model": 7505.326,
+          "gross_margin": 0.65
+        },
+        "annual_formula_revenue": 33205.326,
+        "rounded_input_sum": 33210,
+        "q4_reconciliation_adjustment": -4.674
+      },
+      "valuation": {
+        "transition_pe": 10,
+        "normalized_pe": 16,
+        "excess_cash_per_share": 50
+      }
+    },
+    "Bull": {
+      "probability": 0.2,
+      "annual": {
+        "FY2027": {
+          "bit_growth": 0.33,
+          "asp_index": 125,
+          "cost_index": 86,
+          "gross_margin": 0.8,
+          "operating_expenses": 2600,
+          "other_income": 200,
+          "tax_rate": 0.15,
+          "diluted_shares": 153,
+          "datacenter_share": 0.42,
+          "consumer_share": 0.12,
+          "edge_share": 0.46,
+          "derived_revenue_check": 42743.983333
+        },
+        "FY2028": {
+          "bit_growth": 0.3,
+          "asp_index": 118,
+          "cost_index": 73,
+          "gross_margin": 0.76,
+          "operating_expenses": 3000,
+          "other_income": 350,
+          "tax_rate": 0.16,
+          "diluted_shares": 148,
+          "datacenter_share": 0.55,
+          "consumer_share": 0.1,
+          "edge_share": 0.35,
+          "derived_revenue_check": 52455.416347
+        },
+        "FY2029": {
+          "bit_growth": 0.26,
+          "asp_index": 105,
+          "cost_index": 64,
+          "gross_margin": 0.68,
+          "operating_expenses": 3400,
+          "other_income": 500,
+          "tax_rate": 0.17,
+          "diluted_shares": 144,
+          "datacenter_share": 0.61,
+          "consumer_share": 0.09,
+          "edge_share": 0.3,
+          "derived_revenue_check": 58812.301548
+        },
+        "FY2030": {
+          "bit_growth": 0.23,
+          "asp_index": 90,
+          "cost_index": 55,
+          "gross_margin": 0.6,
+          "operating_expenses": 3800,
+          "other_income": 700,
+          "tax_rate": 0.18,
+          "diluted_shares": 140,
+          "datacenter_share": 0.65,
+          "consumer_share": 0.08,
+          "edge_share": 0.27,
+          "derived_revenue_check": 62004.969346
+        }
+      },
+      "quarterly_fy27": {
+        "Q1": {
+          "input_revenue_rounded": 9500,
+          "revenue_for_model": 9500,
+          "gross_margin": 0.82
+        },
+        "Q2": {
+          "input_revenue_rounded": 10200,
+          "revenue_for_model": 10200,
+          "gross_margin": 0.82
+        },
+        "Q3": {
+          "input_revenue_rounded": 11000,
+          "revenue_for_model": 11000,
+          "gross_margin": 0.81
+        },
+        "Q4": {
+          "input_revenue_rounded": 12050,
+          "revenue_for_model": 12043.983333,
+          "gross_margin": 0.8
+        },
+        "annual_formula_revenue": 42743.983333,
+        "rounded_input_sum": 42750,
+        "q4_reconciliation_adjustment": -6.016667
+      },
+      "valuation": {
+        "transition_pe": 14,
+        "normalized_pe": 18,
+        "excess_cash_per_share": 100
+      }
+    }
+  },
+  "valuation_assumptions": {
+    "transition_period": "FY2027E",
+    "normalized_period": "average of FY2029E and FY2030E",
+    "transition_weight": 0.4,
+    "normalized_weight": 0.6,
+    "weight_sum": 1.0,
+    "current_price": 1470.63,
+    "current_price_type": "intraday",
+    "avoid_peak_capitalization": true
+  },
+  "perimeter_and_modeling_notes": [
+    "SanDisk separated from Western Digital on 2025-02-21 and began trading on 2025-02-24.",
+    "Pre-separation statements are carve-out financials with allocations of Western Digital corporate and shared-service costs.",
+    "FY2026 contains 53 weeks and FY2026 Q1 contains 14 weeks; other modeled quarters contain 13 weeks.",
+    "Cloud and Client historical revenue are normalized to Datacenter and Edge, respectively.",
+    "The company has one reportable operating segment.",
+    "Flash Ventures commitments and direct Kioxia payments are not conventional standalone capex and must remain separately visible.",
+    "The Nanya equity purchase reduces pro-forma cash but its equity value is not netted against enterprise value.",
+    "The share repurchase is an authorization, not evidence of execution; forecast share-count changes are scenario assumptions.",
+    "BiCS10 sampling is a stage-gate disclosure and does not by itself establish volume revenue or normalized margin economics.",
+    "Kioxia, Micron, and TrendForce evidence informs scenario framing but is not SanDisk company guidance."
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "schema_version": "1.0",
+  "contract_id": "SNDK_2026-07-17T122300-0400",
+  "entity": {
+    "legal_name": "SanDisk Corporation",
+    "security": "NASDAQ:SNDK",
+    "reporting_currency": "USD",
+    "financial_units": "USD millions",
+    "fiscal_calendar": "SanDisk fiscal years",
+    "fiscal_year_end_convention": "Friday nearest June 30; FY2026 is a 53-week year ending 2026-07-03"
+  },
+  "as_of": {
+    "information_cutoff": "2026-07-17T12:23:00-04:00",
+    "timezone": "America/New_York",
+    "market_observation": {
+      "price_usd": 1470.63,
+      "observation_type": "intraday",
+      "explicitly_not": "closing price",
+      "source_id": "S030"
+    }
+  },
+  "scope": {
+    "historical_periods": [
+      "FY2023A",
+      "FY2024A",
+      "FY2025A",
+      "FY2026Q1A",
+      "FY2026Q2A",
+      "FY2026Q3A",
+      "FY2026_9MA"
+    ],
+    "forecast_periods": [
+      "FY2026E",
+      "FY2027E",
+      "FY2028E",
+      "FY2029E",
+      "FY2030E"
+    ],
+    "quarterly_forecast_periods": [
+      "FY2027Q1E",
+      "FY2027Q2E",
+      "FY2027Q3E",
+      "FY2027Q4E"
+    ],
+    "required_outputs": [
+      "revenue",
+      "gross_profit",
+      "operating_income",
+      "net_income",
+      "diluted_EPS",
+      "market_capitalization",
+      "enterprise_value",
+      "transition_PE",
+      "normalized_PE",
+      "probability_weighted_value"
+    ],
+    "intended_use": "Fundamental public-equity research and scenario valuation; not investment advice"
+  },
+  "reporting_basis": {
+    "primary": "US GAAP",
+    "supplemental": "Company non-GAAP metrics retained only as separately labeled context",
+    "forecast_convention": "FY2026E equals nine-month actual results plus the midpoint of SanDisk's FY2026 Q4 guidance; FY2027E-FY2030E are explicit Bear/Base/Bull assumptions",
+    "historical_perimeter": "FY2023-FY2025 includes carve-out periods before the 2025-02-21 separation from Western Digital and therefore contains allocated corporate and shared-service costs that may not represent standalone economics",
+    "segment_definition": "One legal operating segment; Cloud was renamed Datacenter and Client was renamed Edge in FY2026"
+  },
+  "business_archetype": {
+    "primary": "commodity_memory_storage",
+    "primary_weight": 0.9,
+    "secondary": "enterprise_ssd_regime_break_option",
+    "secondary_weight": 0.1,
+    "modeling_implication": "Do not capitalize peak-cycle gross margins indefinitely; show transition and normalized earnings separately"
+  },
+  "scenario_policy": {
+    "required_cases": [
+      "Bear",
+      "Base",
+      "Bull"
+    ],
+    "probabilities": {
+      "Bear": 0.3,
+      "Base": 0.5,
+      "Bull": 0.2
+    },
+    "probability_sum": 1.0,
+    "uncertainty_focus": [
+      "NAND bit demand",
+      "ASP and enterprise mix",
+      "cost per bit",
+      "gross-margin normalization",
+      "capital return and dilution",
+      "Datacenter mix"
+    ]
+  },
+  "evidence_policy": {
+    "tier_definitions": {
+      "E0": "audited filing, filed quarterly statement, or directly observed market datum",
+      "E1": "official company earnings release, investor material, or operating disclosure",
+      "E2": "traceable partner, customer, or supplier disclosure",
+      "E3": "credible third-party market research or forecast",
+      "E4": "unverified secondary claim"
+    },
+    "load_bearing_rule": "Prefer E0/E1 evidence; E3 evidence may frame industry scenarios but cannot be presented as SanDisk-reported fact",
+    "fact_assumption_separation": "Every model assumption is explicitly registered and distinct from sourced actuals",
+    "cutoff_rule": "Exclude facts first published after the information cutoff even when they concern an earlier fiscal period",
+    "conflict_rule": "Preserve conflicting evidence and disclose differences rather than silently averaging"
+  },
+  "stage_gates": {
+    "enterprise_ssd": [
+      "sampling or qualification",
+      "production qualification",
+      "volume ramp",
+      "reported Datacenter revenue and economics"
+    ],
+    "capital_return": [
+      "authorization",
+      "execution",
+      "share-count impact"
+    ],
+    "current_state": {
+      "enterprise_ssd": "BiCS10 sampling disclosed; do not assume full production economics without later qualification and ramp evidence",
+      "capital_return": "$6.0 billion repurchase authorization disclosed; execution not evidenced by the cutoff"
+    }
+  },
+  "artifacts": {
+    "source_manifest": "research/sandisk/source_manifest.csv",
+    "model_inputs": "research/sandisk/model_inputs.json",
+    "assumption_register": "research/sandisk/assumption_register.csv"
+  },
+  "limitations": [
+    "The NASDAQ price page is dynamic and the captured price is an intraday observation, not an archival close.",
+    "FY2026 Q4 and full-year results were not published by the cutoff; Q4 values are guidance midpoints, not actuals.",
+    "Industry forecasts from Kioxia, Micron, and TrendForce are corroborating scenario evidence and are not SanDisk guidance.",
+    "The model does not treat the $6.0 billion repurchase authorization as executed.",
+    "The $972 million Nanya investment paid after the FY2026 Q3 balance-sheet date is reflected only in pro-forma excess cash."
+  ]
+}

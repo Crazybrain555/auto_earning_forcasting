@@ -1,0 +1,15 @@
+[project]
+name = "ai-stock-framework-mcp"
+version = "0.1.0"
+description = "Project-local MCP runtime for the AI hardware forecasting skill"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "arxiv-mcp-server[pdf]==0.5.0",
+  "edgartools[ai]==5.40.1",
+  # SOCKS proxy support: the shell exports ALL_PROXY=socks5h://..., and httpx
+  # refuses SOCKS proxies without socksio installed.
+  "httpx[socks]",
+]
+
+[tool.uv]
+package = false

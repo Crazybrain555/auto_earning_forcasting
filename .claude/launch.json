@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "forecast-backend",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["backend/run.sh"],
+      "port": 8787
+    }
+  ]
+}
