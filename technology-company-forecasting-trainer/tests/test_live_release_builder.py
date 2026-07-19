@@ -41,3 +41,26 @@ def test_live_builder_output_passes_live_self_test():
         st=subprocess.run([sys.executable,str(out/'scripts/package_self_test.py'),str(out)],capture_output=True,text=True)
         assert st.returncode==0, st.stdout+st.stderr
         assert 'PASS: live package self-test' in st.stdout
+
+
+def test_live_builder_refuses_overlapping_paths():
+    import shutil
+    with tempfile.TemporaryDirectory() as td:
+        scratch = Path(td) / "trainer-copy"
+        shutil.copytree(ROOT, scratch, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+        def build_with(out):
+            return subprocess.run([sys.executable, str(scratch / "scripts/build_live_release.py"),
+                                    "--trainer-skill-root", str(scratch), "--output-root", str(out)],
+                                   capture_output=True, text=True)
+        # out == src
+        r = build_with(scratch)
+        assert r.returncode != 0 and "overlap" in r.stdout, r.stdout + r.stderr
+        assert (scratch / "SKILL.md").exists()
+        # out inside src
+        r = build_with(scratch / "sub" / "live")
+        assert r.returncode != 0 and "overlap" in r.stdout, r.stdout + r.stderr
+        assert (scratch / "SKILL.md").exists()
+        # src inside out
+        r = build_with(Path(td))
+        assert r.returncode != 0 and "overlap" in r.stdout, r.stdout + r.stderr
+        assert (scratch / "SKILL.md").exists()

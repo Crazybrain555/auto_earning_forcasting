@@ -105,6 +105,10 @@ def main() -> int:
         if not required.exists():
             return fail(f"missing trainer input: {required}")
 
+    # Refuse overlapping paths BEFORE any destructive step: an out that equals
+    # or contains (or sits inside) the trainer source would delete the method.
+    if src == out or src in out.parents or out in src.parents:
+        return fail(f"trainer-skill-root and output-root overlap ({src} vs {out}); refusing")
     if out.exists():
         shutil.rmtree(out)
     shutil.copytree(src, out, ignore=shutil.ignore_patterns("__pycache__", "*.pyc", ".DS_Store"))

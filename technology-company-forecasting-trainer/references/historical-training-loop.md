@@ -28,7 +28,7 @@ Improve the forecasting method through historical cases. Git is the only version
 1. Every forecast-use source's original publication/version time is at or before the frozen `as_of`. Model memory is not evidence; undated or post-cutoff material is quarantined.
 2. No answer-bearing queries before the seal. Keep `historical_query_log.csv` honest and complete.
 3. Seal with `scripts/freeze_training_forecast.py` (which runs the time-boundary, research-completeness, and delivery validators) **before** retrieving any target Actual. Only after the seal, fetch actuals and score with `scripts/score_training_forecast.py`.
-4. Actuals and evaluation outputs stay in the case workspace. Never write an actual, or a rule derived from one specific known actual, into the skill files.
+4. Actuals and evaluation outputs live only in the seal-exempt subdirectories `actuals_vault/` and `evaluation/` (or outside the workspace). Everything else in a sealed workspace is hash-locked: verification fails on any modified, removed, or added file, and scoring must leave the sealed tree bit-for-bit intact. Never write an actual, or a rule derived from one specific known actual, into the skill files.
 5. A case whose seal was broken or whose actuals were seen early can still be used for training and diagnosis — it can never again be counted as validation.
 
 ## The round
