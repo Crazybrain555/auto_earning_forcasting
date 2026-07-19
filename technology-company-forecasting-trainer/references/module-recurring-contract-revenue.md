@@ -63,7 +63,26 @@ A new accounting standard, pricing model, contract migration or acquisition inte
 - Sales anecdotes, unnamed pipeline claims, search snippets and duplicated commentary are monitoring signals only.
 - Missing cohort, duration, cancellation or recognition data require an explicit residual and lower readiness; do not invent customer names or shares.
 
-## 5. Permission and uncertainty
+## 5. Technology-inflection expansion floor
+
+When observable evidence at `as_of` shows a technology inflection driving structural demand acceleration for the recurring product set, the Base expansion rate for FY+2 and FY+3 must not fall below the inflection-driven floor. This rule prevents anchoring on pre-inflection historical averages when the demand driver has demonstrably shifted.
+
+**Applicability.** All three conditions must hold:
+
+1. A named technology transition is in progress (e.g., major semiconductor node shift, new design-methodology requirement, platform migration) with E0/E1 evidence of customer adoption at `as_of`.
+2. The transition creates incremental, measurable demand for the recurring product (more seats, higher complexity per design, new tool attach) — not merely a general narrative of "growth."
+3. At least two independent forward signals (design starts, customer disclosures, order patterns, official guidance citing the transition) corroborate accelerating adoption as of the cutoff.
+
+**Rule.** When applicable, set the FY+2 and FY+3 Base expansion rate at or above the higher of (a) the trailing four-quarter organic expansion rate and (b) the inflection-driven floor implied by the measured adoption signals. The floor is not a point estimate — it sets the lower bound of the Base case; upside scenarios may exceed it.
+
+**Failure conditions — do not apply when:**
+
+- the transition evidence is analyst commentary or model memory only (no E0/E1 anchor);
+- the product's share of the inflection is unquantified or speculative;
+- the customer base is concentrated enough that one delayed program would remove the floor;
+- the inflection is a one-time migration (e.g., ASC 606 transition) rather than a sustained demand expansion.
+
+## 6. Permission and uncertainty
 
 - Guidance is an output constraint and management belief, not the revenue equation.
 - Beginning base, renewal, expansion/new logos, price/usage, stage probability and recognition timing are separate parameters.
@@ -73,11 +92,11 @@ A new accounting standard, pricing model, contract migration or acquisition inte
 - FY+1 point precision requires a bridge that explains a substantial, decision-relevant share of revenue and reconciles to official guidance/run rate.
 - FY+2 shows renewal/expansion and recognition breakpoints; FY+3 is distribution-first when cohort/duration evidence is weak.
 
-## 6. Workbook and registers
+## 7. Workbook and registers
 
 Include product × customer group × contract type × quarter, beginning recurring base, unrecognized contract stock, renewal/expansion/new logos, price/usage, stage conversion, billings/deferred/RPO reconciliation where disclosed, recognition by revenue type, cancellations/FX/scope, margin/cash differences, source permission, materiality, sensitivity and falsification trigger.
 
-## 7. Coverage and residual diagnostics
+## 8. Coverage and residual diagnostics
 
 Calculate:
 
