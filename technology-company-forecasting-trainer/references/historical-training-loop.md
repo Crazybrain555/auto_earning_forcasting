@@ -46,8 +46,46 @@ For each case: `scripts/scaffold_training_run.py --case-role development`, resea
 - Attribute each material error with the taxonomy (DATA, PERIMETER, STATE, PARAM, STRUCTURE, TIMING, REGIME, ACCOUNTING, EXOGENOUS; template `assets/templates/forecast_error_taxonomy_template.csv`).
 - Fix the reusable mechanism, not the number: a change must be a rule with a stated scope and failure condition (the "when X evidence is missing, cap FY+2 confidence" kind), never a growth/margin/tax value tuned to a known actual.
 - Right-reason check: the revised forecast should move for the reason claimed. When useful, score intermediate mechanism outcomes with `scripts/score_mechanism_outcomes.py`.
+- **External-method reflection (required, not optional).** Internal error
+  attribution only tells you *that* the method missed; it cannot tell you what
+  practitioners already know about that failure mode. Before writing the rule,
+  consult outside method sources on the specific error and record what you
+  found in `method_reflection.md` (see below). Search at least two of:
+  practitioner literature and books, analyst/podcast deep dives on the same
+  business type (Business Breakdowns, Acquired, In Practise, Colossus),
+  academic or industry research, and published models for comparable
+  companies. Where a YouTube transcript MCP is configured, transcripts of
+  method talks and company deep dives count as a source lane.
+  Ask of every diagnosed error: *is this a known failure mode with a known
+  remedy?* Adopting a remedy that outside practice already validated beats
+  inventing one from a two-case sample - and where outside practice
+  disagrees with what the errors suggest, record the disagreement rather than
+  resolving it silently.
 - Re-run the affected A cases to confirm the diagnosed error is actually addressed.
 - Commit locally (message = the rule and its rationale, not the case answer). Do not push yet.
+
+### 3b. The reflection record
+
+Each round writes `training-runs/<round>/method_reflection.md` with, per
+proposed rule:
+
+| Field | Content |
+|---|---|
+| `error_observed` | the measured miss (case, horizon, direction, magnitude) |
+| `internal_attribution` | taxonomy code + mechanism reasoning from the cases |
+| `external_sources` | what outside method material was consulted, with links |
+| `outside_view` | what practitioners do about this failure mode |
+| `agreement` | does outside practice confirm, refine, or contradict the internal reading |
+| `rule_adopted` | the rule as written, with scope and failure condition |
+| `why_not_alternatives` | remedies considered and rejected, with reasons |
+
+Two guards this record enforces:
+
+1. **Sample-size honesty.** A rule inferred from two cases is a hypothesis.
+   If outside practice already validates it, say so - the rule inherits that
+   support. If not, mark it `provisional` and give it a wider validation plan.
+2. **No silent overfitting.** A rule that outside practice contradicts must
+   argue explicitly why this method's context differs, or be dropped.
 
 ### 4. Validate on Group B
 
