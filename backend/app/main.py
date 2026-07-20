@@ -209,6 +209,19 @@ def method_evolution():
     return method.evolution()
 
 
+@app.get("/api/method/skill-map")
+def method_skill_map():
+    return method.skill_map()
+
+
+@app.get("/api/method/file", response_class=PlainTextResponse)
+def method_file(path: str):
+    result = method.skill_file(path)
+    if result is None:
+        raise HTTPException(404, "file not found in live skill")
+    return result[1]
+
+
 @app.get("/api/method/skills")
 def method_skills():
     return method.skills()

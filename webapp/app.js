@@ -22,6 +22,77 @@ const apiHref = path => {
   return prefix && path.startsWith("/api/") ? `${prefix}${path.slice(4)}` : path;
 };
 
+/* ACTION_FEEDBACK_START */
+let actionToastTimer = 0;
+
+function safeActionErrorMessage(error) {
+  const raw = String(error?.message || error || "").trim();
+  const status = raw.match(/\b(400|401|403|404|409|422|429|500|502|503|504)\b/)?.[1];
+  if (status === "401") return "未获得控制权限，请使用受信任账号或重新配对。";
+  if (status === "403") return "当前账号没有控制权限。";
+  if (status === "429") return "请求过于频繁，请稍后重试。";
+  if (status === "503") return "控制服务暂时不可用，请稍后重试。";
+  if (status === "504") return "控制请求仍在处理中，请稍后查看。";
+  if (/failed to fetch|networkerror|network request failed/i.test(raw)) return "网络连接失败，请检查连接后重试。";
+
+  const scrubbed = raw
+    .replace(/^error:\s*/i, "")
+    .replace(/authorization\s*[:=]\s*(?:bearer\s+)?[^\s,;]+/gi, "凭证=[已隐藏]")
+    .replace(/\bbearer\s+[a-z0-9._~+/=-]+/gi, "凭证=[已隐藏]")
+    .replace(/\b(?:sk|sess|key|token)-[a-z0-9._-]{6,}\b/gi, "[已隐藏]")
+    .replace(/([?&](?:access[_-]?token|refresh[_-]?token|token|secret|api[_-]?key|password)=)[^&#\s]+/gi, "$1[已隐藏]")
+    .replace(/\b(access[_-]?token|refresh[_-]?token|token|secret|api[_-]?key|password|cookie)\s*[:=]\s*[^\s,;]+/gi, "$1=[已隐藏]")
+    .replace(/\/(?:Users|home)\/[^\s,;]+/g, "[本地路径已隐藏]")
+    .replace(/[\u0000-\u001f\u007f]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!scrubbed || /^(?:400|404|409|422|500|502)\s*$/.test(scrubbed)) return "操作未完成，请重试。";
+  return scrubbed.slice(0, 140);
+}
+
+function showActionToast(message, tone = "error") {
+  let toast = document.getElementById("action-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "action-toast";
+    toast.setAttribute("role", "alert");
+    toast.setAttribute("aria-live", "assertive");
+
+    const text = document.createElement("div");
+    text.className = "action-toast-text";
+    toast.__messageNode = text;
+
+    const close = document.createElement("button");
+    close.type = "button";
+    close.className = "action-toast-close";
+    close.setAttribute("aria-label", "关闭提示");
+    close.textContent = "×";
+    close.onclick = () => {
+      clearTimeout(actionToastTimer);
+      toast.remove();
+    };
+    toast.append(text, close);
+    document.body.append(toast);
+  }
+
+  toast.__messageNode.textContent = String(message || "操作未完成，请重试。");
+  toast.dataset.tone = tone;
+  toast.className = "action-toast on";
+  clearTimeout(actionToastTimer);
+  actionToastTimer = setTimeout(() => toast.remove(), 7000);
+  return toast;
+}
+
+function reportActionError(action, error) {
+  return showActionToast(`${action}失败：${safeActionErrorMessage(error)}`, "error");
+}
+
+globalThis.__FORECAST_ACTION_FEEDBACK = Object.freeze({
+  safeErrorMessage: safeActionErrorMessage,
+  showError: reportActionError,
+});
+/* ACTION_FEEDBACK_END */
+
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const pct = (v, d = 1) => v == null ? "—" : (v * 100).toFixed(d) + "%";
 const num = (v, d = 2) => v == null || v === "" || isNaN(Number(v)) ? "—" : Number(v).toFixed(d);
@@ -116,7 +187,14 @@ async function refreshHeader() {
     document.getElementById("chip-control").innerHTML = statusChip(paused ? "warning" : "good", paused ? "自动优化:已暂停" : "自动优化:运行");
     document.getElementById("chip-method").innerHTML = `方法 <span class="mono">${esc(timeline.branch || "?")}@${esc((timeline.head || "").slice(0, 7))}</span>`;
     const refresh = document.getElementById("chip-refresh");
-    if (status.bridge && status.bridge.online === false) {
+    const snapshotSource = String(status.snapshot_source || "");
+    const snapshotTime = Date.parse(status.generated_at || "");
+    const snapshotStale = snapshotSource && Number.isFinite(snapshotTime) && Date.now() - snapshotTime > 5 * 60 * 1000;
+    if (/unavailable|不可用|尚未同步/i.test(snapshotSource)) {
+      refresh.innerHTML = statusChip("critical", "数据尚未同步");
+    } else if (snapshotStale) {
+      refresh.innerHTML = statusChip("warning", "数据已过期 · " + fmtTime(status.generated_at));
+    } else if (status.bridge && status.bridge.online === false) {
       refresh.innerHTML = statusChip("critical", "同步桥离线");
     } else if (status.bridge?.online) {
       refresh.textContent = "同步于 " + fmtTime(status.generated_at || status.bridge.last_seen_at || status.bridge.heartbeat_at);
@@ -147,10 +225,9 @@ const visibleEngines = list => {
   return policy ? source.filter(item => policy.has(item.engine)) : source;
 };
 let engineList = [];                 // /api/engines payload
-let pfEngine = (() => {
-  try { return JSON.parse(localStorage.getItem("enginePrefs") || "{}").last || "claude"; }
-  catch { return "claude"; }
-})();
+const enginePreferenceStore = globalThis.__FORECAST_PREFERENCES;
+let volatileEnginePrefs = {};
+let pfEngine = engPrefs().last || "claude";
 if (!visibleEngines(DEFAULT_ENGINE_SPECS).some(item => item.engine === pfEngine)) {
   pfEngine = (visibleEngines(DEFAULT_ENGINE_SPECS)[0] || {}).engine || "codex";
 }
@@ -163,13 +240,24 @@ const ENGINE_BLURB = {
 let _engMenuClose = null;
 
 function engPrefs() {
-  try { return JSON.parse(localStorage.getItem("enginePrefs") || "{}"); } catch { return {}; }
+  try {
+    const saved = enginePreferenceStore?.readObject?.("enginePrefs");
+    if (saved && typeof saved === "object" && !Array.isArray(saved)) {
+      volatileEnginePrefs = { ...saved };
+    }
+  } catch {
+    // Keep the last page-memory value when storage is unavailable.
+  }
+  return { ...volatileEnginePrefs };
 }
 function saveEngPref(engine, model, effort) {
   const p = engPrefs();
   p.last = engine;
   p[engine] = { model, effort };
-  localStorage.setItem("enginePrefs", JSON.stringify(p));
+  volatileEnginePrefs = p;
+  try { enginePreferenceStore?.writeObject?.("enginePrefs", p); } catch {
+    // Saving a UI preference must never prevent the selected action.
+  }
   pfEngine = engine;
 }
 
@@ -488,14 +576,38 @@ function openLogDrawer(jobId) {
   drawerTimer = setInterval(load, 3000);
 }
 
+/* 方法文件抽屉:点 skill 地图里的文件直接读原文 */
+function openFileDrawer(path) {
+  openDrawer(`<span class="mono" style="font-size:12.5px">${esc(path)}</span>`, `<div id="file-body">加载中…</div>`);
+  const load = async () => {
+    const box = document.getElementById("file-body");
+    if (!box) return;
+    try {
+      const text = await api(`/api/method/file?path=${encodeURIComponent(path)}`);
+      box.innerHTML = /\.md$/.test(path) ? mdRender(text) : `<pre class="log drawer-log">${esc(text)}</pre>`;
+    } catch (e) {
+      box.innerHTML = `<div class="empty">读取失败:${esc(e.message)}<br><button class="btn btn-sm" id="file-retry" style="margin-top:8px">重试</button></div>`;
+      const retry = document.getElementById("file-retry");
+      if (retry) retry.onclick = load;
+    }
+  };
+  load();
+}
+
 /* 版本管理抽屉:单选 = 看板显示哪版;删除/恢复;固定后可恢复自动 */
 function openVersionDrawer(sec, entity) {
   openDrawer(`${esc(entity || sec)} <span class="mono cellnote">${esc(sec)}</span> · 版本管理`, `<div id="ver-body">加载中…</div>`);
   const load = async () => {
-    let hist = [];
-    try { hist = await api(`/api/history/${encodeURIComponent(sec)}`); } catch {}
+    let hist = null;
+    try { hist = await api(`/api/history/${encodeURIComponent(sec)}`); } catch { hist = null; }
     const box = document.getElementById("ver-body");
     if (!box) return;
+    if (hist === null) {
+      box.innerHTML = `<div class="empty">版本列表加载失败(后端可能正在重启)<br><button class="btn btn-sm" id="ver-retry" style="margin-top:8px">重试</button></div>`;
+      const retry = document.getElementById("ver-retry");
+      if (retry) retry.onclick = load;
+      return;
+    }
     if (!hist.length) { box.innerHTML = `<div class="empty">还没有入库版本——跑一次预测后这里会出现。</div>`; return; }
     const pinned = hist.find(h => h.is_active && !h.deleted);
     const effective = pinned || hist.find(h => h.has_valuation && !h.deleted) || null;
@@ -601,7 +713,7 @@ function bindPortfolio() {
   };
   const sugClear = document.getElementById("sug-clear");
   if (sugClear) sugClear.onclick = async () => {
-    try { await del("/api/watch-suggestions"); sugData = null; paintPortfolio(); } catch {}
+    try { await del("/api/watch-suggestions"); sugData = null; paintPortfolio(); } catch (error) { reportActionError("清空推荐", error); }
   };
   $view.querySelectorAll("[data-sugadd]").forEach(b => b.onclick = async () => {
     const it = ((sugData || {}).suggestions || [])[+b.dataset.sugadd];
@@ -631,7 +743,9 @@ function bindPortfolio() {
   $view.querySelectorAll("[data-unwatch]").forEach(b => b.onclick = async ev => {
     ev.stopPropagation();
     if (!confirm(`把 ${b.dataset.unwatch} 移出关注列表?(不删除已有预测记录)`)) return;
-    await del(`/api/watchlist/${encodeURIComponent(b.dataset.unwatch)}`); expanded.delete(b.dataset.unwatch); viewPortfolio();
+    try {
+      await del(`/api/watchlist/${encodeURIComponent(b.dataset.unwatch)}`); expanded.delete(b.dataset.unwatch); viewPortfolio();
+    } catch (error) { reportActionError(`移除 ${b.dataset.unwatch}`, error); }
   });
   $view.querySelectorAll("[data-toggle]").forEach(el => el.onclick = () => {
     const sec = el.dataset.toggle;
@@ -888,8 +1002,10 @@ function bindTraining(paused) {
     refill();
   }
   document.getElementById("btn-toggle").onclick = async () => {
-    await post("/api/control", { auto_training: paused ? "run" : "pause", note: "dashboard 手动切换" });
-    refreshHeader(); viewTraining();
+    try {
+      await post("/api/control", { auto_training: paused ? "run" : "pause", note: "dashboard 手动切换" });
+      refreshHeader(); viewTraining();
+    } catch (error) { reportActionError(paused ? "恢复自动优化" : "暂停自动优化", error); }
   };
   $view.querySelectorAll("[data-fill]").forEach(b => b.onclick = () => {
     for (const c of JSON.parse(b.dataset.fill)) {
@@ -1133,29 +1249,33 @@ const PIPE_SVG = `
   <line class="pe" x1="694" y1="215" x2="714" y2="215"/><line class="pe" x1="930" y1="215" x2="950" y2="215"/>
 </svg>`;
 
-const SKILL_MODULES = {
-  "机制模块(利润从哪来)": ["量·价·成本 unit-volume-price-cost", "产能利用率与良率 capacity-utilization-yield", "订阅与合同收入 recurring-contract-revenue", "订单积压与确认 orders-backlog-recognition", "项目分阶段转化 program-stage-conversion", "平台用量与渗透 platform-usage-adoption", "订户与内容经济 subscriber-content-economics", "离散会计事件 discrete-accounting-events", "口径与并表 perimeter-and-accounting", "合同/合资/资本 contracts-jv-capital", "DTA 估值准备(子模块)"],
-  "行业透镜(公司属于哪种生意)": ["存储 memory-storage", "设备与过程控制 equipment-process-control", "代工封装材料 foundry-packaging-materials", "网络/光/定制硅 networking-optics-custom-silicon", "计算平台 compute-platforms", "云基础设施 cloud-infrastructure", "企业订阅软件 enterprise-recurring-software", "订阅内容平台 subscription-content-platform"],
-  "治理与证据(不许胡说的部分)": ["核心工作流 core-forecast-workflow", "证据分级 core-source-and-evidence", "输出与估值契约 core-output-and-valuation", "前瞻证据校验 forward-evidence-validation", "研究充分性 research-completeness", "交付契约 full-company-delivery-contract", "模式路由与时间边界 mode-router"],
-};
-
 async function viewMethod() {
-  const [timeline, skills, evolution, progress] = await Promise.all([
+  const [timeline, skills, evolution, progress, skillMap] = await Promise.all([
     api("/api/method/timeline"), api("/api/method/skills"),
     api("/api/method/evolution").catch(() => ({ versions: [] })),
-    api("/api/method/progress").catch(() => [])]);
+    api("/api/method/progress").catch(() => []),
+    api("/api/method/skill-map").catch(() => null)]);
   const progByCommit = {};
   for (const r of progress) progByCommit[r.method_commit] = r;
 
-  const moduleGroups = Object.entries(SKILL_MODULES).map(([group, items]) =>
-    `<h3 class="wavehead">${group}</h3><div style="display:flex;flex-wrap:wrap;gap:6px">${items.map(m => `<span class="chip">${esc(m)}</span>`).join("")}</div>`).join("");
+  const fileChip = f => `<button class="filechip ${f.exists ? "" : "filechip-missing"}" data-skillfile="${esc(f.path)}"
+      title="${esc(f.title || f.path)}${f.lines ? " · " + f.lines + " 行" : ""} · 点击阅读原文">${esc(f.path.split("/").pop())}</button>`;
+  const stageCards = skillMap ? skillMap.stages.map(s => `
+    <div class="stagecard">
+      <div class="stage-h"><span class="stage-no mono">${esc(s.no)}</span><b>${esc(s.name)}</b></div>
+      <div class="stage-purpose">${esc(s.purpose)}</div>
+      ${s.gates && s.gates.length ? `<ul class="stage-gates">${s.gates.map(g => `<li>${esc(g)}</li>`).join("")}</ul>` : ""}
+      <div class="stage-files">${s.files.map(fileChip).join("")}</div>
+    </div>`).join("") : `<div class="empty">skill 地图加载失败(后端重启后刷新)。</div>`;
+  const howToChange = skillMap ? `<div class="howto">${esc(skillMap.how_to_change)}</div>` : "";
 
   let html = `
     <div class="card">
       <h2>生产 skill 完整逻辑(technology-company-profit-forecasting)</h2>
       <div class="card-sub">一次实时预测从 01 到 10 全流程走完才允许交付;任何一道门失败都会中止并留下失败记录。</div>
       <div class="loopwrap">${PIPE_SVG}</div>
-      ${moduleGroups}
+      ${howToChange}
+      ${stageCards}
     </div>
     <div class="card">
       <h2>自训练闭环(technology-company-forecasting-trainer)</h2>
@@ -1189,6 +1309,7 @@ async function viewMethod() {
       </li>`;
     }).join("") + `</ul></div>`;
   $view.innerHTML = html;
+  $view.querySelectorAll("[data-skillfile]").forEach(b => b.onclick = () => openFileDrawer(b.dataset.skillfile));
 }
 
 /* ---------- router ---------- */

@@ -264,6 +264,24 @@ table.grid tr:last-child td { border-bottom: none; }
   color: var(--muted); font-size: 12.5px; background: var(--card); margin-bottom: 14px;
 }
 .notice { font-size: 12px; color: var(--muted); margin-top: 14px; line-height: 1.6; }
+.action-toast {
+  position: fixed; right: 20px; bottom: 20px; z-index: 500;
+  display: flex; align-items: flex-start; gap: 12px;
+  width: min(420px, calc(100vw - 32px)); padding: 12px 14px;
+  border: 1px solid var(--line); border-radius: 9px;
+  background: var(--dark); color: #f5f5f2;
+  box-shadow: 0 14px 36px rgba(20,22,26,.24);
+  opacity: 0; transform: translateY(10px); pointer-events: none;
+  transition: opacity .18s, transform .18s;
+}
+.action-toast.on { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.action-toast[data-tone="error"] { border-color: rgba(239,130,117,.66); }
+.action-toast-text { flex: 1; min-width: 0; font-size: 12.5px; line-height: 1.55; }
+.action-toast-close {
+  border: none; background: none; color: #d5d8d2; padding: 0 2px;
+  cursor: pointer; font: inherit; font-size: 17px; line-height: 1;
+}
+.action-toast-close:hover { color: #fff; }
 
 /* ---------- 自训练 ---------- */
 .planrow { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -335,6 +353,7 @@ pre.log {
   .pchead { grid-template-columns: 1.4fr 1fr auto 20px; }
   .pc-up { display: none; }
   .brand-sub { display: none; }
+  .action-toast { left: 12px; right: 12px; bottom: 12px; width: auto; }
 }
 
 /* ---------- 引擎选择菜单(动作时弹出,非常驻筛选) ---------- */
@@ -437,3 +456,24 @@ pre.log {
   display: inline-flex; gap: 6px; padding: 1px 8px; border-radius: 4px; font-size: 10.5px;
   background: rgba(11,122,67,.08); color: var(--good); font-family: var(--mono);
 }
+
+/* ---------- skill 地图(开发者视角) ---------- */
+.howto {
+  border-left: 3px solid var(--accent); background: rgba(37,99,201,.05);
+  border-radius: 0 6px 6px 0; padding: 9px 14px; margin: 12px 0 14px;
+  font-size: 12.5px; color: var(--soft);
+}
+.stagecard { border: 1px solid var(--line2); border-radius: 8px; padding: 12px 15px; margin-bottom: 9px; background: var(--card); }
+.stage-h { display: flex; align-items: baseline; gap: 9px; }
+.stage-no { color: var(--faint); font-size: 11px; letter-spacing: .1em; }
+.stage-h b { font-size: 13.5px; }
+.stage-purpose { color: var(--soft); font-size: 12.5px; margin: 3px 0 6px; line-height: 1.55; }
+.stage-gates { margin: 0 0 8px; padding-left: 20px; font-size: 12px; color: var(--critical); }
+.stage-gates li { margin-bottom: 2px; }
+.stage-files { display: flex; flex-wrap: wrap; gap: 6px; }
+.filechip {
+  padding: 2.5px 10px; border-radius: 5px; font-size: 11.5px; cursor: pointer;
+  font-family: var(--mono); background: var(--panel2); border: 1px solid var(--line2); color: var(--accent);
+}
+.filechip:hover { border-color: var(--accent); background: rgba(37,99,201,.06); }
+.filechip-missing { color: var(--critical); text-decoration: line-through; }

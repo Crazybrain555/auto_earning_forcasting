@@ -121,3 +121,80 @@ def evolution(limit: int = 60) -> dict:
             "dels": dels,
         })
     return {"head": git("rev-parse", "--short", "HEAD"), "versions": versions}
+
+
+# ---------- 生产 skill 地图:阶段 → 目的 / 硬门槛 / 责任文件(给开发者改方法用) ----------
+_LIVE_SKILL = "technology-company-profit-forecasting"
+
+_SKILL_STAGES = [
+    {"no": "01", "name": "范围与时间边界", "purpose": "锁定公司口径、财历与 as_of;live 与训练模式路由,时间边界从这里生效。",
+     "gates": ["所有证据原始发布时间 ≤ as_of", "财历口径必须显式声明(自然年/财年)"],
+     "files": ["SKILL.md", "references/mode-router-and-time-boundary.md", "references/core-forecast-workflow.md"]},
+    {"no": "02", "name": "证据摄取与分级(数据处理)", "purpose": "一切数据在这里进包:来源分级 E0(公告/财报)→E4(匿名渠道),记录原始发布时间、内容哈希、用途许可与独立性簇。",
+     "gates": ["content_hash 必须真实 sha256 或显式 unhashed:<原因>,不许编造", "非发行人独立来源 ≥2", "E4 只允许用于监控触发,不得进 Base"],
+     "files": ["references/core-source-and-evidence.md", "references/research-completeness-and-company-quality.md", "scripts/validate_research_completeness.py"]},
+    {"no": "03", "name": "前瞻证据 SignalCards", "purpose": "面向未来的信号卡:家族受控词表、方向/强度/证伪条件、独立性映射;查询日志防答案泄漏。",
+     "gates": ["信号 ≥6 · 受控家族 ≥3 · 独立(非官方)家族 ≥1", "技术论文类信号不得直接进 Base 点值", "查询日志禁用结果词(防时间泄漏)"],
+     "files": ["references/forward-evidence-and-signal-validation.md", "scripts/validate_forward_evidence_workspace.py"]},
+    {"no": "04", "name": "机制路由与建模", "purpose": "利润从哪来:9+1 机制模块(量价成本/产能良率/订阅合同/订单积压/项目转化/平台用量/订户内容/离散会计/口径并表/合资资本 + DTA 子模块)按权重组合,8 个行业透镜提供参数先验。",
+     "gates": ["mechanism_weights 必须和为 1", "机制选择要写进 manifest 且与快照一致"],
+     "files": ["references/mechanism-router.md"] + ["references/module-*.md"] + ["references/lens-*.md"] + ["references/submodule-dta-valuation-allowance.md"]},
+    {"no": "05", "name": "公式化三表模型", "purpose": "model.xlsx 必须公式驱动(收入→利润→现金流勾稽),硬编码数字的工作簿不是模型。",
+     "gates": ["公式数 ≥30(manifest 可调)", "#REF!/#NAME? = 硬失败"],
+     "files": ["scripts/validate_delivery.py", "assets/examples/generic_v80/README.md"]},
+    {"no": "06", "name": "情景与分布输出", "purpose": "FY+1 点值、FY+2 情景(悲观/基准/乐观)、FY+3 分位(p10/p50/p90),快照只允许标准键。",
+     "gates": ["canonical 键强制:revenue_point/low/high + profit_point 或 eps_point(方言=拒绝交付)", "scenario_probabilities 和为 1"],
+     "files": ["references/core-output-and-valuation.md", "assets/templates/forecast_snapshot_template.json", "assets/schemas/forecast_snapshot.schema.json"]},
+    {"no": "07", "name": "估值与买入纪律", "purpose": "DCF/倍数/市场隐含反推三角互证;推荐买入价从悲观公允价加安全边际推导,不许拍脑袋。",
+     "gates": ["报告必须含「买入纪律」与「一致性检查」小节", "快照 fair_value 与报告数字必须对账一致"],
+     "files": ["references/core-output-and-valuation.md", "references/full-company-delivery-contract.md"]},
+    {"no": "08", "name": "独立红队", "purpose": "红队按编号攻击双算、来源独立、估值正常化等;每条 P0/P1 必须闭环或明确降级。",
+     "gates": ["开放 P0/P1 时 readiness 必须降为 screen-grade,否则拒绝交付", "红队必须覆盖来源独立性挑战"],
+     "files": ["references/full-company-delivery-contract.md"]},
+    {"no": "09", "name": "严格交付校验", "purpose": "validate_delivery --strict 是总闸:上述所有门槛在这里机械执行,任何一门不过就不是交付。",
+     "gates": ["--strict 模式全部 error 级", "校验结果写入 delivery_validation.json 留痕"],
+     "files": ["scripts/validate_delivery.py", "scripts/package_self_test.py"]},
+    {"no": "10", "name": "封存与入库", "purpose": "快照哈希封存(训练模式先封箱后见真值),后端摄取为不可变版本行,上看板。",
+     "gates": ["训练案例:评分前后各验一次封条;actuals 只进隔离目录", "版本入库后工作区覆盖不再影响历史"],
+     "files": ["references/skill-compatibility.md"]},
+]
+
+
+def skill_map() -> dict:
+    root = SKILLS_REPO / _LIVE_SKILL
+    stages = []
+    for stage in _SKILL_STAGES:
+        files = []
+        for pattern in stage["files"]:
+            matches = sorted(root.glob(pattern)) if "*" in pattern else [root / pattern]
+            for path in matches:
+                rel = str(path.relative_to(root))
+                entry = {"path": rel, "exists": path.is_file()}
+                if entry["exists"]:
+                    try:
+                        text = path.read_text(encoding="utf-8", errors="replace")
+                        entry["lines"] = len(text.splitlines())
+                        for line in text.splitlines():
+                            line = line.strip()
+                            if line.startswith("#"):
+                                entry["title"] = line.lstrip("# ").strip()
+                                break
+                    except OSError:
+                        pass
+                files.append(entry)
+        stages.append({**stage, "files": files})
+    return {"skill": _LIVE_SKILL, "root": str(root), "stages": stages,
+            "how_to_change": "改方法 = 编辑对应文件 → 跑 trainer 的 pytest → commit → push;训练轮会沿同一条链自动做(machine 可改,人也可改)。生产 skill 由 build_live_release.py 从 trainer 模板重建,别直接改生产副本。"}
+
+
+def skill_file(rel_path: str) -> tuple[str, str] | None:
+    """Read one file inside the live skill, traversal-safe. Returns (path, text)."""
+    root = (SKILLS_REPO / _LIVE_SKILL).resolve()
+    candidate = (root / rel_path).resolve()
+    try:
+        candidate.relative_to(root)
+    except ValueError:
+        return None
+    if not candidate.is_file() or candidate.suffix not in {".md", ".py", ".json", ".yaml", ".yml", ".csv", ".jsonl"}:
+        return None
+    return str(candidate.relative_to(root)), candidate.read_text(encoding="utf-8", errors="replace")[:400_000]
