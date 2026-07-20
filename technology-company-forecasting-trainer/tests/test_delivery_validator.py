@@ -51,7 +51,8 @@ class DeliveryValidatorTest(unittest.TestCase):
                 w=csv.writer(f);w.writerow(signal_headers);w.writerows(signal_rows)
             with (workspace/'historical_query_log.csv').open('w',encoding='utf-8-sig',newline='') as f:
                 w=csv.writer(f);w.writerow(['query_id','case_id','searched_at','cutoff','query_text','domains','result_source_ids','future_outcome_terms_used','reviewer','notes'])
-                for i in range(3):w.writerow([f'Q{i+1}','TEST','2026-07-18T12:00:00Z','2026-07-18T23:59:59Z',f'query {i+1}','example.com',f'SIG{i+1}','false','reviewer','point-in-time'])
+                for qid,qtext,doms in [('Q1', 'TEST 10-K annual report SEC EDGAR filing', 'sec.gov'), ('Q2', 'TEST Q3 earnings call transcript management guidance', 'seekingalpha.com'), ('Q3', 'TEST investor day CEO keynote fireside interview', 'ir.example.com'), ('Q4', 'TEST supplier customer value chain cross-company commentary', 'example.com'), ('Q5', 'TrendForce IDC industry shipment data unit forecast', 'trendforce.com'), ('Q6', 'sell-side broker research report analyst note initiation', 'example.com'), ('Q7', 'expert network channel check supply chain distributor', 'example.com'), ('Q8', 'arXiv IEEE ISSCC JEDEC standard patent roadmap paper', 'arxiv.org;jedec.org')]:
+                    w.writerow([qid,'TEST','2026-07-18T12:00:00Z','2026-07-18T23:59:59Z',qtext,doms,'SIG1','false','reviewer','point-in-time'])
             with (workspace/'source_independence_map.csv').open('w',encoding='utf-8-sig',newline='') as f:
                 w=csv.writer(f);w.writerow(['cluster_id','original_source_id','derived_source_id','relationship','independence_weight','notes'])
                 for i in range(3):w.writerow([f'C{i+1}',f'SIG{i+1}','','original',1.0,'independent source chain'])

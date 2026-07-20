@@ -554,6 +554,98 @@ def main() -> int:
         except Exception:
             pass
 
+    # Research lanes: a filings-only pack is one lane's blind spots wearing a
+    # model. Coverage is audited on the query log (what was searched, whether
+    # or not it found anything), and material assumptions must be corroborated
+    # across lanes. See references/research-lanes-and-corroboration.md.
+    RESEARCH_LANES = {
+        "L1_filings": ["10-k", "10-q", "8-k", "annual report", "prospectus", "sec edgar", "sec.gov",
+                       "filing", "earnings release", "press release", "年报", "招股"],
+        "L2_management": ["earnings call", "transcript", "investor day", "analyst day", "keynote",
+                          "fireside", "interview", "ceo", "cfo", "guidance call", "conference presentation",
+                          "业绩说明会", "投资者交流", "调研纪要", "管理层"],
+        "L3_cross_company": ["supplier", "customer", "competitor", "partner", "value chain",
+                             "cross-company", "同行", "客户", "供应商"],
+        "L4_industry_data": ["trendforce", "idc", "gartner", "counterpoint", "yole", "techinsights",
+                             "omdia", "semi.org", "market research", "shipment data", "行业数据"],
+        "L5_sellside": ["research report", "broker", "sell-side", "analyst note", "initiation",
+                        "morgan", "goldman", "jefferies", "bernstein", "研报", "券商"],
+        "L6_expert_channel": ["expert", "channel check", "supply chain check", "tegus", "gerson",
+                              "distributor", "dealer check", "专家", "产业链调研", "渠道调研"],
+        "L7_technical": ["arxiv", "ieee", "isscc", "iedm", "jedec", "patent", "paper", "standard",
+                         "ofc", "vlsi", "hot chips", "roadmap", "论文", "专利", "标准"],
+        "L8_press": ["news", "article", "reuters", "bloomberg", "nikkei", "digitimes", "the information",
+                     "报道", "媒体"],
+    }
+
+    def _lanes_of(text: str) -> set:
+        low = str(text or "").lower()
+        return {lane for lane, kws in RESEARCH_LANES.items() if any(k in low for k in kws)}
+
+    query_path = workspace / "historical_query_log.csv"
+    if query_path.exists():
+        try:
+            with query_path.open(encoding="utf-8-sig", newline="") as fh:
+                qrows = list(csv.DictReader(fh))
+            covered = set()
+            for q in qrows:
+                covered |= _lanes_of(str(q.get("query_text", "")) + " " + str(q.get("domains", "")) + " " + str(q.get("notes", "")))
+            lane_min = int(manifest.get("research_lane_min", 5))
+            missing_required = []
+            if "L2_management" not in covered:
+                missing_required.append("L2_management (earnings call / investor day / management interview - mandatory)")
+            if "L7_technical" not in covered and not manifest.get("technology_trend_not_applicable"):
+                missing_required.append("L7_technical (papers/standards/patents - mandatory for FY+2+ horizons)")
+            if len(covered) >= lane_min and not missing_required:
+                pass_record(checks, "research:lane-coverage", f"{len(covered)}/8 lanes: {','.join(sorted(covered))}")
+            else:
+                detail = f"only {len(covered)}/8 research lanes searched ({','.join(sorted(covered)) or 'none'}); need >={lane_min}"
+                if missing_required:
+                    detail += "; missing required: " + "; ".join(missing_required)
+                fail_record(checks, "research:lane-coverage", detail + " - see references/research-lanes-and-corroboration.md",
+                            "error" if args.strict else "warning")
+        except Exception as exc:
+            fail_record(checks, "research:lane-coverage", str(exc), "warning")
+
+    support_path = workspace / "material_assumption_support.csv"
+    if support_path.exists() and source_path.exists():
+        try:
+            with support_path.open(encoding="utf-8-sig", newline="") as fh:
+                srows = list(csv.DictReader(fh))
+            src_lane = {}
+            for s in json.loads(source_path.read_text(encoding="utf-8")).get("sources", []):
+                blob = " ".join(str(s.get(k, "")) for k in ("source_type", "publisher", "location", "claim_or_fact", "source_family"))
+                src_lane[str(s.get("source_id", ""))] = _lanes_of(blob)
+            anchoring = {"L1_filings", "L2_management", "L3_cross_company"}
+            weight_floor = float(manifest.get("material_assumption_weight_floor", 0.10))
+            problems = []
+            for row in srows:
+                try:
+                    weight = float(row.get("materiality_weight") or 0)
+                except ValueError:
+                    weight = 0.0
+                status = str(row.get("support_status", "")).strip().lower()
+                if weight < weight_floor or status == "scenario_only":
+                    continue
+                ids = [i.strip() for i in re.split(r"[;,]", str(row.get("source_ids", ""))) if i.strip()]
+                lanes = set()
+                for i in ids:
+                    lanes |= src_lane.get(i, set())
+                aid = row.get("assumption_id", "?")
+                if len(lanes) < 2:
+                    problems.append(f"{aid} (weight {weight:.2f}) supported by {len(lanes)} lane(s) - material assumptions need >=2 lanes")
+                elif not (lanes & anchoring):
+                    problems.append(f"{aid} has no anchoring lane (filing/management/cross-company)")
+                if status in {"single_lane", ""} and weight >= weight_floor:
+                    problems.append(f"{aid} support_status '{status or 'blank'}' cannot carry a Base number")
+            if problems:
+                fail_record(checks, "research:material-corroboration", "; ".join(problems[:6]),
+                            "error" if args.strict else "warning")
+            else:
+                pass_record(checks, "research:material-corroboration")
+        except Exception as exc:
+            fail_record(checks, "research:material-corroboration", str(exc), "warning")
+
     # Provenance honesty: hashes are either real or explicitly absent - never invented.
     if source_path.exists():
         try:
