@@ -116,10 +116,106 @@ def case_detail(round_id: str, case_id: str) -> dict | None:
         if name == "forecast_seal.json" and isinstance(payload, dict):
             payload = {k: v for k, v in payload.items() if k != "files"} | {"file_count": len(payload.get("files", []) or [])}
         detail[name.replace(".json", "")] = payload
+    detail["outputs_normalized"] = normalize_outputs(detail.get("forecast_snapshot"))
     detail["files"] = sorted(
         str(p.relative_to(case_dir)) for p in case_dir.rglob("*") if p.is_file()
     )
     return detail
+
+
+
+
+# ---------- snapshot output normalization (dialect -> canonical) ----------
+# Snapshots produced before the canonical-keys contract use per-run dialects
+# (revenue_M / revenue_base / revenue_p50_M, eps_bear / non_gaap_eps_bull, ...).
+# Normalize once here so every consumer (dashboard, exports) reads one shape:
+# outputs_normalized.<period> = {period, revenue: {point,low,high},
+#                                profit: {...}, eps: {...}, extras: {...}}
+_ROLE_SUFFIXES = {
+    "point": ["", "_point", "_base", "_p50"],
+    "low": ["_low", "_bear", "_p10"],
+    "high": ["_high", "_bull", "_p90"],
+}
+_NESTED_ROLE_KEYS = {
+    "point": ["point", "base", "p50", "mid"],
+    "low": ["low", "bear", "p10"],
+    "high": ["high", "bull", "p90"],
+}
+_MEASURE_BASES = {
+    "revenue": ["revenue"],
+    "profit": ["profit", "net_income", "gaap_net_income"],
+    "eps": ["eps", "diluted_eps", "gaap_eps", "non_gaap_eps"],
+}
+
+
+def _is_num(value) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _normalize_period(o: dict) -> dict:
+    used: set[str] = set()
+
+    def resolve(measure: str, role: str):
+        for base in _MEASURE_BASES[measure]:
+            for suffix in _ROLE_SUFFIXES[role]:
+                for key in (base + suffix, base + suffix + "_M"):
+                    value = o.get(key)
+                    if _is_num(value):
+                        used.add(key)
+                        return value
+            # 嵌套情景方言:revenue_M: {bear, base, bull} / {p10, p50, p90}
+            for key in (base, base + "_M"):
+                value = o.get(key)
+                if isinstance(value, dict):
+                    for nested_key in _NESTED_ROLE_KEYS[role]:
+                        if _is_num(value.get(nested_key)):
+                            used.add(key)
+                            return value[nested_key]
+        return None
+
+    out = {"period": o.get("period")}
+    used.add("period")
+    for measure in ("revenue", "profit", "eps"):
+        out[measure] = {role: resolve(measure, role) for role in ("point", "low", "high")}
+    out["extras"] = {k: v for k, v in o.items()
+                     if k not in used and k != "point_evaluable" and v is not None and not isinstance(v, (dict, list))}
+    return out
+
+
+def normalize_outputs(snapshot: dict | None) -> dict:
+    outputs = (snapshot or {}).get("outputs") or {}
+    norm = {key: _normalize_period(value) for key, value in outputs.items() if isinstance(value, dict) and value}
+
+    # 净利推导:快照只给 EPS 没给净利总额时,净利 ≈ EPS × 摊薄股数(标 derived)。
+    # 股数优先级:本期 diluted_shares_M > year_1 的 diluted_shares_M > year_1 净利/EPS 隐含。
+    y1_raw = outputs.get("year_1") or {}
+    y1 = norm.get("year_1") or {}
+
+    def _implied_shares(period_raw: dict):
+        for candidate in (period_raw.get("diluted_shares_M"), y1_raw.get("diluted_shares_M")):
+            if _is_num(candidate) and candidate > 0:
+                return candidate
+        p_point = (y1.get("profit") or {}).get("point")
+        e_point = (y1.get("eps") or {}).get("point")
+        if _is_num(p_point) and _is_num(e_point) and e_point:
+            return p_point / e_point
+        return None
+
+    for key, o in norm.items():
+        profit, eps = o.get("profit") or {}, o.get("eps") or {}
+        if any(_is_num(profit.get(r)) for r in ("point", "low", "high")):
+            continue
+        if not any(_is_num(eps.get(r)) for r in ("point", "low", "high")):
+            continue
+        shares = _implied_shares(outputs.get(key) or {})
+        if not shares:
+            continue
+        for role in ("point", "low", "high"):
+            if _is_num(eps.get(role)):
+                profit[role] = round(eps[role] * shares)
+        profit["derived"] = True
+    return norm
+
 
 
 def case_file(round_id: str, case_id: str, kind: str) -> Path | None:
@@ -233,13 +329,21 @@ def case_valuation(round_id: str, case_id: str) -> dict | None:
     return snap.get("valuation_summary")
 
 
+def _sec_key(value) -> str:
+    """Normalize a security id for matching: agents sometimes write NASDAQ:MU."""
+    return str(value or "").upper().split(":")[-1].strip()
+
+
 def portfolio(watchlist: list[dict], running_jobs: list[dict]) -> list[dict]:
+    from . import db
     cases = list_cases()
-    running_secs = set()
+    db.scan(lambda: cases, read_json, normalize_outputs)
+    running_map: dict[str, str] = {}
     for job in running_jobs:
-        sec = str((job.get("params") or {}).get("security") or (job.get("params") or {}).get("entity") or "").upper()
+        sec = _sec_key((job.get("params") or {}).get("security") or (job.get("params") or {}).get("entity"))
         if sec:
-            running_secs.add(sec)
+            running_map.setdefault(sec, job.get("id"))
+    running_secs = set(running_map)
     rows = []
     for item in watchlist:
         if not isinstance(item, dict) or not (item.get("security") or item.get("entity")):
@@ -248,17 +352,20 @@ def portfolio(watchlist: list[dict], running_jobs: list[dict]) -> list[dict]:
                 "note": item.get("note", ""), "added_at": item.get("added_at")}
         sec = item["security"]
         mine = [c for c in cases
-                if str(c.get("security") or "").upper() == sec or c.get("entity") == item["entity"]]
+                if _sec_key(c.get("security")) == _sec_key(sec) or c.get("entity") == item["entity"]]
         mine.sort(key=lambda c: c.get("last_activity") or 0, reverse=True)
         latest = mine[0] if mine else None
         latest_live = next((c for c in mine if c.get("run_mode") == "live_forecast"), None)
         primary = latest_live or latest
-        valuation = case_valuation(primary["round_id"], primary["case_id"]) if primary else None
+        # DB effective version first (pinned or newest good one - survives workspace
+        # overwrites); live file only as fallback for anything not yet captured.
+        valuation = db.effective_valuation(sec) or (case_valuation(primary["round_id"], primary["case_id"]) if primary else None)
         rows.append({
             **item,
             "case_count": len(mine),
             "latest": latest,
             "latest_live": latest_live,
+            "job_id": running_map.get(sec),
             "valuation": valuation,
             "job_running": sec in running_secs,
             "cases": mine,
@@ -269,10 +376,10 @@ def portfolio(watchlist: list[dict], running_jobs: list[dict]) -> list[dict]:
 def security_history(security: str) -> list[dict]:
     """Every run of one security, newest first, with its valuation conclusion -
     the version trail of the watchboard as the method evolves."""
-    sec = (security or "").strip().upper()
+    sec = _sec_key(security)
     entries = []
     for c in list_cases():
-        if str(c.get("security") or "").upper() != sec:
+        if _sec_key(c.get("security")) != sec:
             continue
         case_dir = safe_case_dir(c["round_id"], c["case_id"])
         snap = read_json(case_dir / "forecast_snapshot.json") if case_dir else None
@@ -287,3 +394,28 @@ def security_history(security: str) -> list[dict]:
         })
     entries.sort(key=lambda e: e.get("last_activity") or 0, reverse=True)
     return entries
+
+
+def method_progress() -> list[dict]:
+    """Is the skill getting better? Aggregate evaluated cases per method commit."""
+    buckets: dict[str, dict] = {}
+    for c in list_cases():
+        m = c.get("metrics")
+        commit = (c.get("method_commit") or "unknown")[:7]
+        if not m:
+            continue
+        b = buckets.setdefault(commit, {"method_commit": commit, "cases": 0, "first_seen": None,
+                                          "_mape": [], "_mae": [], "_cov": []})
+        b["cases"] += 1
+        stamp = c.get("last_activity") or 0
+        b["first_seen"] = min(b["first_seen"], stamp) if b["first_seen"] else stamp
+        if m.get("revenue_mape") is not None: b["_mape"].append(m["revenue_mape"])
+        if m.get("profit_margin_mae_pp") is not None: b["_mae"].append(m["profit_margin_mae_pp"])
+        if m.get("revenue_coverage") is not None: b["_cov"].append(m["revenue_coverage"])
+    out = []
+    for b in sorted(buckets.values(), key=lambda x: x["first_seen"] or 0):
+        mean = lambda v: sum(v) / len(v) if v else None
+        out.append({"method_commit": b["method_commit"], "cases": b["cases"], "first_seen": b["first_seen"],
+                    "avg_revenue_mape": mean(b["_mape"]), "avg_margin_mae_pp": mean(b["_mae"]),
+                    "avg_revenue_coverage": mean(b["_cov"])})
+    return out

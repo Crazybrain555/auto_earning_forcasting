@@ -22,9 +22,13 @@ codex-work/
 # Runtime data (see CLAUDE.md): training case workspaces and backend job logs
 training-runs/
 backend/jobs/
+backend/state/*.db
+backend/state/*.db-*
+backend/state/watch_suggestions.json
 
 # Local junk
 pkcs11.txt
+validator_stderr.txt
 
 # Office temp lock files
 .~lock.*#

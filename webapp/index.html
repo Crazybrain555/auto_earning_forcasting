@@ -4,24 +4,28 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>科技公司预测系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="topbar">
   <div class="brand">
     <span class="brand-title">科技公司预测系统</span>
-    <span class="brand-sub">投资研究作战台</span>
+    <span class="brand-sub">FORECAST OPS CONSOLE · 投资研究作战台</span>
   </div>
-  <div class="topbar-chips">
-    <span class="chip" id="chip-method" title="方法版本 = skills 仓库当前 git 提交">方法版本 —</span>
-    <span class="chip" id="chip-control">自动优化 —</span>
-    <span class="chip chip-muted" id="chip-refresh">未刷新</span>
+  <div class="readout">
+    <a class="readout-cell" id="chip-method" href="#/method" title="方法版本 = skills 仓库当前 git 提交,点击查看演进时间线">方法 —</a>
+    <span class="readout-cell" id="chip-control">自动优化 —</span>
+    <span class="readout-cell readout-dim" id="chip-refresh">未刷新</span>
   </div>
 </header>
 
 <nav class="tabs">
   <a href="#/portfolio" data-tab="portfolio">投资看板</a>
   <a href="#/training" data-tab="training">自训练</a>
+  <a href="#/jobs" data-tab="jobs">任务</a>
   <a href="#/method" data-tab="method">方法</a>
 </nav>
 

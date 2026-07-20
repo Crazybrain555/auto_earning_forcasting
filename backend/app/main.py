@@ -1,16 +1,16 @@
 """Forecasting dashboard backend.
 
 Read-only data API over the training-runs tree and the skills git repo, plus
-the two write paths the dashboard is allowed: training-runs/control.json and
-launching/stopping agent jobs (engine: claude now, codex slot reserved).
+the controlled dashboard mutations and Codex job lifecycle endpoints.
 """
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Literal
 
 from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, PlainTextResponse
+from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -46,7 +46,8 @@ class ControlRequest(BaseModel):
 
 class JobRequest(BaseModel):
     type: str
-    engine: str = "claude"
+    # CONTRACT (user requirement): both engines are selectable from the dashboard.
+    engine: Literal["claude", "codex"] = "claude"
     params: dict = {}
 
 
@@ -92,6 +93,8 @@ def index():
             "GET  /api/portfolio",
             "GET  /api/curriculum",
             "GET  /api/quotes?symbols=A,B",
+            "GET  /api/symbol-search?q=lam",
+            "GET  /api/watch-suggestions",
             "POST /api/rounds  (save round plan)",
             "DELETE /api/rounds/{round_id}",
             "DELETE /api/cases/{round_id}/{case_id}",
@@ -154,13 +157,56 @@ def case_model(round_id: str, case_id: str):
 
 @app.get("/api/history/{security}")
 def security_history(security: str):
-    """Per-security forecast version history (the watchboard's version trail)."""
-    return data.security_history(security)
+    """Per-security version trail from the durable store (survives overwrites)."""
+    from . import db
+    db.scan(data.list_cases, data.read_json, data.normalize_outputs)
+    return db.history(security)
+
+
+@app.post("/api/runs/{run_id}/activate", **MUTATING)
+def activate_run(run_id: int):
+    from . import db
+    if not db.activate(run_id):
+        raise HTTPException(404, "run version not found")
+    return {"ok": True}
+
+
+@app.post("/api/history/{security}/auto", **MUTATING)
+def auto_version(security: str):
+    from . import db
+    db.deactivate(security)
+    return {"ok": True}
+
+
+@app.delete("/api/runs/{run_id}", **MUTATING)
+def delete_run(run_id: int):
+    from . import db
+    if not db.soft_delete(run_id):
+        raise HTTPException(404, "run version not found (or already deleted)")
+    return {"ok": True}
+
+
+@app.post("/api/runs/{run_id}/restore", **MUTATING)
+def restore_run(run_id: int):
+    from . import db
+    if not db.restore(run_id):
+        raise HTTPException(404, "run version not found")
+    return {"ok": True}
 
 
 @app.get("/api/method/timeline")
 def method_timeline():
     return method.timeline()
+
+
+@app.get("/api/method/progress")
+def method_progress():
+    return data.method_progress()
+
+
+@app.get("/api/method/evolution")
+def method_evolution():
+    return method.evolution()
 
 
 @app.get("/api/method/skills")
@@ -297,6 +343,22 @@ def get_curriculum():
     return curriculum.waves()
 
 
+@app.get("/api/symbol-search")
+def symbol_search(q: str = ""):
+    return quotes.search_symbols(q[:60])
+
+
+@app.get("/api/watch-suggestions")
+def watch_suggestions():
+    return state.load_suggestions()
+
+
+@app.delete("/api/watch-suggestions", **MUTATING)
+def clear_watch_suggestions():
+    state.clear_suggestions()
+    return {"ok": True}
+
+
 @app.get("/api/quotes")
 def get_quotes(symbols: str = ""):
     requested = [s.strip() for s in symbols.split(",") if s.strip()]
@@ -335,6 +397,45 @@ def delete_case(round_id: str, case_id: str):
 
 # Serve the local dashboard (webapp/ at project root) from the same port.
 # Mounted last so /api/* routes keep precedence.
+
+@app.middleware("http")
+async def _static_no_cache(request, call_next):
+    """Dashboard js/css/html must revalidate on every load (ETag 304s still apply);
+    without this browsers heuristically cache app.js and users see stale UI."""
+    response = await call_next(request)
+    if request.url.path.startswith("/api"):
+        response.headers["Cache-Control"] = "no-store"   # 状态接口永远实时,禁止启发式缓存
+    else:
+        response.headers["Cache-Control"] = "no-cache"
+    return response
+
+
 WEBAPP_DIR = Path(CONFIG["project_root"]) / "webapp"
+
+
+def _asset_version(name: str) -> str:
+    """Content version for a webapp asset: changes only when the file changes."""
+    try:
+        stat = (WEBAPP_DIR / name).stat()
+        return f"{int(stat.st_mtime)}-{stat.st_size}"
+    except OSError:
+        return "0"
+
+
+@app.get("/", response_class=HTMLResponse)
+@app.get("/index.html", response_class=HTMLResponse)
+def dashboard_index():
+    """Serve index.html with versioned asset URLs.
+
+    Browsers heuristically cache style.css/app.js and then show a stale UI after
+    an edit; a content-derived query string makes a changed file a new URL, so a
+    plain refresh always picks up edits while unchanged files still cache.
+    """
+    html = (WEBAPP_DIR / "index.html").read_text(encoding="utf-8")
+    for name in ("style.css", "app.js"):
+        html = html.replace(f'"{name}"', f'"{name}?v={_asset_version(name)}"')
+    return HTMLResponse(html)
+
+
 if WEBAPP_DIR.is_dir():
     app.mount("/", StaticFiles(directory=str(WEBAPP_DIR), html=True), name="dashboard")

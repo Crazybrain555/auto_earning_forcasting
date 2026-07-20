@@ -54,3 +54,22 @@ def remove_watch(security: str) -> list[dict]:
         items = [i for i in load_watchlist() if str(i.get("security", "")).upper() != security]
         _save(items)
         return items
+
+
+SUGGESTIONS_PATH = STATE_DIR / "watch_suggestions.json"
+
+
+def load_suggestions() -> dict:
+    if SUGGESTIONS_PATH.is_file():
+        try:
+            data = json.loads(SUGGESTIONS_PATH.read_text(encoding="utf-8"))
+            if isinstance(data, dict) and isinstance(data.get("suggestions"), list):
+                return data
+        except Exception:
+            pass
+    return {"generated_at": None, "hint": "", "suggestions": []}
+
+
+def clear_suggestions() -> None:
+    if SUGGESTIONS_PATH.is_file():
+        SUGGESTIONS_PATH.unlink()

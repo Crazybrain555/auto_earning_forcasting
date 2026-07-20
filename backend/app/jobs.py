@@ -1,11 +1,4 @@
-"""Job manager: launch, track, and stop agent runs.
-
-An engine is a headless agent CLI. `claude` is live today (skills auto-load
-from .claude/skills and the project CLAUDE.md supplies the operating notes).
-`codex` is a reserved slot: it stays available=false in config.json until the
-Codex skill port is finalized, then flipping it on (plus its proxy env) is the
-only change needed — job types, prompts, and the API do not change.
-"""
+"""Launch, track, and stop project-scoped Codex runs."""
 from __future__ import annotations
 
 import datetime as dt
@@ -19,6 +12,7 @@ import threading
 from pathlib import Path
 
 from .config import CONFIG
+from . import state as ui_state
 
 JOBS_DIR = Path(CONFIG["jobs_dir"])
 JOBS_DIR.mkdir(parents=True, exist_ok=True)
@@ -28,7 +22,7 @@ RUNS_ROOT = Path(CONFIG["runs_root"])
 _LOCK = threading.Lock()
 _PROCS: dict[str, subprocess.Popen] = {}
 
-JOB_TYPES = {"live_forecast", "training_case", "training_round", "plan_round"}
+JOB_TYPES = {"live_forecast", "training_case", "training_round", "plan_round", "suggest_watch"}
 ROUND_ID_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,63}")
 
 
@@ -53,7 +47,10 @@ def engines() -> dict:
 
 def engine_status() -> list[dict]:
     return [
-        {"engine": name, "available": bool(spec.get("available")), "note": spec.get("note", "")}
+        {"engine": name, "available": bool(spec.get("available")), "note": spec.get("note", ""),
+         "default_model": spec.get("default_model"), "models": spec.get("models") or []}
+        # CONTRACT (user requirement): BOTH engines stay listed - the dashboard
+        # offers claude and codex side by side. Do not filter to one engine.
         for name, spec in engines().items()
     ]
 
@@ -119,6 +116,8 @@ def build_prompt(job_type: str, params: dict) -> tuple[str, dict]:
             if not isinstance(params.get(group), list) or len(params[group]) != 2:
                 raise ValueError(f"params.{group} must have exactly 2 companies (2+2 round; inline or in the round plan)")
         as_of, case_id, case_role = "", "", ""
+    elif job_type == "suggest_watch":  # assistant: recommend watchlist candidates, no forecasting
+        round_id, as_of, case_id, case_role = "", "", "", ""
     else:  # plan_round: agent arranges the next round from the curriculum
         round_id = _check_round_id(params.get("round_id"), required=False)
         as_of, case_id, case_role = "", "", ""
@@ -136,10 +135,46 @@ def build_prompt(job_type: str, params: dict) -> tuple[str, dict]:
         "group_a": json.dumps(params.get("group_a", []), ensure_ascii=False),
         "group_b": json.dumps(params.get("group_b", []), ensure_ascii=False),
         "extra": (params.get("extra") or "").strip(),
+        "hint": (params.get("hint") or "").strip(),
+        "watchlist": json.dumps(
+            [{"entity": i.get("entity"), "security": i.get("security")} for i in ui_state.load_watchlist()],
+            ensure_ascii=False),
+        "suggestions_path": str(ui_state.SUGGESTIONS_PATH),
     }
     prompt = template.format(**fields)
     normalized = {**params, "round_id": round_id, "case_id": case_id, "workspace": str(workspace)}
     return prompt, normalized
+
+
+def compose_cmd(spec: dict, prompt: str, params: dict) -> list[str]:
+    """Engine cmd with optional model/effort overrides from params.
+
+    Overrides are validated against the engine's model registry and spliced in
+    BEFORE the prompt argument (codex exec wants options before the positional).
+    Absent overrides add no flags: each engine keeps its own defaults.
+    """
+    model = (params.get("model") or "").strip()
+    effort = (params.get("effort") or "").strip()
+    extra: list[str] = []
+    if model or effort:
+        registry = {m.get("id"): m for m in spec.get("models") or []}
+        if model:
+            if registry and model not in registry:
+                raise ValueError(f"unknown model {model} for this engine (choose from {sorted(registry)})")
+            extra += [str(a).replace("{model}", model) for a in spec.get("model_args") or []]
+        if effort:
+            allowed = (registry.get(model or spec.get("default_model")) or {}).get("efforts")
+            if allowed and effort not in allowed:
+                raise ValueError(f"effort {effort} not supported by {model or spec.get('default_model')} (choose from {allowed})")
+            extra += [str(a).replace("{effort}", effort) for a in spec.get("effort_args") or []]
+    cmd: list[str] = []
+    for part in spec["cmd"]:
+        part = str(part)
+        if "{prompt}" in part and extra:
+            cmd += extra
+            extra = []
+        cmd.append(part.replace("{prompt}", prompt))
+    return cmd + extra
 
 
 def start_job(job_type: str, engine: str, params: dict) -> dict:
@@ -152,7 +187,7 @@ def start_job(job_type: str, engine: str, params: dict) -> dict:
         raise PermissionError(spec.get("note") or f"engine {engine} is not available yet")
 
     prompt, normalized = build_prompt(job_type, params)
-    cmd = [str(part).replace("{prompt}", prompt) for part in spec["cmd"]]
+    cmd = compose_cmd(spec, prompt, params)
     job_id = dt.datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + secrets.token_hex(2)
 
     env = dict(os.environ)
@@ -165,6 +200,7 @@ def start_job(job_type: str, engine: str, params: dict) -> dict:
         cmd,
         cwd=str(PROJECT_ROOT),
         env=env,
+        stdin=subprocess.DEVNULL,   # codex exec reads stdin when it is a pipe and blocks forever
         stdout=log_handle,
         stderr=subprocess.STDOUT,
         start_new_session=True,
@@ -190,17 +226,49 @@ def start_job(job_type: str, engine: str, params: dict) -> dict:
     def reap() -> None:
         returncode = proc.wait()
         log_handle.close()
+        try:  # capture the delivered version into the durable store right away
+            from . import data as _data, db as _db
+            _db.scan(_data.list_cases, _data.read_json, _data.normalize_outputs, force=True)
+        except Exception:
+            pass
+        usage = _parse_result_json(_log_path(job_id))
         with _LOCK:
             current = _load(job_id) or record
             if current["status"] == "running":
                 current["status"] = "finished" if returncode == 0 else "failed"
             current["returncode"] = returncode
             current["ended_at"] = now()
+            if usage:
+                current.update(usage)
             _save(current)
             _PROCS.pop(job_id, None)
 
     threading.Thread(target=reap, daemon=True).start()
     return record
+
+
+def _parse_result_json(log_path: Path) -> dict | None:
+    """With --output-format json the engine's stdout ends in one JSON object;
+    extract cost/usage/result. Tolerant: plain-text logs return None."""
+    try:
+        text = log_path.read_text(encoding="utf-8", errors="replace")
+        start = text.rfind("\n{")
+        if start < 0:
+            return None
+        payload = json.loads(text[start + 1:])
+        usage = payload.get("usage") or {}
+        out = {
+            "cost_usd": payload.get("total_cost_usd"),
+            "engine_duration_ms": payload.get("duration_ms"),
+            "tokens_out": usage.get("output_tokens"),
+            "result_summary": str(payload.get("result", ""))[:600],
+        }
+        # append readable result to the log for the dashboard log viewer
+        with log_path.open("a", encoding="utf-8") as handle:
+            handle.write("\n# result summary:\n" + str(payload.get("result", ""))[:2000] + "\n")
+        return out
+    except Exception:
+        return None
 
 
 def stop_job(job_id: str) -> dict | None:
@@ -258,18 +326,48 @@ def delete_job(job_id: str) -> bool:
 
 
 def _refresh(record: dict) -> dict:
-    """Reconcile records that predate this backend process."""
-    if record.get("status") == "running" and record["id"] not in _PROCS:
-        pid = record.get("pid")
-        alive = False
-        if pid:
-            try:
-                os.kill(pid, 0)
-                alive = True
-            except (ProcessLookupError, PermissionError):
-                alive = False
-        record["status"] = "running_detached" if alive else "interrupted"
-        _save(record)
+    """Reconcile records that predate this backend process.
+
+    running/running_detached records without a live managed process are
+    re-checked every listing: pid alive (and still our engine binary - pids
+    recycle) -> running_detached; pid gone -> finished when the log tail shows
+    a normal completion, else interrupted. Completed detached work is ingested
+    into the durable store immediately.
+    """
+    status = record.get("status")
+    if status not in {"running", "running_detached"} or record["id"] in _PROCS:
+        return record
+    pid = record.get("pid")
+    alive = False
+    if pid:
+        probe = subprocess.run(["ps", "-p", str(pid), "-o", "command="],
+                                capture_output=True, text=True)
+        command = probe.stdout.strip()
+        engine_cmd = (engines().get(record.get("engine"), {}).get("cmd") or [""])[0]
+        alive = bool(command) and (not engine_cmd or engine_cmd.split("/")[-1] in command)
+    if alive:
+        if status != "running_detached":
+            record["status"] = "running_detached"
+            _save(record)
+        return record
+    tail = ""
+    try:
+        with open(_log_path(record["id"]), "rb") as fh:
+            fh.seek(0, 2)
+            size = fh.tell()
+            fh.seek(max(0, size - 8192))
+            tail = fh.read().decode("utf-8", "replace")
+    except OSError:
+        pass
+    ok_markers = ('"subtype":"success"', '"subtype": "success"', "tokens used")
+    record["status"] = "finished" if any(m in tail for m in ok_markers) else "interrupted"
+    record["ended_at"] = record.get("ended_at") or now()
+    _save(record)
+    try:  # capture whatever the detached run delivered
+        from . import data as _data, db as _db
+        _db.scan(_data.list_cases, _data.read_json, _data.normalize_outputs, force=True)
+    except Exception:
+        pass
     return record
 
 
