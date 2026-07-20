@@ -1,8 +1,7 @@
 import unittest
 from pathlib import Path
 
-ROOT=Path(__file__).resolve().parents[3]
-SKILL=ROOT/'skills/technology-company-forecasting-trainer'
+SKILL=Path(__file__).resolve().parents[1]
 
 class CodexParityContractTest(unittest.TestCase):
     def test_required_files(self):

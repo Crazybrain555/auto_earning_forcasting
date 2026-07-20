@@ -1,12 +1,12 @@
 import unittest
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[3];SKILL=ROOT/'skills/technology-company-forecasting-trainer'
+SKILL=Path(__file__).resolve().parents[1]
 class UnifiedArchitectureTest(unittest.TestCase):
     def test_single_skill_folder(self):
         # Package layout ships only the trainer; the installed git repo has the
         # trainer next to the built production skill. Nothing else may appear.
         allowed={'technology-company-forecasting-trainer','technology-company-profit-forecasting'}
-        skills={p.name for p in (ROOT/'skills').iterdir() if p.is_dir() and not p.name.startswith('.')}
+        skills={p.name for p in SKILL.parent.iterdir() if p.is_dir() and not p.name.startswith('.')}
         self.assertIn('technology-company-forecasting-trainer',skills)
         self.assertTrue(skills<=allowed,skills)
     def test_common_core_and_modules(self):

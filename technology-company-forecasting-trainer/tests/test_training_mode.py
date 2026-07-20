@@ -1,6 +1,6 @@
 import csv,json,subprocess,sys,tempfile,unittest
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[3];SKILL=ROOT/'skills/technology-company-forecasting-trainer'
+SKILL=Path(__file__).resolve().parents[1]
 class TrainingModeTest(unittest.TestCase):
   def test_cutoff_blocks_used_future_source(self):
     with tempfile.TemporaryDirectory() as td:

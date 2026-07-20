@@ -1,7 +1,6 @@
 import json, subprocess, sys, tempfile, unittest
 from pathlib import Path
-ROOT = Path(__file__).resolve().parents[3]
-SKILL = ROOT / "skills/technology-company-forecasting-trainer"
+SKILL = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SKILL / "scripts"))
 import _seal_core as core
 

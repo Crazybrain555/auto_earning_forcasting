@@ -1,6 +1,6 @@
 import unittest
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[3];REF=ROOT/'skills/technology-company-forecasting-trainer/references'
+REF=Path(__file__).resolve().parents[1]/'references'
 class SubscriptionContentModuleTest(unittest.TestCase):
     def test_required_bridges(self):
         t=(REF/'module-subscriber-content-economics.md').read_text().lower()

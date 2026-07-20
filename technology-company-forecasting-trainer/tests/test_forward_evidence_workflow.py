@@ -1,6 +1,6 @@
 import json,subprocess,sys,tempfile,unittest
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[3];SKILL=ROOT/'skills/technology-company-forecasting-trainer'
+SKILL=Path(__file__).resolve().parents[1]
 class T(unittest.TestCase):
  def test_files(self):
   for p in ['references/forward-evidence-and-signal-validation.md','assets/templates/forward_signal_card_template.csv','scripts/validate_point_in_time_sources.py']:self.assertTrue((SKILL/p).exists())

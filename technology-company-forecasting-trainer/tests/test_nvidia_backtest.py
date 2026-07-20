@@ -1,6 +1,6 @@
 import json,subprocess,sys,tempfile,unittest
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[3];SK=ROOT/'skills/technology-company-forecasting-trainer'
+SK=Path(__file__).resolve().parents[1]
 class NvidiaBacktestTest(unittest.TestCase):
     def test_nvidia_gates(self):
         with tempfile.TemporaryDirectory() as td:
