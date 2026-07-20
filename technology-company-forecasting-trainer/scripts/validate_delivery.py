@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import csv
 import datetime as dt
+import datetime as dtmod
 import json
 import re
 import sys
@@ -420,6 +421,54 @@ def main() -> int:
         number_in_report((vs.get("fair_value") or {}).get("base"), "fair-value-base")
         y1 = (snap_obj.get("outputs") or {}).get("year_1") or {}
         number_in_report(y1.get("revenue_point"), "fy1-revenue-point")
+
+    # Source date hygiene: every source needs a parseable published_at at or
+    # before as_of (end of day). Live runs use as_of = today, so this catches
+    # future-dated and undated sourcing there too, not only in training.
+    if source_path.exists():
+        try:
+            cutoff_raw = str(manifest.get("as_of", "")).strip()
+            cutoff = None
+            if cutoff_raw:
+                text = cutoff_raw if len(cutoff_raw) > 10 else cutoff_raw + "T23:59:59+00:00"
+                if text.endswith("Z"):
+                    text = text[:-1] + "+00:00"
+                cutoff = dtmod.datetime.fromisoformat(text)
+                if cutoff.tzinfo is None:
+                    cutoff = cutoff.replace(tzinfo=dtmod.timezone.utc)
+            undated, future = [], []
+            for s in json.loads(source_path.read_text(encoding="utf-8")).get("sources", []):
+                sid = s.get("source_id", "UNKNOWN")
+                raw = str(s.get("published_at", "") or "").strip()
+                if not raw:
+                    undated.append(sid)
+                    continue
+                try:
+                    text = raw if len(raw) > 10 else raw + "T23:59:59+00:00"
+                    if text.endswith("Z"):
+                        text = text[:-1] + "+00:00"
+                    published = dtmod.datetime.fromisoformat(text)
+                    if published.tzinfo is None:
+                        published = published.replace(tzinfo=dtmod.timezone.utc)
+                except Exception:
+                    undated.append(sid)
+                    continue
+                if cutoff is not None and published > cutoff:
+                    future.append(sid)
+            if future:
+                fail_record(checks, "sources:published-before-as-of",
+                            "sources dated after as_of " + cutoff_raw + ": " + ",".join(future[:8]),
+                            "error" if args.strict else "warning")
+            else:
+                pass_record(checks, "sources:published-before-as-of")
+            if undated:
+                fail_record(checks, "sources:published-at-known",
+                            "sources with missing/unparseable published_at: " + ",".join(undated[:8]),
+                            "warning")
+            else:
+                pass_record(checks, "sources:published-at-known")
+        except Exception:
+            pass
 
     # Provenance honesty: hashes are either real or explicitly absent - never invented.
     if source_path.exists():

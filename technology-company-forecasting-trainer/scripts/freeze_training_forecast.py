@@ -10,13 +10,38 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import hashlib
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import _seal_core as core
+
+
+def group_lock_hash(round_dir: Path):
+    """Lock the round's group membership: sha256 over round id, base commit and
+    both groups' case identities. Sealed cases whose receipts carry different
+    lock hashes reveal a mid-round company swap. None for ad-hoc cases."""
+    round_json = round_dir / "round.json"
+    if not round_json.is_file():
+        return None
+    try:
+        plan = json.loads(round_json.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    def ids(group):
+        out = []
+        for case in plan.get(group) or []:
+            if isinstance(case, dict):
+                out.append(case.get("case_id") or f"{case.get('security')}@{case.get('as_of')}")
+        return sorted(str(x) for x in out)
+    locked = {"round_id": plan.get("round_id"), "base_method_commit": plan.get("base_method_commit"),
+              "group_a": ids("group_a"), "group_b": ids("group_b")}
+    canon = json.dumps(locked, sort_keys=True, separators=(",", ":")).encode()
+    return "sha256:" + hashlib.sha256(canon).hexdigest()
 
 
 def run(cmd):
@@ -56,8 +81,40 @@ def main() -> int:
     except core.SealError as exc:
         raise SystemExit(f"seal failed: {exc}")
     (workspace / "forecast_seal.json").write_text(json.dumps(seal, indent=2) + "\n", encoding="utf-8")
+
+    # External seal receipt: recorded OUTSIDE the workspace before any actual is
+    # retrieved. Closes the rewrite-the-whole-workspace hole: the scorer refuses
+    # to score without a receipt whose pack_hash matches the in-workspace seal.
+    receipt_dir = workspace.parent / "seal_receipts"
+    receipt_path = receipt_dir / f"{workspace.name}.json"
+    if receipt_path.exists():
+        (workspace / "forecast_seal.json").unlink()
+        raise SystemExit(
+            f"seal receipt already exists for {workspace.name} - this case was sealed once "
+            "before; a reseal after possible actuals exposure is not clean validation. "
+            "Use a fresh case workspace (new case id) instead.")
+    receipt = {
+        "schema_version": 1,
+        "round_id": workspace.parent.name,
+        "case_id": workspace.name,
+        "forecast_workspace": str(workspace),
+        "pack_hash": seal["pack_hash"],
+        "file_count": len(seal["files"]),
+        "sealed_at": now,
+        "recorded_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "recorded_before_actuals": True,
+        "group_lock_hash": group_lock_hash(workspace.parent),
+    }
+    try:
+        receipt_dir.mkdir(exist_ok=True)
+        receipt_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+        os.chmod(receipt_path, 0o444)
+    except Exception as exc:
+        (workspace / "forecast_seal.json").unlink()   # transactional: no receipt -> no seal
+        raise SystemExit(f"failed to record external seal receipt, seal rolled back: {exc}")
     print(json.dumps({"status": seal["status"], "sealed_at": now,
-                      "pack_hash": seal["pack_hash"], "files": len(seal["files"])}, indent=2))
+                      "pack_hash": seal["pack_hash"], "files": len(seal["files"]),
+                      "seal_receipt": str(receipt_path)}, indent=2))
     return 0
 
 

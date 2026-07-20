@@ -27,7 +27,7 @@ Improve the forecasting method through historical cases. Git is the only version
 
 1. Every forecast-use source's original publication/version time is at or before the frozen `as_of`. Model memory is not evidence; undated or post-cutoff material is quarantined.
 2. No answer-bearing queries before the seal. Keep `historical_query_log.csv` honest and complete.
-3. Seal with `scripts/freeze_training_forecast.py` (which runs the time-boundary, research-completeness, and delivery validators) **before** retrieving any target Actual. Only after the seal, fetch actuals and score with `scripts/score_training_forecast.py`.
+3. Seal with `scripts/freeze_training_forecast.py` (which runs the time-boundary, research-completeness, and delivery validators — the delivery validator's canonical-outputs checks refuse to seal a snapshot with missing periods, missing intervals, or dialect keys) **before** retrieving any target Actual. Freezing also records an **external seal receipt** at `<round>/seal_receipts/<case>.json` (pack hash, sealed_at, group-lock hash) outside the workspace; the freeze rolls back if the receipt cannot be written, and refuses to reseal a case whose receipt already exists — a reseal after possible actuals exposure is never clean validation. Only after the seal, fetch actuals and score with `scripts/score_training_forecast.py`, which verifies the receipt against the in-workspace seal (a workspace wholly rebuilt after actuals exposure is self-consistent but fails the receipt) and records `receipt_verified` in the evaluation.
 4. Actuals and evaluation outputs live only in the seal-exempt subdirectories `actuals_vault/` and `evaluation/` (or outside the workspace). Everything else in a sealed workspace is hash-locked: verification fails on any modified, removed, or added file, and scoring must leave the sealed tree bit-for-bit intact. Never write an actual, or a rule derived from one specific known actual, into the skill files.
 5. A case whose seal was broken or whose actuals were seen early can still be used for training and diagnosis — it can never again be counted as validation.
 
@@ -57,6 +57,19 @@ Run both B cases fresh: scaffold as `--case-role validation`, research, seal, th
 - B cases that were fine before are not made worse (no new systematic bias);
 - intervals were not silently widened to pass — width must still be attributed to named states;
 - spot-check one previously trained company (`--case-role regression`, or the bundled backtest scripts) when the rule touches its mechanism.
+
+Answer these **as a structured `fold_review` block in `round.json`** — one line of evidence per field, never a bare "pass":
+
+```json
+"fold_review": {
+  "target_error_recurred": false,
+  "new_systematic_bias": false,
+  "intervals_silently_widened": false,
+  "right_reason_ok": true,
+  "regression_ok": true,
+  "evidence": "one line per field: which case/metric shows it"
+}
+```
 
 **Pass → release:** rebuild the production skill (`scripts/build_live_release.py --trainer-skill-root <trainer> --output-root <live> --self-test`), run `scripts/package_self_test.py` and the test suite, commit, push. Round done; record `status: pushed`.
 

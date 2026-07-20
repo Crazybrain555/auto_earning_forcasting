@@ -48,6 +48,10 @@ def main() -> int:
     parser.add_argument("--workspace", required=True)
     parser.add_argument("--actuals", required=True)
     parser.add_argument("--output", default=None)
+    parser.add_argument("--receipt", default=None,
+                        help="external seal receipt path (default <round>/seal_receipts/<case>.json)")
+    parser.add_argument("--allow-missing-receipt", action="store_true",
+                        help="score a pre-receipt legacy workspace; recorded as receipt_verified=legacy_no_receipt")
     args = parser.parse_args()
     workspace = Path(args.workspace).resolve()
     actuals_path = Path(args.actuals).resolve()
@@ -57,6 +61,31 @@ def main() -> int:
         core.assert_outside_sealed_area(workspace, actuals_path)
     except core.SealError as exc:
         raise SystemExit(f"seal verification failed: {exc}")
+
+    # External receipt check: the in-workspace seal alone cannot prove the
+    # workspace was not wholly rebuilt after actuals exposure; the receipt was
+    # recorded outside the workspace at freeze time and must match exactly.
+    receipt_path = Path(args.receipt).resolve() if args.receipt else workspace.parent / "seal_receipts" / f"{workspace.name}.json"
+    receipt_verified = "legacy_no_receipt"
+    if receipt_path.is_file():
+        try:
+            receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+        except Exception as exc:
+            raise SystemExit(f"seal receipt unreadable: {exc}")
+        problems = []
+        if receipt.get("pack_hash") != seal["pack_hash"]:
+            problems.append("pack_hash mismatch - workspace was resealed or rebuilt after the receipt")
+        if receipt.get("sealed_at") != seal.get("sealed_at"):
+            problems.append("sealed_at mismatch")
+        if receipt.get("recorded_before_actuals") is not True:
+            problems.append("recorded_before_actuals is not true")
+        if problems:
+            raise SystemExit("seal receipt verification failed: " + "; ".join(problems))
+        receipt_verified = True
+    elif not args.allow_missing_receipt:
+        raise SystemExit(
+            f"no external seal receipt at {receipt_path} - freeze_training_forecast.py records one "
+            "at seal time; for pre-receipt legacy workspaces pass --allow-missing-receipt")
 
     actuals = json.loads(actuals_path.read_text(encoding="utf-8"))
     if not actuals.get("retrieved_after_seal"):
@@ -99,6 +128,7 @@ def main() -> int:
                "revenue_coverage": mean("revenue_hit"), "profit_coverage": mean("profit_hit"),
                "revenue_interval_score": mean("revenue_interval_score"), "profit_interval_score": mean("profit_interval_score")}
     result = {"case_id": actuals.get("case_id"), "seal_hash": seal["pack_hash"], "hash_verified": True,
+              "receipt_verified": receipt_verified,
               "seal_reverified_after_scoring": False, "actuals_retrieved_after_seal": True,
               "scored_at": dt.datetime.now(dt.timezone.utc).isoformat(), "metrics": metrics, "scores": rows}
 
