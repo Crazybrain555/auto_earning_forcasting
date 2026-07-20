@@ -271,9 +271,14 @@ def all_jobs():
 
 
 @app.post("/api/jobs", status_code=201, **MUTATING)
-def create_job(req: JobRequest):
+def create_job(req: JobRequest, x_idempotency_key: str | None = Header(None)):
     try:
-        return jobs.start_job(req.type, req.engine, req.params)
+        return jobs.start_job(
+            req.type,
+            req.engine,
+            req.params,
+            idempotency_key=x_idempotency_key or "",
+        )
     except PermissionError as exc:
         raise HTTPException(501, str(exc))
     except ValueError as exc:
@@ -289,8 +294,8 @@ def job_detail(job_id: str):
 
 
 @app.get("/api/jobs/{job_id}/log", response_class=PlainTextResponse)
-def job_log(job_id: str, tail: int = 200):
-    log = jobs.job_log(job_id, tail=max(1, min(tail, 5000)))
+def job_log(job_id: str, tail: int = 200, safe: bool = False):
+    log = jobs.job_log(job_id, tail=max(1, min(tail, 5000)), safe=safe)
     if log is None:
         raise HTTPException(404, "log not found")
     return log

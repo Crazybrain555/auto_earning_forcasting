@@ -396,15 +396,14 @@ function paintPortfolio() {
         <div class="pc-up"><span class="v" style="color:${e.u == null ? "var(--muted)" : e.u >= 0 ? "var(--gain)" : "var(--loss)"}">${e.u == null ? "—" : (e.u >= 0 ? "+" : "") + (e.u * 100).toFixed(1) + "%"}</span><div class="l">上涨空间</div></div>
         <div class="pc-target"><span class="v">${money(e.base)}</span><div class="l">目标价</div></div>
         <div class="pc-act">${r.job_running
-          ? `<a class="btn btn-sm" href="#/jobs?log=${esc(r.job_id || "")}" onclick="event.stopPropagation()">日志</a> <button class="btn btn-sm btn-danger" data-canceljob="${esc(r.job_id || "")}" data-sec="${esc(r.security)}">取消</button>`
-          : `<button class="btn btn-sm" data-run="${esc(r.security)}" data-entity="${esc(r.entity)}">跑预测</button>`}</div>
+          ? `<button class="btn btn-sm" data-viewlog="${esc(r.job_id || "")}">日志</button> <button class="btn btn-sm btn-danger" data-canceljob="${esc(r.job_id || "")}" data-sec="${esc(r.security)}">取消</button>`
+          : `<button class="btn btn-sm" data-run="${esc(r.security)}" data-entity="${esc(r.entity)}">跑预测</button>`}
+          <button class="btn btn-sm" data-versions="${esc(r.security)}" data-entity="${esc(r.entity)}" title="版本管理:选择看板显示哪一版 / 删除坏版本">版本</button>
+          <button class="btn btn-sm btn-danger" data-unwatch="${esc(r.security)}" title="移出关注列表(历史版本保留在数据库)">移除</button></div>
         <div class="chev ${isOpen ? "open" : ""}">›</div>
       </div>
       ${valbarHtml(e)}
-      ${isOpen ? `<div class="pcbody"><div class="pc-actions">
-          <button class="btn btn-sm btn-danger" data-unwatch="${esc(r.security)}">移除关注</button>
-          <span class="cellnote">移除只是不再关注,历史版本仍保存在数据库,可随时重新加入</span>
-        </div><div class="dwrap" id="d-${esc(r.security)}">加载中…</div></div>` : ""}
+      ${isOpen ? `<div class="pcbody"><div class="dwrap" id="d-${esc(r.security)}">加载中…</div></div>` : ""}
     </div>`;
   }
   html += `<div class="notice">折叠看结论 · 展开看理由(论点、预测输出、情景概率、机制权重、运行记录、版本对比、完整报告)。估值区间条:黑标 = 现价,蓝标 = AI 目标价(基准情景),金标 = 建议买入价,蓝底 = 悲观↔乐观区间。实时价源自 Yahoo,取不到时回退研究时点价格。</div>`;
@@ -437,6 +436,99 @@ function suggestCardHtml() {
     ${rows}
     ${s.generated_at ? `<div class="cellnote" style="margin-top:8px">生成于 ${fmtTime(s.generated_at)}${s.hint ? " · 提示:" + esc(s.hint) : ""}</div>` : ""}
   </div>`;
+}
+
+/* ---------- 通用右侧抽屉(日志 / 版本管理 共用) ---------- */
+let drawerTimer = null;
+
+function closeDrawer() {
+  clearInterval(drawerTimer); drawerTimer = null;
+  ["drawer-ov", "drawer"].forEach(id => { const el = document.getElementById(id); if (el) el.remove(); });
+}
+
+function openDrawer(titleHtml, bodyHtml) {
+  closeDrawer();
+  const ov = document.createElement("div"); ov.id = "drawer-ov"; ov.className = "drawer-ov";
+  const dr = document.createElement("div"); dr.id = "drawer"; dr.className = "drawer";
+  dr.innerHTML = `<div class="drawer-h"><div class="drawer-t">${titleHtml}</div><button class="btn btn-sm" id="drawer-x">关闭 Esc</button></div><div class="drawer-b">${bodyHtml}</div>`;
+  document.body.append(ov, dr);
+  requestAnimationFrame(() => { ov.classList.add("on"); dr.classList.add("on"); });
+  ov.onclick = closeDrawer;
+  dr.querySelector("#drawer-x").onclick = closeDrawer;
+  const onEsc = ev => { if (ev.key === "Escape") { closeDrawer(); document.removeEventListener("keydown", onEsc); } };
+  document.addEventListener("keydown", onEsc);
+  return dr;
+}
+
+/* 日志抽屉:任何页面都能开,3 秒轮询,运行中可直接停止 */
+function openLogDrawer(jobId) {
+  if (!jobId) { alert("找不到任务 ID"); return; }
+  openDrawer(`任务日志 · <span class="mono">${esc(jobId)}</span>`,
+    `<div id="log-meta" class="cellnote" style="margin-bottom:8px">加载中…</div><pre class="log drawer-log" id="drawer-log"></pre>`);
+  const load = async () => {
+    try {
+      const [rec, log] = await Promise.all([api(`/api/jobs/${jobId}`), api(`/api/jobs/${jobId}/log?tail=500`)]);
+      const meta = document.getElementById("log-meta"), pre = document.getElementById("drawer-log");
+      if (!meta || !pre) return;
+      const isRunning = ["running", "running_detached"].includes(rec.status);
+      meta.innerHTML = `${jobTypeChip(rec.type)} ${jobChip(rec.status)} <span class="mono">${esc(rec.engine)}${rec.params && rec.params.model ? " · " + esc(rec.params.model) : ""}${rec.params && rec.params.effort ? " · " + esc(rec.params.effort) : ""}</span> <span class="cellnote">${elapsed(rec.started_at, rec.ended_at)}</span> ${isRunning ? `<button class="btn btn-sm btn-danger" id="drawer-stop">停止任务</button>` : ""}`;
+      const stick = pre.scrollTop + pre.clientHeight >= pre.scrollHeight - 40;
+      pre.textContent = log || "(暂无日志)";
+      if (stick) pre.scrollTop = pre.scrollHeight;
+      const stop = document.getElementById("drawer-stop");
+      if (stop) stop.onclick = async () => { if (!confirm("停止该任务?")) return; try { await api(`/api/jobs/${jobId}/stop`, { method: "POST" }); } catch {} load(); };
+      if (!isRunning) { clearInterval(drawerTimer); drawerTimer = null; }
+    } catch (e) {
+      const meta = document.getElementById("log-meta"), pre = document.getElementById("drawer-log");
+      if (meta) meta.textContent = "日志暂不可用";
+      if (pre) pre.textContent = e && e.message ? e.message : "安全日志尚未同步";
+    }
+  };
+  load();
+  drawerTimer = setInterval(load, 3000);
+}
+
+/* 版本管理抽屉:单选 = 看板显示哪版;删除/恢复;固定后可恢复自动 */
+function openVersionDrawer(sec, entity) {
+  openDrawer(`${esc(entity || sec)} <span class="mono cellnote">${esc(sec)}</span> · 版本管理`, `<div id="ver-body">加载中…</div>`);
+  const load = async () => {
+    let hist = [];
+    try { hist = await api(`/api/history/${encodeURIComponent(sec)}`); } catch {}
+    const box = document.getElementById("ver-body");
+    if (!box) return;
+    if (!hist.length) { box.innerHTML = `<div class="empty">还没有入库版本——跑一次预测后这里会出现。</div>`; return; }
+    const pinned = hist.find(h => h.is_active && !h.deleted);
+    const effective = pinned || hist.find(h => h.has_valuation && !h.deleted) || null;
+    box.innerHTML = `<div class="cellnote" style="margin-bottom:10px">选中的版本就是投资看板显示的结论。默认自动跟随最新有估值版本;手动选中后固定不动。删除是软删除,可恢复;数据在 backend/state/forecast.db,工作区被覆盖也不丢。</div>` +
+      hist.map(h => {
+        const val = h.valuation || {}, fv = val.fair_value || {};
+        const isEff = effective && effective.id === h.id;
+        return `<div class="vercard ${h.deleted ? "ver-del" : ""} ${isEff ? "ver-eff" : ""}">
+          <div class="ver-pick">${h.deleted || !h.has_valuation ? "" : `<input type="radio" name="verpick" ${isEff ? "checked" : ""} data-actrun="${h.id}" title="设为看板显示版本">`}</div>
+          <div class="ver-main">
+            <div><b class="mono" style="font-size:14px">${money(fv.base)}</b> ${h.has_valuation ? actionChip(val.action) : statusChip("muted", "无估值")}
+              ${isEff ? statusChip("good", pinned ? "当前显示 · 手动固定" : "当前显示 · 自动") : ""} ${h.deleted ? statusChip("critical", "已删除") : ""}</div>
+            <div class="cellnote">买入 ≤ ${money(val.recommended_buy_price)} · 方法 <span class="mono">${esc((h.method_commit || "—").slice(0, 7))}</span> · ${esc(h.engine || "—")}${h.model ? " · " + esc(h.model) : ""}${h.effort ? " · " + esc(h.effort) : ""}</div>
+            <div class="cellnote mono">${fmtTime(h.captured_at)} · as_of ${esc((h.as_of || "").slice(0, 10))} · ${esc(h.case_id || "")}</div>
+          </div>
+          <div class="ver-ops">${h.deleted ? `<button class="btn btn-sm" data-resrun="${h.id}">恢复</button>` : `<button class="btn btn-sm btn-danger" data-delrun="${h.id}">删除</button>`}</div>
+        </div>`;
+      }).join("") +
+      (pinned ? `<button class="btn btn-sm" id="ver-auto" style="margin-top:10px">恢复自动(总是显示最新版)</button>` : "");
+    const act = fn => async () => {
+      try { await fn(); } catch (e) { if (e.message !== "cancelled") alert("操作失败:" + e.message); }
+      detailCache.clear(); load(); viewPortfolio();
+    };
+    box.querySelectorAll("[data-actrun]").forEach(r => r.onchange = act(() => api(`/api/runs/${r.dataset.actrun}/activate`, { method: "POST" })));
+    box.querySelectorAll("[data-delrun]").forEach(b => b.onclick = act(async () => {
+      if (!confirm("删除该版本?(软删除,可恢复)")) throw new Error("cancelled");
+      await api(`/api/runs/${b.dataset.delrun}`, { method: "DELETE" });
+    }));
+    box.querySelectorAll("[data-resrun]").forEach(b => b.onclick = act(() => api(`/api/runs/${b.dataset.resrun}/restore`, { method: "POST" })));
+    const auto = document.getElementById("ver-auto");
+    if (auto) auto.onclick = act(() => api(`/api/history/${encodeURIComponent(sec)}/auto`, { method: "POST" }));
+  };
+  load();
 }
 
 function bindAutocomplete() {
@@ -527,6 +619,8 @@ function bindPortfolio() {
       catch (e) { alert("启动失败:" + e.message); viewPortfolio(); }
     });
   });
+  $view.querySelectorAll("[data-viewlog]").forEach(b => b.onclick = ev => { ev.stopPropagation(); openLogDrawer(b.dataset.viewlog); });
+  $view.querySelectorAll("[data-versions]").forEach(b => b.onclick = ev => { ev.stopPropagation(); openVersionDrawer(b.dataset.versions, b.dataset.entity); });
   $view.querySelectorAll("[data-canceljob]").forEach(b => b.onclick = async ev => {
     ev.stopPropagation();
     if (!b.dataset.canceljob) { alert("找不到任务 ID,请到「任务」页停止"); return; }
@@ -627,53 +721,13 @@ async function renderDetail(sec, rows) {
       }
       html += `</tbody></table></div>`;
     }
-    try {
-      const hist = await api(`/api/history/${encodeURIComponent(sec)}`);
-      if (hist.length) {
-        const pinned = hist.find(h => h.is_active && !h.deleted);
-        const effective = pinned || hist.find(h => h.has_valuation && !h.deleted) || null;
-        html += `<div class="dsec"><h3>版本管理(每次预测入库为一个版本 · 可选择显示哪版 / 删除坏版)</h3>
-          <table class="grid"><thead><tr><th>入库时间</th><th>方法</th><th>引擎</th><th class="num">目标价</th><th class="num">建议买入</th><th>评级</th><th>状态</th><th></th></tr></thead><tbody>` +
-          hist.map(h => {
-            const val = h.valuation || {};
-            const isEff = effective && effective.id === h.id;
-            const state = h.deleted ? statusChip("critical", "已删除")
-              : isEff ? statusChip("good", h.is_active ? "当前显示(手动)" : "当前显示")
-              : !h.has_valuation ? statusChip("muted", "无估值") : statusChip("muted", "历史");
-            const ops = h.deleted
-              ? `<button class="btn btn-sm" data-resrun="${h.id}">恢复</button>`
-              : `${h.is_active ? `<button class="btn btn-sm" data-autorun="${esc(sec)}">恢复自动</button>`
-                               : h.has_valuation ? `<button class="btn btn-sm" data-actrun="${h.id}">设为显示</button>` : ""}
-                 <button class="btn btn-sm btn-danger" data-delrun="${h.id}">删除</button>`;
-            return `<tr style="${h.deleted ? "opacity:.5" : ""}"><td class="mono cellnote">${fmtTime(h.captured_at)}</td>
-              <td class="mono">${esc((h.method_commit || "—").slice(0, 7))}</td>
-              <td class="cellnote">${esc(h.engine || "—")}${h.model ? `<div class="mono">${esc(h.model)}${h.effort ? " · " + esc(h.effort) : ""}</div>` : ""}</td>
-              <td class="num">${money(val.fair_value && val.fair_value.base)}</td>
-              <td class="num">${money(val.recommended_buy_price)}</td>
-              <td>${h.has_valuation ? actionChip(val.action) : "—"}</td>
-              <td>${state}</td><td>${ops}</td></tr>`;
-          }).join("") + `</tbody></table>
-          <div class="cellnote">「设为显示」把该版本固定为投资看板结论;「恢复自动」回到默认(最新的有估值版本)。删除为软删除,可恢复。数据存于 backend/state/forecast.db,工作区被覆盖也不丢失。</div></div>`;
-      }
-    } catch {}
+    // 版本管理已提升为卡片头「版本」按钮的抽屉
     if (primary.has_report) {
       const report = await api(`/api/cases/${encodeURIComponent(primary.round_id)}/${encodeURIComponent(primary.case_id)}/report`);
       html += `<div class="dsec"><h3>完整理由(研究报告)</h3>${mdRender(report)}</div>`;
     }
   } catch (e) { html += `<div class="notice">明细加载失败:${esc(e.message)}</div>`; }
   box.innerHTML = html;
-  const vguard = fn => async ev => {
-    ev.stopPropagation();
-    try { await fn(); } catch (e) { alert("操作失败:" + e.message); }
-    detailCache.clear(); viewPortfolio();
-  };
-  box.querySelectorAll("[data-actrun]").forEach(b => b.onclick = vguard(() => api(`/api/runs/${b.dataset.actrun}/activate`, { method: "POST" })));
-  box.querySelectorAll("[data-autorun]").forEach(b => b.onclick = vguard(() => api(`/api/history/${encodeURIComponent(b.dataset.autorun)}/auto`, { method: "POST" })));
-  box.querySelectorAll("[data-delrun]").forEach(b => b.onclick = vguard(async () => {
-    if (!confirm("删除该版本?(软删除,可在版本表恢复)")) return;
-    await api(`/api/runs/${b.dataset.delrun}`, { method: "DELETE" });
-  }));
-  box.querySelectorAll("[data-resrun]").forEach(b => b.onclick = vguard(() => api(`/api/runs/${b.dataset.resrun}/restore`, { method: "POST" })));
   box.querySelectorAll("[data-delcase]").forEach(b => b.onclick = async ev => {
     ev.stopPropagation();
     const [r, c] = b.dataset.delcase.split("|");
@@ -965,18 +1019,9 @@ async function viewJobs() {
     if (!confirm("删除该任务记录和日志?(移入 jobs/_trash)")) return;
     await del(`/api/jobs/${b.dataset.deljob}`);
   }));
-  $view.querySelectorAll("[data-log]").forEach(b => b.onclick = () => {
-    const id = b.dataset.log;
-    document.getElementById("logbox").style.display = "";
-    document.getElementById("logtitle").textContent = "任务日志 " + id + "(每 3 秒刷新)";
-    const load = async () => { try { document.getElementById("logpre").textContent = await api(`/api/jobs/${id}/log?tail=300`); } catch {} };
-    clearInterval(logTimer); load(); logTimer = setInterval(load, 3000);
-  });
+  $view.querySelectorAll("[data-log]").forEach(b => b.onclick = () => openLogDrawer(b.dataset.log));
   const wantLog = (window.__routeQuery || new URLSearchParams()).get("log");
-  if (wantLog) {
-    const b = $view.querySelector(`[data-log="${CSS.escape(wantLog)}"]`);
-    if (b) b.click();
-  }
+  if (wantLog) openLogDrawer(wantLog);
   if (running.length && !document.getElementById("logbox").style.display) {
     boardTimer = setInterval(() => { if ((location.hash || "").includes("jobs") && document.getElementById("logbox").style.display === "none") viewJobs(); }, 15000);
   }
@@ -1051,11 +1096,69 @@ const LOOP_SVG = `
   <text class="lb" x="112" y="243">新方法版本 → 下一轮</text>
 </svg>`;
 
+const PIPE_SVG = `
+<svg viewBox="0 0 1160 306" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="生产 skill 预测流水线">
+  <defs><marker id="par" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a8c92"/></marker></defs>
+  <style>
+    .pbx{fill:#fff;stroke:#dedcd4}
+    .pno{font:500 9.5px 'IBM Plex Mono',monospace;fill:#c2c1b9;letter-spacing:.1em}
+    .pbt{font:600 12.5px 'IBM Plex Sans',system-ui,sans-serif;fill:#14161a}
+    .pbs{font:10.5px 'IBM Plex Sans',system-ui,sans-serif;fill:#8a8c92}
+    .pe{stroke:#8a8c92;stroke-width:1.5;fill:none;marker-end:url(#par)}
+  </style>
+  <rect class="pbx" x="10" y="30" width="212" height="66" rx="7"/><text class="pno" x="24" y="48">01</text>
+  <text class="pbt" x="116" y="60" text-anchor="middle">范围与时间边界</text><text class="pbs" x="116" y="78" text-anchor="middle">公司口径 · 财历 · as_of 锁定</text>
+  <rect class="pbx" x="246" y="30" width="212" height="66" rx="7"/><text class="pno" x="260" y="48">02</text>
+  <text class="pbt" x="352" y="60" text-anchor="middle">点时点 Source Pack</text><text class="pbs" x="352" y="78" text-anchor="middle">E0–E4 分级证据 · 哈希留痕</text>
+  <rect class="pbx" x="482" y="30" width="212" height="66" rx="7"/><text class="pno" x="496" y="48">03</text>
+  <text class="pbt" x="588" y="60" text-anchor="middle">前瞻证据 SignalCards</text><text class="pbs" x="588" y="78" text-anchor="middle">≥6 信号 · ≥3 家族 · 独立源约束</text>
+  <rect class="pbx" x="718" y="30" width="212" height="66" rx="7"/><text class="pno" x="732" y="48">04</text>
+  <text class="pbt" x="824" y="60" text-anchor="middle">机制路由与建模</text><text class="pbs" x="824" y="78" text-anchor="middle">9+1 机制模块 × 8 行业透镜 · 权重</text>
+  <rect class="pbx" x="954" y="30" width="196" height="66" rx="7"/><text class="pno" x="968" y="48">05</text>
+  <text class="pbt" x="1052" y="60" text-anchor="middle">公式化三表模型</text><text class="pbs" x="1052" y="78" text-anchor="middle">model.xlsx · ≥30 公式驱动</text>
+  <line class="pe" x1="222" y1="63" x2="242" y2="63"/><line class="pe" x1="458" y1="63" x2="478" y2="63"/>
+  <line class="pe" x1="694" y1="63" x2="714" y2="63"/><line class="pe" x1="930" y1="63" x2="950" y2="63"/>
+  <path class="pe" d="M 1052 96 V 130 Q 1052 138 1044 138 H 124 Q 116 138 116 146 V 178"/>
+  <rect class="pbx" x="10" y="182" width="212" height="66" rx="7"/><text class="pno" x="24" y="200">06</text>
+  <text class="pbt" x="116" y="212" text-anchor="middle">情景与分布输出</text><text class="pbs" x="116" y="230" text-anchor="middle">FY+1 点 · FY+2 情景 · FY+3 分位</text>
+  <rect class="pbx" x="246" y="182" width="212" height="66" rx="7"/><text class="pno" x="260" y="200">07</text>
+  <text class="pbt" x="352" y="212" text-anchor="middle">估值与买入纪律</text><text class="pbs" x="352" y="230" text-anchor="middle">DCF/倍数 · 市场隐含反推 · 买点</text>
+  <rect class="pbx" x="482" y="182" width="212" height="66" rx="7"/><text class="pno" x="496" y="200">08</text>
+  <text class="pbt" x="588" y="212" text-anchor="middle">独立红队</text><text class="pbs" x="588" y="230" text-anchor="middle">开放 P0/P1 不闭环 = 不许交付</text>
+  <rect class="pbx" x="718" y="182" width="212" height="66" rx="7"/><text class="pno" x="732" y="200">09</text>
+  <text class="pbt" x="824" y="212" text-anchor="middle">严格交付校验</text><text class="pbs" x="824" y="230" text-anchor="middle">validate_delivery --strict 全门槛</text>
+  <rect class="pbx" x="954" y="182" width="196" height="66" rx="7"/><text class="pno" x="968" y="200">10</text>
+  <text class="pbt" x="1052" y="212" text-anchor="middle">封存与入库</text><text class="pbs" x="1052" y="230" text-anchor="middle">快照哈希 · 版本入库 · 上看板</text>
+  <line class="pe" x1="222" y1="215" x2="242" y2="215"/><line class="pe" x1="458" y1="215" x2="478" y2="215"/>
+  <line class="pe" x1="694" y1="215" x2="714" y2="215"/><line class="pe" x1="930" y1="215" x2="950" y2="215"/>
+</svg>`;
+
+const SKILL_MODULES = {
+  "机制模块(利润从哪来)": ["量·价·成本 unit-volume-price-cost", "产能利用率与良率 capacity-utilization-yield", "订阅与合同收入 recurring-contract-revenue", "订单积压与确认 orders-backlog-recognition", "项目分阶段转化 program-stage-conversion", "平台用量与渗透 platform-usage-adoption", "订户与内容经济 subscriber-content-economics", "离散会计事件 discrete-accounting-events", "口径与并表 perimeter-and-accounting", "合同/合资/资本 contracts-jv-capital", "DTA 估值准备(子模块)"],
+  "行业透镜(公司属于哪种生意)": ["存储 memory-storage", "设备与过程控制 equipment-process-control", "代工封装材料 foundry-packaging-materials", "网络/光/定制硅 networking-optics-custom-silicon", "计算平台 compute-platforms", "云基础设施 cloud-infrastructure", "企业订阅软件 enterprise-recurring-software", "订阅内容平台 subscription-content-platform"],
+  "治理与证据(不许胡说的部分)": ["核心工作流 core-forecast-workflow", "证据分级 core-source-and-evidence", "输出与估值契约 core-output-and-valuation", "前瞻证据校验 forward-evidence-validation", "研究充分性 research-completeness", "交付契约 full-company-delivery-contract", "模式路由与时间边界 mode-router"],
+};
+
 async function viewMethod() {
-  const [timeline, skills] = await Promise.all([api("/api/method/timeline"), api("/api/method/skills")]);
+  const [timeline, skills, evolution, progress] = await Promise.all([
+    api("/api/method/timeline"), api("/api/method/skills"),
+    api("/api/method/evolution").catch(() => ({ versions: [] })),
+    api("/api/method/progress").catch(() => [])]);
+  const progByCommit = {};
+  for (const r of progress) progByCommit[r.method_commit] = r;
+
+  const moduleGroups = Object.entries(SKILL_MODULES).map(([group, items]) =>
+    `<h3 class="wavehead">${group}</h3><div style="display:flex;flex-wrap:wrap;gap:6px">${items.map(m => `<span class="chip">${esc(m)}</span>`).join("")}</div>`).join("");
+
   let html = `
     <div class="card">
-      <h2>自训练闭环</h2>
+      <h2>生产 skill 完整逻辑(technology-company-profit-forecasting)</h2>
+      <div class="card-sub">一次实时预测从 01 到 10 全流程走完才允许交付;任何一道门失败都会中止并留下失败记录。</div>
+      <div class="loopwrap">${PIPE_SVG}</div>
+      ${moduleGroups}
+    </div>
+    <div class="card">
+      <h2>自训练闭环(technology-company-forecasting-trainer)</h2>
       <div class="idea-row">
         <div class="idea"><b>时间沙盒</b><span>历史训练只用截止日前公开的资料,模型记忆不算证据。</span></div>
         <div class="idea"><b>先封存,后见真值</b><span>预测在看真实结果前哈希封存,打分只对封存版本进行。</span></div>
@@ -1067,13 +1170,24 @@ async function viewMethod() {
     <div class="card"><h2>两个技能的分工</h2><table class="grid"><tbody>` +
     skills.map(s => `<tr><td style="min-width:220px"><b class="mono">${esc(s.name)}</b></td><td>${esc(s.description)}</td></tr>`).join("") +
     `</tbody></table></div>
-    <div class="card"><h2>方法演进时间线</h2>
-      <div class="card-sub">方法版本 = git 提交。当前 <span class="mono">${esc(timeline.branch)}@${esc((timeline.head || "").slice(0, 7))}</span> · 远程 ${esc(timeline.remote || "—")}</div>
-      <ul class="timeline">` + timeline.commits.map(c => `
-      <li><div class="tl-head"><span class="tl-date">${esc((c.date || "").replace("T", " ").slice(0, 16))}</span>
-        <span class="mono" style="color:var(--muted)">${esc(c.short)}</span>
-        <span class="tl-subject">${esc(c.subject)}</span></div>
-        ${c.body ? `<div class="tl-body">${esc(c.body)}</div>` : ""}</li>`).join("") + `</ul></div>`;
+    <div class="card"><h2>方法演进脉络(每个版本优化了什么)</h2>
+      <div class="card-sub">方法版本 = git 提交,当前 <span class="mono">${esc(timeline.branch)}@${esc((timeline.head || "").slice(0, 7))}</span> · 远程 ${esc(timeline.remote || "—")} · 绿点 = 当前版本;带训练成绩的版本标注验证结果。</div>
+      <ul class="evo">` +
+    evolution.versions.map((v, i) => {
+      const prog = progByCommit[v.short];
+      return `<li class="${i === 0 ? "evo-head" : ""}">
+        <div class="evo-meta">
+          <span class="evo-hash">${esc(v.short)}</span>
+          <span class="evo-date">${esc((v.date || "").replace("T", " ").slice(0, 16))}</span>
+          ${v.categories.map(c => `<span class="evo-cat c-${esc(c)}">${esc(c)}</span>`).join("")}
+          ${prog ? `<span class="evo-metrics">验证 ${prog.cases} 案例 · MAPE ${pct(prog.avg_revenue_mape)}</span>` : ""}
+        </div>
+        <div class="evo-subject">${esc(v.subject)}</div>
+        ${v.points.length ? `<ul class="evo-points">${v.points.map(pt => `<li>${esc(pt)}</li>`).join("")}</ul>`
+          : v.body ? `<div class="evo-points" style="padding-left:0">${esc(v.body.split("\\n")[0].slice(0, 160))}</div>` : ""}
+        <div class="evo-foot">${v.file_count} 文件 · +${v.adds} −${v.dels}${v.files.length ? " · " + esc(v.files.slice(0, 3).map(f => f.split("/").pop()).join(" · ")) + (v.file_count > 3 ? " …" : "") : ""}</div>
+      </li>`;
+    }).join("") + `</ul></div>`;
   $view.innerHTML = html;
 }
 

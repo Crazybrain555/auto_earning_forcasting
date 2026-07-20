@@ -40,14 +40,14 @@ The backend is read-only over case data; its only writes are
 
 - `GET /api/engines` — `[{engine: "claude", available: true}, {engine: "codex", available: false, note}]`.
   Render codex as a disabled option until available flips.
-- `POST /api/jobs` — body `{"type", "engine": "claude", "params": {...}}` → 201 job record.
+- `POST /api/jobs` — body `{"type", "engine": "claude"|"codex", "params": {...}}` → 201 job record. Optional `X-Idempotency-Key` (8–128 safe characters) replays the original record instead of launching a second process.
   - `type: "live_forecast"` — params `{entity, security?, as_of?, extra?}`; workspace `training-runs/live/<security>@<as_of>/`.
   - `type: "training_case"` — params `{entity, security?, as_of, round_id, case_role: development|validation|regression, extra?}`.
   - `type: "training_round"` — params `{round_id, group_a:[{entity, security?, as_of}...], group_b:[...], extra?}` — the full autonomous round (this is the "start auto-optimization" button; "stop" = POST pause + stop the job).
   - Errors: 422 bad params, 501 engine not available (codex until wired).
 - `GET /api/jobs` — newest-first job records `{id, type, engine, params, pid, status: running|finished|failed|stopped|running_detached|interrupted, started_at, ended_at, returncode}`.
 - `GET /api/jobs/{id}` — one record.
-- `GET /api/jobs/{id}/log?tail=200` — `text/plain` log tail (poll this for live progress).
+- `GET /api/jobs/{id}/log?tail=200` — `text/plain` log tail (poll this for live progress). Add `safe=1` for remote synchronization: the backend removes the exact stored prompt prefix and fails closed if it cannot verify that boundary.
 - `POST /api/jobs/{id}/stop` — SIGTERM the process group.
 
 ## Watchlist & portfolio (投资看板)

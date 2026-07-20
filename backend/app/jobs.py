@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
 import json
 import re
 import os
@@ -24,6 +25,7 @@ _PROCS: dict[str, subprocess.Popen] = {}
 
 JOB_TYPES = {"live_forecast", "training_case", "training_round", "plan_round", "suggest_watch"}
 ROUND_ID_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,63}")
+IDEMPOTENCY_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]{7,127}")
 
 
 def _check_round_id(round_id: str, required: bool) -> str:
@@ -177,7 +179,28 @@ def compose_cmd(spec: dict, prompt: str, params: dict) -> list[str]:
     return cmd + extra
 
 
-def start_job(job_type: str, engine: str, params: dict) -> dict:
+def _request_fingerprint(job_type: str, engine: str, params: dict) -> str:
+    payload = json.dumps(
+        {"type": job_type, "engine": engine, "params": params},
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _find_idempotent_job(key: str) -> dict | None:
+    for path in JOBS_DIR.glob("*.json"):
+        try:
+            record = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if record.get("idempotency_key") == key:
+            return record
+    return None
+
+
+def start_job(job_type: str, engine: str, params: dict, idempotency_key: str = "") -> dict:
     if job_type not in JOB_TYPES:
         raise ValueError(f"job type must be one of {sorted(JOB_TYPES)}")
     spec = engines().get(engine)
@@ -186,40 +209,59 @@ def start_job(job_type: str, engine: str, params: dict) -> dict:
     if not spec.get("available"):
         raise PermissionError(spec.get("note") or f"engine {engine} is not available yet")
 
+    idempotency_key = (idempotency_key or "").strip()
+    if idempotency_key and not IDEMPOTENCY_RE.fullmatch(idempotency_key):
+        raise ValueError("Idempotency-Key must be 8-128 safe characters")
+
     prompt, normalized = build_prompt(job_type, params)
     cmd = compose_cmd(spec, prompt, params)
-    job_id = dt.datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + secrets.token_hex(2)
+    fingerprint = _request_fingerprint(job_type, engine, normalized)
 
     env = dict(os.environ)
     env.update(spec.get("env") or {})
-    log_handle = _log_path(job_id).open("w", encoding="utf-8")
-    log_handle.write(f"# job {job_id} | {job_type} | engine={engine}\n# prompt:\n{prompt}\n\n")
-    log_handle.flush()
-
-    proc = subprocess.Popen(
-        cmd,
-        cwd=str(PROJECT_ROOT),
-        env=env,
-        stdin=subprocess.DEVNULL,   # codex exec reads stdin when it is a pipe and blocks forever
-        stdout=log_handle,
-        stderr=subprocess.STDOUT,
-        start_new_session=True,
-    )
-
-    record = {
-        "id": job_id,
-        "type": job_type,
-        "engine": engine,
-        "params": normalized,
-        "prompt": prompt,
-        "pid": proc.pid,
-        "status": "running",
-        "started_at": now(),
-        "ended_at": None,
-        "returncode": None,
-        "log": str(_log_path(job_id)),
-    }
     with _LOCK:
+        if idempotency_key:
+            existing = _find_idempotent_job(idempotency_key)
+            if existing is not None:
+                if existing.get("idempotency_fingerprint") != fingerprint:
+                    raise ValueError("Idempotency-Key was already used for a different job request")
+                return existing
+
+        job_id = dt.datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + secrets.token_hex(2)
+        log_handle = _log_path(job_id).open("w", encoding="utf-8")
+        log_handle.write(f"# job {job_id} | {job_type} | engine={engine}\n# prompt:\n{prompt}\n\n")
+        log_handle.flush()
+
+        try:
+            proc = subprocess.Popen(
+                cmd,
+                cwd=str(PROJECT_ROOT),
+                env=env,
+                stdin=subprocess.DEVNULL,   # codex exec reads stdin when it is a pipe and blocks forever
+                stdout=log_handle,
+                stderr=subprocess.STDOUT,
+                start_new_session=True,
+            )
+        except Exception:
+            log_handle.close()
+            _log_path(job_id).unlink(missing_ok=True)
+            raise
+
+        record = {
+            "id": job_id,
+            "type": job_type,
+            "engine": engine,
+            "params": normalized,
+            "prompt": prompt,
+            "pid": proc.pid,
+            "status": "running",
+            "started_at": now(),
+            "ended_at": None,
+            "returncode": None,
+            "log": str(_log_path(job_id)),
+            "idempotency_key": idempotency_key or None,
+            "idempotency_fingerprint": fingerprint if idempotency_key else None,
+        }
         _PROCS[job_id] = proc
         _save(record)
 
@@ -386,11 +428,23 @@ def get_job(job_id: str) -> dict | None:
     return _refresh(record) if record else None
 
 
-def job_log(job_id: str, tail: int = 200) -> str | None:
+def job_log(job_id: str, tail: int = 200, safe: bool = False) -> str | None:
     path = _log_path(job_id)
     if not path.is_file():
         return None
-    lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    text = path.read_text(encoding="utf-8", errors="replace")
+    if safe:
+        record = _load(job_id)
+        prompt = record.get("prompt") if isinstance(record, dict) else None
+        if not isinstance(prompt, str):
+            return None
+        marker = f"\n# prompt:\n{prompt}\n\n"
+        marker_at = text.find(marker)
+        if marker_at < 0:
+            # Never return an uncertain prefix to a remote synchronizer.
+            return None
+        text = text[marker_at + len(marker):]
+    lines = text.splitlines()
     return "\n".join(lines[-tail:])
 
 
