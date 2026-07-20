@@ -365,6 +365,8 @@ def synthetic_report() -> str:
         ("Limitations", "Limitation placeholder: human-required items and confidence caps."),
         ("买入纪律 (buy price)", "Recommended buy price placeholder with margin of safety logic."),
         ("一致性检查 (arithmetic)", "Arithmetic consistency check placeholder: implied tax rate, segment sums, EPS x shares."),
+        ("核心变量 (thesis carriers)", "Thesis carriers placeholder: the 1-3 driver quantities that carry the call."),
+        ("隐含指标 (implied diagnostics)", "Implied diagnostics placeholder: implied yoy, incremental margin flow-through, implied share."),
     ]
     body = ["# Self-test delivery report", ""]
     for title, text in sections:
@@ -385,6 +387,8 @@ def delivery_smoke_test(skill: Path, profile: str, td: Path) -> None:
     manifest["workbook_formula_min"] = 0  # synthetic/legacy example workbooks carry no formulas
     manifest["outputs_canonical_relaxed"] = True  # smoke snapshot keeps template nulls
     manifest["driver_tree_relaxed"] = True  # smoke exercises plumbing, not modeling doctrine
+    manifest["workbook_checks_relaxed"] = True  # legacy example workbook predates Check-row doctrine
+    manifest["quarterly_spine_relaxed"] = True
     manifest["selected_mechanisms"] = ["unit-volume-price-cost"]
     manifest["phase_status"] = {key: "complete" for key in manifest["phase_status"]}
     (workspace / "run_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
@@ -412,7 +416,8 @@ def delivery_smoke_test(skill: Path, profile: str, td: Path) -> None:
     sig = [
         ["S1", "TEST", "SIG1", "Example Corp", "2026-04-01", "official-dialogue", "E1", "state_signal", "C1", "2", "2", "2", "2", "1", "1", "2", "0-1y", "base_driver", "demand", "raise usage", "https://example.com/s1", "incentive reviewed"],
         ["S2", "TEST", "SIG2", "Independent Research", "2026-05-01", "industry-research", "E3", "timing_signal", "C2", "2", "2", "2", "2", "0", "-1", "2", "0-1y", "base_driver", "inventory", "lower ASP", "https://example.com/s2", "method recorded"],
-        ["S3", "TEST", "SIG3", "Paper", "2026-03-01", "technical-paper-standard", "E2", "failure_boundary", "C3", "2", "2", "1", "2", "0", "1", "1", "2-5y", "scenario_probability", "technical", "tail only", "https://example.com/s3", "not commercial"],
+        ["S3", "TEST", "SIG3", "Paper", "2026-03-01", "technical-paper-standard", "E2", "failure_boundary", "C3", "2", "2", "1", "2", "0", "1", "1", "2-5y", "scenario_probability", "FY+2 unit ASP", "bounds ASP uplift", "https://example.com/s3", "not commercial"],
+        ["S4", "TEST", "SIG4", "JEDEC", "2026-02-01", "technical-paper-standard", "E2", "feasibility_bound", "C3", "2", "2", "2", "2", "0", "1", "2", "2-5y", "timing_signal", "FY+2 shipments", "ramp gated by ratification", "https://example.com/s4", "standard timing"],
     ]
     with (workspace / "forward_signal_cards.csv").open("w", encoding="utf-8-sig", newline="") as f:
         w = csv.writer(f)
@@ -441,7 +446,7 @@ def delivery_smoke_test(skill: Path, profile: str, td: Path) -> None:
         encoding="utf-8",
     )
     if profile == "trainer":
-        report_text = (skill / "assets/examples/sandisk_v73/Sandisk_SNDK_v7.3_模型报告.md").read_text(encoding="utf-8") + "\n\n## Forward evidence and research synthesis\nInvestor dialogue, independent research, technical papers, source independence clusters, rejected signals and falsification triggers were reviewed.\n\n## 买入纪律\nRecommended buy price derives from the Bear fair value with a stated margin of safety.\n\n## 一致性检查\nArithmetic consistency check: implied tax rate, segment sums, EPS x shares reconcile.\n"
+        report_text = (skill / "assets/examples/sandisk_v73/Sandisk_SNDK_v7.3_模型报告.md").read_text(encoding="utf-8") + "\n\n## Forward evidence and research synthesis\nInvestor dialogue, independent research, technical papers, source independence clusters, rejected signals and falsification triggers were reviewed.\n\n## 买入纪律\nRecommended buy price derives from the Bear fair value with a stated margin of safety.\n\n## 一致性检查\nArithmetic consistency check: implied tax rate, segment sums, EPS x shares reconcile.\n\n## 核心变量\nThesis carriers named.\n\n## 隐含指标\nImplied yoy and incremental margin stated.\n"
         (workspace / "report.md").write_text(report_text, encoding="utf-8")
         (workspace / "model").mkdir(exist_ok=True)
         (workspace / "model/model.xlsx").write_bytes((skill / "assets/examples/sandisk_v73/Sandisk_SNDK_v7.3_五年财务模型.xlsx").read_bytes())

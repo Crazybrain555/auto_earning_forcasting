@@ -64,7 +64,7 @@ This contract is intentionally low freedom. It is designed to reduce variance ac
 1. Read `references/companion-live-skill-contract.md`, then `references/mode-router-and-time-boundary.md` and select the run mode. For a full-company delivery, first read `references/codex-parity-execution.md` and `references/full-company-delivery-contract.md`, then scaffold the run workspace.
 2. Read `references/core-source-and-evidence.md`, `references/forward-evidence-and-signal-validation.md`, and `references/research-completeness-and-company-quality.md`.
 3. Read `references/core-forecast-workflow.md`.
-4. Read `references/driver-tree-modeling.md` first (the modeling constitution: historical base -> terminal-demand anchors -> driver tree with volume x price leaves -> explicit main line 主线 -> unit economics -> three statements), then `references/mechanism-router.md` to pick the decomposition template for each branch. Segments must sum to total revenue; the snapshot carries `driver_tree` (mechanism weights are retired - a model is one arithmetic tree, not a weighted blend).
+4. Read `references/driver-tree-modeling.md` first (the modeling constitution: historical base -> terminal-demand anchors -> driver tree with volume x price leaves -> explicit main line 主线 -> unit economics -> three statements), then `references/mechanism-router.md` to pick the decomposition template for each branch. Segments must sum to total revenue; the snapshot carries `driver_tree` (mechanism weights are retired - a model is one arithmetic tree, not a weighted blend). Model integrity is mechanical: `references/model-mechanical-integrity.md` (quarterly spine for FY+1, Check rows that tie the three statements, diagnostic qoq/yoy/%rev rails, two independent revenue decompositions). For any FY+2+ horizon read `references/technology-trend-evidence.md` and build the technology lane (papers/standards/patents -> driver parameter -> falsification condition) - filings are backward-looking and cannot answer which transition lands when.
 5. Read only the selected module references and any relevant validated lens.
 6. Read `references/core-output-and-valuation.md`.
 7. For historical training or method changes, read `references/historical-training-loop.md` (the git-flow round: sandbox, train, validate, swap fold, push or revert) and `references/training-curriculum.md`, then run the bundled scripts.
@@ -265,6 +265,8 @@ Release:
 - `references/core-output-and-valuation.md`
 - `references/historical-training-loop.md`
 - `references/driver-tree-modeling.md`
+- `references/model-mechanical-integrity.md`
+- `references/technology-trend-evidence.md`
 - `references/mechanism-router.md`
 - `references/module-unit-volume-price-cost.md`
 - `references/module-capacity-utilization-yield.md`

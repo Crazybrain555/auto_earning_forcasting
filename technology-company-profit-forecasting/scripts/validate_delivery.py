@@ -62,6 +62,11 @@ REPORT_SECTION_GROUPS = {
     "limitations": ["limitation", "限制", "human-required", "可信度"],
     "buy_discipline": ["recommended buy", "buy price", "买入价", "margin of safety", "安全边际", "买入纪律"],
     "arithmetic_check": ["arithmetic", "consistency check", "一致性检查", "勾稽", "自洽检查"],
+    # Thesis compression + diagnostic rails (driver-tree-modeling.md L2d,
+    # model-mechanical-integrity.md 3): the report must lead with the numbers
+    # that carry the call and show the implied growth/flow-through they need.
+    "thesis_carriers": ["thesis carrier", "核心变量", "关键变量", "主线变量", "carries the call", "承载变量"],
+    "implied_diagnostics": ["implied", "隐含", "incremental margin", "增量利润率", "flow-through", "yoy"],
 }
 
 
@@ -299,6 +304,9 @@ def main() -> int:
                 fail_record(checks, "snapshot:fields", ", ".join(missing))
             else:
                 pass_record(checks, "snapshot:fields")
+            def _num(value):
+                return isinstance(value, (int, float)) and not isinstance(value, bool)
+
             # Driver tree replaces mechanism weights (weights = factor-scoring
             # smell; a model is one arithmetic tree, see driver-tree-modeling.md).
             tree = snap.get("driver_tree") or {}
@@ -316,6 +324,24 @@ def main() -> int:
                         seg_errors.append("segment missing name")
                     if seg.get("basis") not in known_basis:
                         seg_errors.append(f"segment {seg.get('name')}: basis must be one of {sorted(known_basis)}")
+                    # Main-line branches must bottom out in a physical/contractual unit
+                    # (bits, wafers, units, subscribers, tonnes) - a growth rate is an
+                    # assertion, not a model. See driver-tree-modeling.md L2c.
+                    if seg.get("main_line") and seg.get("basis") != "ratio_carry":
+                        unit = str(seg.get("unit") or "").strip()
+                        has_qty = _num(seg.get("volume")) or _num(seg.get("units")) or _num(seg.get("subscribers")) or _num(seg.get("capacity"))
+                        has_price = _num(seg.get("price")) or _num(seg.get("asp")) or _num(seg.get("arpu"))
+                        if not (unit and has_qty and has_price):
+                            seg_errors.append(
+                                f"main-line segment {seg.get('name')}: needs unit + quantity (volume/units/subscribers/capacity) "
+                                "+ price (price/asp/arpu) - the thesis branch must bottom out in a physical unit")
+                # Thesis compression: name the 1-3 drivers that carry the call (L2d)
+                carriers = tree.get("thesis_carriers")
+                if not isinstance(carriers, list) or not carriers:
+                    seg_errors.append("driver_tree.thesis_carriers missing: name the 1-3 driver quantities "
+                                      "(e.g. 'FY+2 NAND ASP $/GB') whose variation dominates the outcome")
+                elif len(carriers) > 3:
+                    seg_errors.append(f"driver_tree.thesis_carriers has {len(carriers)} entries - compress to at most 3")
                 seg_sum = sum(float(s.get("revenue_point") or 0) for s in segments)
                 y1_rev = ((snap.get("outputs") or {}).get("year_1") or {}).get("revenue_point")
                 if isinstance(y1_rev, (int, float)) and y1_rev and abs(seg_sum - y1_rev) / abs(y1_rev) > 0.01:
@@ -343,8 +369,6 @@ def main() -> int:
             # (dashboard, scorer, exports) read canonical keys only.
             relaxed_outputs = bool(manifest.get("outputs_canonical_relaxed", False))
             outputs = snap.get("outputs") or {}
-            def _num(value):
-                return isinstance(value, (int, float)) and not isinstance(value, bool)
             for period_key, needs_range in (("year_1", False), ("year_2", True), ("year_3_distribution", True)):
                 out = outputs.get(period_key)
                 label = f"snapshot:canonical-{period_key}"
@@ -384,6 +408,38 @@ def main() -> int:
                     fail_record(checks, f"workbook:{concept}", f"sheets={names}")
         except Exception as exc:
             fail_record(checks, "workbook:read", str(exc))
+        # Mechanical integrity: Check rows must exist (model-mechanical-integrity.md).
+        # A workbook with no reconciliation rows has not been checked.
+        try:
+            import zipfile as _zip, re as _re
+            blob = ""
+            with _zip.ZipFile(model_path) as zf:
+                for name in zf.namelist():
+                    if name.startswith("xl/") and name.endswith((".xml", ".rels")):
+                        blob += zf.read(name).decode("utf-8", "replace")
+            low = blob.lower()
+            check_terms = ["check", "勾稽", "校验", "tie-out", "balance check"]
+            has_check = any(t in low for t in check_terms)
+            if has_check or bool(manifest.get("workbook_checks_relaxed", False)):
+                pass_record(checks, "workbook:check-rows")
+            else:
+                fail_record(checks, "workbook:check-rows",
+                            "no Check/勾稽 reconciliation rows found - the workbook must carry explicit zero-valued "
+                            "check rows (balance sheet balances, cash tie, segment sum, quarter roll, GAAP bridge); "
+                            "see references/model-mechanical-integrity.md",
+                            "error" if args.strict else "warning")
+            # Quarterly spine for FY+1
+            quarter_terms = ["q1", "q2", "q3", "q4", "1q", "2q", "3q", "4q", "季度"]
+            if any(t in low for t in quarter_terms) or bool(manifest.get("quarterly_spine_relaxed", False)):
+                pass_record(checks, "workbook:quarterly-spine")
+            else:
+                fail_record(checks, "workbook:quarterly-spine",
+                            "no quarterly columns found - FY+1 is modeled by quarter where the company reports "
+                            "quarterly (annual = sum of quarters); state human-required if disclosure prevents it",
+                            "warning")
+        except Exception as exc:
+            fail_record(checks, "workbook:integrity-scan", str(exc), "warning")
+
         # formula-driven enforcement + broken-reference scan
         try:
             stats = workbook_formula_stats(model_path)

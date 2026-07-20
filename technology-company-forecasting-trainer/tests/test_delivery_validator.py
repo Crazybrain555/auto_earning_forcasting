@@ -44,7 +44,8 @@ class DeliveryValidatorTest(unittest.TestCase):
             signal_rows=[
                 ['S1','TEST','SIG1','Example Corp','2026-04-01','official-dialogue','E1','state_signal','C1','2','2','2','2','1','1','2','0-1y','base_driver','demand','raise usage','https://example.com/s1','incentive reviewed'],
                 ['S2','TEST','SIG2','Independent Research','2026-05-01','industry-research','E3','timing_signal','C2','2','2','2','2','0','-1','2','0-1y','base_driver','inventory','lower ASP','https://example.com/s2','method recorded'],
-                ['S3','TEST','SIG3','Paper','2026-03-01','technical-paper-standard','E2','failure_boundary','C3','2','2','1','2','0','1','1','2-5y','scenario_probability','technical','tail only','https://example.com/s3','not commercial'],
+                ['S3','TEST','SIG3','Paper','2026-03-01','technical-paper-standard','E2','failure_boundary','C3','2','2','1','2','0','1','1','2-5y','scenario_probability','FY+2 AI unit ASP ($/unit)','bounds ASP uplift','https://example.com/s3','not commercial'],
+                ['S4','TEST','SIG4','JEDEC','2026-02-01','technical-paper-standard','E2','feasibility_bound','C3','2','2','2','2','0','1','2','2-5y','timing_signal','FY+2 AI shipments (k units)','ramp cannot start before ratification','https://example.com/s4','standard timing'],
             ]
             with (workspace/'forward_signal_cards.csv').open('w',encoding='utf-8-sig',newline='') as f:
                 w=csv.writer(f);w.writerow(signal_headers);w.writerows(signal_rows)
@@ -58,7 +59,7 @@ class DeliveryValidatorTest(unittest.TestCase):
             red='''# Red-team review\n\n| ID | Severity | Area | Finding | Evidence | Model impact | Required action | Status |\n|---|---|---|---|---|---|---|---|\n| RT-001 | P1 | double counting | Double-count capex and COGS test | SRC0 | FCF | reconcile | closed |\n| RT-002 | P1 | valuation | Normalization and terminal valuation challenge | SRC0 | value | stress | closed |\n| RT-003 | P1 | demand | Base demand share unsupported | SRC1 | revenue | cap share | closed |\n| RT-004 | P1 | supply | Capacity constraint omitted | SRC2 | revenue | add supply | closed |\n| RT-005 | P1 | accounting | GAAP cash bridge incomplete | SRC0 | profit | bridge | closed |\n| RT-006 | P1 | source independence | Repeated reports may share one original source cluster | SIG1/SIG2 | Base | map source chains | closed |\n'''
             (workspace/'red_team.md').write_text(red,encoding='utf-8')
             report=(SKILL/'assets/examples/sandisk_v73/Sandisk_SNDK_v7.3_模型报告.md').read_text(encoding='utf-8')
-            report+='\n\n## Forward evidence and research synthesis\nInvestor dialogue, independent research, technical papers, source independence clusters, rejected signals and falsification triggers were reviewed.\n\n## 买入纪律\nRecommended buy price derives from Bear fair value with margin of safety.\n\n## 一致性检查\nArithmetic consistency: implied tax rate, segment sums, EPS x shares reconcile. FY+1 base revenue point 100,000.\n'
+            report+='\n\n## Forward evidence and research synthesis\nInvestor dialogue, independent research, technical papers, source independence clusters, rejected signals and falsification triggers were reviewed.\n\n## 买入纪律\nRecommended buy price derives from Bear fair value with margin of safety.\n\n## 一致性检查\nArithmetic consistency: implied tax rate, segment sums, EPS x shares reconcile. FY+1 base revenue point 100,000.\n\n## 核心变量 (thesis carriers)\nThe call is carried by FY+2 AI unit ASP and FY+2 AI shipments.\n\n## 隐含指标 (implied diagnostics)\nImplied revenue yoy +10%; incremental margin (flow-through) 40%.\n'
             (workspace/'report.md').write_text(report,encoding='utf-8')
             (workspace/'model').mkdir(exist_ok=True)
             (workspace/'model/model.xlsx').write_bytes((SKILL/'assets/examples/sandisk_v73/Sandisk_SNDK_v7.3_五年财务模型.xlsx').read_bytes())
@@ -72,9 +73,12 @@ class DeliveryValidatorTest(unittest.TestCase):
             snapshot['outputs']['year_2'].update({'revenue_point':110000,'revenue_low':90000,'revenue_high':130000,'profit_point':22000,'profit_low':15000,'profit_high':30000})
             snapshot['outputs']['year_3_distribution'].update({'revenue_point':120000,'revenue_low':95000,'revenue_high':150000,'eps_point':6.0,'eps_low':3.0,'eps_high':9.0})
             # driver tree: segments must sum to year_1 revenue_point, main line declared
-            snapshot['driver_tree']={'main_line':'AI capacity ramp','segments':[
+            snapshot['driver_tree']={'main_line':'AI capacity ramp',
+                'thesis_carriers':['FY+2 AI unit ASP ($/unit)','FY+2 AI shipments (k units)'],
+                'segments':[
                 {'name':'Segment-Trad','basis':'volume_price','revenue_point':80000,'main_line':False},
-                {'name':'Segment-AI','basis':'capacity_ramp','revenue_point':20000,'main_line':True}]}
+                {'name':'Segment-AI','basis':'capacity_ramp','revenue_point':20000,'main_line':True,
+                 'unit':'k units','capacity':500,'volume':400,'price':50.0,'unit_cost':30.0}]}
             (workspace/'forecast_snapshot.json').write_text(json.dumps(snapshot,indent=2),encoding='utf-8')
 
             validate=[sys.executable,str(SKILL/'scripts/validate_delivery.py'),'--workspace',str(workspace),'--strict']

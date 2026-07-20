@@ -88,6 +88,33 @@ thesis (e.g. "AI CCL capacity ramp", "HBM bit share gain"). Requirements:
 - Scenario spread (L5) is driven primarily by main-line outcomes, not by
   uniform haircuts on everything.
 
+## L2c - The forecast must bottom out in a physical unit
+
+Every main-line branch terminates in a **physical or contractual unit** that
+exists outside the model: bits shipped, wafers, tools, units, subscribers,
+workloads, tonnes, licensed seats. Revenue = unit × price. A branch whose
+deepest level is a growth rate is not modeled - it is asserted.
+
+Calibration example (Goldman, SNDK): the entire revenue build is two rows -
+`NAND GB shipped` and `ASP per 1GB-equivalent` - and the forecast's whole
+claim is that ASP moves ~5x while bits grow modestly. Two numbers carry the
+report. That is the standard of compression to aim for.
+
+## L2d - Thesis compression: name the numbers that carry the call
+
+The model must identify the **1-3 quantities whose variation dominates the
+outcome**, state them in the report's opening, and show a sensitivity around
+each (typically ±1 standard case step). Requirements:
+
+- Each carrier is a driver, never an output: "FY+2 NAND ASP $/GB", not
+  "FY+2 EPS".
+- Show what the carrier must do for the Bear / Base / Bull cases to hold.
+- If no small set of carriers dominates, the thesis is diffuse - say so
+  explicitly; a diffuse thesis is a legitimate finding, a hidden one is not.
+
+This is the operational meaning of "logic, not scoring": a reader should be
+able to disagree with the forecast by disagreeing with a specific number.
+
 ## L3 - Unit economics (量价成本五件套)
 
 For every manufacturing leaf, model the five-line unit table:
@@ -100,9 +127,16 @@ equivalent: subscribers → ARPU → gross adds/churn → contribution.
 
 Segment gross profits roll up; opex lines are forecast by driver (headcount,
 % of revenue with stated operating leverage), then tax, minority interest,
-working capital, capex/depreciation, and cash. The workbook must chain these
-with formulas (the ≥30-formula gate exists for this). FY+1 quarterly split
-where disclosure allows.
+working capital (by DSO/DIO/DPO days), capex/depreciation, and cash.
+
+FY+1 is modeled **quarterly** where the company reports quarterly; the annual
+column is the sum of quarters. Every forecast line carries qoq / yoy / % of
+revenue diagnostic rows, and the statements must tie through explicit Check
+rows (balance sheet balances, cash-flow ending cash equals balance-sheet
+cash, quarters sum to the year, GAAP↔Non-GAAP bridge sums).
+
+Full requirements: `references/model-mechanical-integrity.md`. That file is
+not optional - a model that does not tie is not a model.
 
 ## L5 - Scenarios and distribution
 

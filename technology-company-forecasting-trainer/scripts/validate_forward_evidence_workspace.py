@@ -20,6 +20,25 @@ def main():
     if len(ss)<minsig:errs.append(f'signals {len(ss)}<{minsig}')
     clusters={s.get('independence_cluster','').strip() for s in ss if s.get('independence_cluster','').strip()};families={s.get('source_family','').strip().lower() for s in ss if s.get('source_family')}
     if len(clusters)<mincl:errs.append(f'clusters {len(clusters)}<{mincl}')
+    # Technology-trend lane: papers/standards/patents answer WHICH transition
+    # lands and WHEN - the 2-5y question that filings cannot. The taxonomy had
+    # this family from the start but nothing required it, so three live runs
+    # shipped with zero technical sources. Now it is a gate.
+    tech_min=int(manifest.get('technology_trend_min_signals', 2 if a.strict else 1))
+    tech_rows=[s for s in ss if s.get('source_family','').strip().lower()=='technical-paper-standard']
+    if manifest.get('technology_trend_not_applicable'):
+        reason=str(manifest.get('technology_trend_not_applicable')).strip()
+        if len(reason)<20:
+            errs.append('technology_trend_not_applicable must carry a stated reason (>=20 chars) - an empty technical lane is an argued choice, never an omission')
+    elif len(tech_rows)<tech_min:
+        errs.append(f'technology-trend signals {len(tech_rows)}<{tech_min} - cite papers/standards/patents (family technical-paper-standard) for the assumed technology transition, or set manifest technology_trend_not_applicable with a reason; see references/technology-trend-evidence.md')
+    else:
+        for s in tech_rows:
+            if not str(s.get('model_driver','')).strip():
+                errs.append('technical signal '+s.get('signal_id','UNKNOWN')+' has no model_driver - a paper that does not attach to a driver parameter is decoration')
+        if not any(str(s.get('evidence_role','')).strip().lower() in {'failure_boundary','feasibility_bound'} for s in tech_rows):
+            errs.append('technology lane has no failure_boundary/feasibility_bound signal - state the technical condition that would falsify the assumed transition')
+
     if a.strict:
         unknown=sorted(families-KNOWN_FAMILIES)
         if unknown:errs.append('unknown source_family slug(s) '+','.join(unknown)+' - use the controlled vocabulary: '+', '.join(sorted(KNOWN_FAMILIES)))
