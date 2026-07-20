@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import datetime as dt
 import json
 import shutil
 from pathlib import Path
@@ -18,12 +19,29 @@ def main() -> int:
     parser.add_argument("--currency", default="USD")
     parser.add_argument("--accounting-basis", default="GAAP")
     parser.add_argument("--mode", choices=["historical_train","live_forecast","audit_only"], default="live_forecast")
+    parser.add_argument("--rescaffold-delivered", action="store_true",
+                        help="required to scaffold over a sealed/validated workspace; archives the old one first")
     args = parser.parse_args()
 
     script_dir = Path(__file__).resolve().parent
     skill_root = script_dir.parent
     templates = skill_root / "assets" / "templates"
     workspace = Path(args.workspace).resolve()
+    # Never silently overwrite a delivered forecast: templates are copied over
+    # the workspace, so re-scaffolding a sealed/validated case destroys its
+    # snapshot, report and registers. Archive-and-recreate only on explicit flag.
+    delivered = [name for name in ("forecast_seal.json", "delivery_validation.json")
+                 if (workspace / name).exists()]
+    if delivered:
+        if not args.rescaffold_delivered:
+            raise SystemExit(
+                f"refusing to scaffold over {workspace} - it already holds a delivered forecast "
+                f"({', '.join(delivered)}). Rerunning would overwrite its snapshot/report/registers "
+                "with templates. Pass --rescaffold-delivered to archive the old workspace and start fresh.")
+        stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        archive = workspace.parent / f"{workspace.name}.archived-{stamp}"
+        workspace.rename(archive)
+        print(f"archived previous delivery to {archive}")
     workspace.mkdir(parents=True, exist_ok=True)
     (workspace / "model").mkdir(exist_ok=True)
 
