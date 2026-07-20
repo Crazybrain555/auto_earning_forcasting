@@ -153,13 +153,16 @@ def compose_cmd(spec: dict, prompt: str, params: dict) -> list[str]:
 
     Overrides are validated against the engine's model registry and spliced in
     BEFORE the prompt argument (codex exec wants options before the positional).
-    Absent overrides add no flags: each engine keeps its own defaults.
+    Absent overrides FALL BACK to the engine's default_model/default_effort so
+    every job runs an explicitly chosen tier - never the CLI's ambient default
+    (which once silently dropped a forecast onto haiku).
     """
-    model = (params.get("model") or "").strip()
-    effort = (params.get("effort") or "").strip()
+    registry = {m.get("id"): m for m in spec.get("models") or []}
+    model = (params.get("model") or "").strip() or str(spec.get("default_model") or "")
+    effort = (params.get("effort") or "").strip() \
+        or str((registry.get(model) or {}).get("default_effort") or spec.get("default_effort") or "")
     extra: list[str] = []
     if model or effort:
-        registry = {m.get("id"): m for m in spec.get("models") or []}
         if model:
             if registry and model not in registry:
                 raise ValueError(f"unknown model {model} for this engine (choose from {sorted(registry)})")

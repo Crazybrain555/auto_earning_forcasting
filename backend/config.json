@@ -35,7 +35,7 @@
             "high",
             "max"
           ],
-          "default_effort": "high"
+          "default_effort": "max"
         },
         {
           "id": "sonnet",
@@ -58,7 +58,8 @@
           ],
           "default_effort": "medium"
         }
-      ]
+      ],
+      "default_effort": "max"
     },
     "codex": {
       "available": true,
@@ -139,7 +140,8 @@
           ],
           "default_effort": "high"
         }
-      ]
+      ],
+      "default_effort": "xhigh"
     }
   },
   "prompts": {
