@@ -60,7 +60,7 @@ class DeliveryValidatorTest(unittest.TestCase):
             red='''# Red-team review\n\n| ID | Severity | Area | Finding | Evidence | Model impact | Required action | Status |\n|---|---|---|---|---|---|---|---|\n| RT-001 | P1 | double counting | Double-count capex and COGS test | SRC0 | FCF | reconcile | closed |\n| RT-002 | P1 | valuation | Normalization and terminal valuation challenge | SRC0 | value | stress | closed |\n| RT-003 | P1 | demand | Base demand share unsupported | SRC1 | revenue | cap share | closed |\n| RT-004 | P1 | supply | Capacity constraint omitted | SRC2 | revenue | add supply | closed |\n| RT-005 | P1 | accounting | GAAP cash bridge incomplete | SRC0 | profit | bridge | closed |\n| RT-006 | P1 | source independence | Repeated reports may share one original source cluster | SIG1/SIG2 | Base | map source chains | closed |\n'''
             (workspace/'red_team.md').write_text(red,encoding='utf-8')
             report=(SKILL/'assets/examples/sandisk_v73/Sandisk_SNDK_v7.3_模型报告.md').read_text(encoding='utf-8')
-            report+='\n\n## Forward evidence and research synthesis\nInvestor dialogue, independent research, technical papers, source independence clusters, rejected signals and falsification triggers were reviewed.\n\n## 买入纪律\nRecommended buy price derives from Bear fair value with margin of safety.\n\n## 一致性检查\nArithmetic consistency: implied tax rate, segment sums, EPS x shares reconcile. FY+1 base revenue point 100,000.\n\n## 核心变量 (thesis carriers)\nThe call is carried by FY+2 AI unit ASP and FY+2 AI shipments.\n\n## 隐含指标 (implied diagnostics)\nImplied revenue yoy +10%; incremental margin (flow-through) 40%.\n'
+            report+='\n\n## Forward evidence and research synthesis\nInvestor dialogue, independent research, technical papers, source independence clusters, rejected signals and falsification triggers were reviewed.\n\n## 买入纪律\nRecommended buy price derives from Bear fair value with margin of safety.\n\n## 一致性检查\nArithmetic consistency: implied tax rate, segment sums, EPS x shares reconcile. FY+1 base revenue point 100,000.\n\n## 核心变量 (thesis carriers)\nThe call is carried by FY+2 AI unit ASP and FY+2 AI shipments.\n\n## 隐含指标 (implied diagnostics)\nImplied revenue yoy +10%; incremental margin (flow-through) 40%.\n\n## 线下项筛查\nTax rate normalized 21%, no valuation allowance exposure. Interest income modeled from cash; no material FX. No impairment or restructuring expected. Share count flat, no buyback.\n'
             (workspace/'report.md').write_text(report,encoding='utf-8')
             (workspace/'model').mkdir(exist_ok=True)
             (workspace/'model/model.xlsx').write_bytes((SKILL/'assets/examples/sandisk_v73/Sandisk_SNDK_v7.3_五年财务模型.xlsx').read_bytes())
@@ -74,6 +74,10 @@ class DeliveryValidatorTest(unittest.TestCase):
             snapshot['outputs']['year_2'].update({'revenue_point':110000,'revenue_low':90000,'revenue_high':130000,'profit_point':22000,'profit_low':15000,'profit_high':30000})
             snapshot['outputs']['year_3_distribution'].update({'revenue_point':120000,'revenue_low':95000,'revenue_high':150000,'eps_point':6.0,'eps_low':3.0,'eps_high':9.0})
             # driver tree: segments must sum to year_1 revenue_point, main line declared
+            snapshot['historical_base']={'trailing_organic_growth_pct':8.0,'base_period':'FY2026'}
+            snapshot['error_budget']={h:{'expected_revenue_error_pct':e,'expected_margin_error_pp':m,
+                'dominant_risk':'margin','why':'price/cost spread uncertainty'}
+                for h,e,m in [('year_1',6,2),('year_2',11,4),('year_3_distribution',19,7)]}
             snapshot['driver_tree']={'main_line':'AI capacity ramp',
                 'thesis_carriers':['FY+2 AI unit ASP ($/unit)','FY+2 AI shipments (k units)'],
                 'segments':[

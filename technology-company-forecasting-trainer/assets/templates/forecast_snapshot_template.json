@@ -89,5 +89,31 @@
   "driver_tree": {
     "main_line": null,
     "segments": []
-  }
+  },
+  "historical_base": {
+    "trailing_organic_growth_pct": null,
+    "base_period": null,
+    "note": null
+  },
+  "error_budget": {
+    "year_1": {
+      "expected_revenue_error_pct": null,
+      "expected_margin_error_pp": null,
+      "dominant_risk": null,
+      "why": null
+    },
+    "year_2": {
+      "expected_revenue_error_pct": null,
+      "expected_margin_error_pp": null,
+      "dominant_risk": null,
+      "why": null
+    },
+    "year_3_distribution": {
+      "expected_revenue_error_pct": null,
+      "expected_margin_error_pp": null,
+      "dominant_risk": null,
+      "why": null
+    }
+  },
+  "deceleration_reason": null
 }

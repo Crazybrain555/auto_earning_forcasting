@@ -554,6 +554,97 @@ def main() -> int:
         except Exception:
             pass
 
+    # ---- Accuracy gates: aimed straight at the three scored metrics
+    # (revenue MAPE, margin error, interval coverage). Grounded in this
+    # method's own measured errors - see references/profit-forecast-accuracy.md.
+    if snap_path.exists():
+        try:
+            snap_acc = json.loads(snap_path.read_text(encoding="utf-8"))
+        except Exception:
+            snap_acc = {}
+        outputs_acc = snap_acc.get("outputs") or {}
+
+        def _n(v):
+            return v if isinstance(v, (int, float)) and not isinstance(v, bool) else None
+
+        # (a) Interval width floors. Round-1 coverage was 50% - intervals were
+        # too narrow to be honest. Floors come from measured APE by horizon.
+        floors = {"year_1": 6.0, "year_2": 11.0, "year_3_distribution": 19.0}
+        floors.update({k: float(v) for k, v in (manifest.get("interval_width_floor_pct") or {}).items()})
+        narrow = []
+        for key, floor in floors.items():
+            o = outputs_acc.get(key) or {}
+            point, low, high = _n(o.get("revenue_point")), _n(o.get("revenue_low")), _n(o.get("revenue_high"))
+            if point is None or not point:
+                continue
+            if low is None or high is None:
+                if key != "year_1":
+                    narrow.append(f"{key}: no revenue interval")
+                continue
+            half_width = max(point - low, high - point) / abs(point) * 100
+            if half_width + 1e-9 < floor:
+                narrow.append(f"{key}: +/-{half_width:.1f}% < floor {floor:.0f}%")
+        if narrow and not manifest.get("interval_floor_relaxed"):
+            fail_record(checks, "accuracy:interval-width",
+                        "; ".join(narrow) + " - measured FY+1/2/3 revenue APE is ~6/10/19%, so tighter intervals "
+                        "claim precision this method has not demonstrated; widen or argue the regime in the manifest",
+                        "error" if args.strict else "warning")
+        else:
+            pass_record(checks, "accuracy:interval-width")
+
+        # (b) Deceleration must be argued. Twelve of twelve round-1 horizons
+        # under-forecast; unexplained deceleration is the main sub-cause.
+        growth_issue = []
+        trailing = _n((snap_acc.get("historical_base") or {}).get("trailing_organic_growth_pct"))
+        y1, y2 = outputs_acc.get("year_1") or {}, outputs_acc.get("year_2") or {}
+        r1, r2 = _n(y1.get("revenue_point")), _n(y2.get("revenue_point"))
+        if trailing is not None and r1 and r2:
+            implied = (r2 / r1 - 1) * 100
+            if implied < trailing - 0.5 and not str(snap_acc.get("deceleration_reason") or "").strip():
+                growth_issue.append(f"FY+2 implied growth {implied:.1f}% < trailing organic {trailing:.1f}% "
+                                    "with no deceleration_reason stated")
+        if growth_issue:
+            fail_record(checks, "accuracy:deceleration-argued", "; ".join(growth_issue),
+                        "error" if args.strict else "warning")
+        else:
+            pass_record(checks, "accuracy:deceleration-argued")
+
+        # (c) Error budget: say in advance where the forecast will be wrong.
+        budget = snap_acc.get("error_budget")
+        if isinstance(budget, dict) and budget:
+            missing_b = [h for h in ("year_1", "year_2", "year_3_distribution")
+                         if not isinstance(budget.get(h), dict)]
+            if missing_b:
+                fail_record(checks, "accuracy:error-budget", "missing horizons: " + ", ".join(missing_b),
+                            "error" if args.strict else "warning")
+            else:
+                pass_record(checks, "accuracy:error-budget")
+        else:
+            fail_record(checks, "accuracy:error-budget",
+                        "snapshot.error_budget missing - state per horizon the expected revenue error and the "
+                        "expected margin-error contribution, and which dominates",
+                        "error" if args.strict else "warning")
+
+    # (d) Below-the-line screen. The largest single round-1 margin error
+    # (CDNS, 27.6pp at FY+2) was a deferred-tax valuation-allowance release
+    # the forecast never considered.
+    if report_path.exists():
+        rtext = report_path.read_text(encoding="utf-8").lower()
+        btl_terms = {
+            "tax": ["tax rate", "税率", "valuation allowance", "递延所得税", "nol", "dta"],
+            "interest_fx": ["interest income", "interest expense", "利息", "fx", "汇兑", "currency"],
+            "one_offs": ["impairment", "restructuring", "减值", "重组", "one-off", "one-time", "非经常"],
+            "share_count": ["share count", "buyback", "dilution", "股数", "回购", "摊薄"],
+        }
+        missing_btl = [k for k, terms in btl_terms.items() if not any(t in rtext for t in terms)]
+        if missing_btl and not manifest.get("below_the_line_relaxed"):
+            fail_record(checks, "accuracy:below-the-line-screen",
+                        "report never addresses: " + ", ".join(missing_btl) +
+                        " - each must be quantified into the profit bridge or recorded as 'no material exposure because X'",
+                        "error" if args.strict else "warning")
+        else:
+            pass_record(checks, "accuracy:below-the-line-screen")
+
     # Research lanes: a filings-only pack is one lane's blind spots wearing a
     # model. Coverage is audited on the query log (what was searched, whether
     # or not it found anything), and material assumptions must be corroborated

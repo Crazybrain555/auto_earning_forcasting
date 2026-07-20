@@ -371,6 +371,7 @@ def synthetic_report() -> str:
         ("一致性检查 (arithmetic)", "Arithmetic consistency check placeholder: implied tax rate, segment sums, EPS x shares."),
         ("核心变量 (thesis carriers)", "Thesis carriers placeholder: the 1-3 driver quantities that carry the call."),
         ("隐含指标 (implied diagnostics)", "Implied diagnostics placeholder: implied yoy, incremental margin flow-through, implied share."),
+        ("线下项筛查 (below the line)", "Tax rate and valuation allowance reviewed; interest and FX modeled; no impairment or restructuring; share count and buyback dilution stated."),
     ]
     body = ["# Self-test delivery report", ""]
     for title, text in sections:
@@ -391,6 +392,7 @@ def delivery_smoke_test(skill: Path, profile: str, td: Path) -> None:
     manifest["workbook_formula_min"] = 0  # synthetic/legacy example workbooks carry no formulas
     manifest["outputs_canonical_relaxed"] = True  # smoke snapshot keeps template nulls
     manifest["driver_tree_relaxed"] = True  # smoke exercises plumbing, not modeling doctrine
+    manifest["interval_floor_relaxed"] = True  # smoke snapshot carries template nulls
     manifest["workbook_checks_relaxed"] = True  # legacy example workbook predates Check-row doctrine
     manifest["quarterly_spine_relaxed"] = True
     manifest["selected_mechanisms"] = ["unit-volume-price-cost"]

@@ -1,9 +1,16 @@
 # Business quality and moat (the persistence question)
 
-The driver tree says *what the numbers do*. This file says *why they should
-keep doing it*. Every multi-year forecast contains an implicit claim that
-today's economics persist; that claim is the least examined and most
-expensive part of most models.
+**Scope: this file exists only to make FY+2/FY+3 forecasts more accurate.**
+The objective is revenue and profit accuracy (`profit-forecast-accuracy.md`),
+not investment philosophy. A multi-year forecast contains one persistence
+claim - that today's growth and margin economics continue - and that claim is
+what this file forces you to argue instead of inherit. Use the parts that set
+a number in the model; ignore the rest.
+
+The one thing that must come out of this analysis is a **stated fade
+assumption**: over the forecast horizon, do growth and margin hold, decay, or
+expand, and on what evidence. That assumption directly sets FY+2/FY+3 and is
+where round-1 lost most of its accuracy.
 
 Sources studied: Michael Mauboussin's *Measuring the Moat* framework, the
 Business Breakdowns ASML and Moody's episodes, and Li Lu's value-investing
