@@ -617,27 +617,49 @@ def main() -> int:
                 blob = " ".join(str(s.get(k, "")) for k in ("source_type", "publisher", "location", "claim_or_fact", "source_family"))
                 src_lane[str(s.get("source_id", ""))] = _lanes_of(blob)
             anchoring = {"L1_filings", "L2_management", "L3_cross_company"}
-            weight_floor = float(manifest.get("material_assumption_weight_floor", 0.10))
+            # Materiality is COMPUTED, not assigned. An assumption matters if
+            # perturbing it moves the output or flips the conclusion - that is a
+            # derivative you can check, not a 0-1 weight someone typed. Assigned
+            # weights are factor-scoring; this method is arithmetic + logic.
+            rev_floor = float(manifest.get("material_revenue_impact_pct", 2.0))
+            profit_floor = float(manifest.get("material_profit_impact_pct", 5.0))
+            anchoring = {"L1_filings", "L2_management", "L3_cross_company"}
             problems = []
-            for row in srows:
+
+            def _pct(value):
                 try:
-                    weight = float(row.get("materiality_weight") or 0)
+                    return abs(float(str(value).strip().rstrip("%") or 0))
                 except ValueError:
-                    weight = 0.0
+                    return 0.0
+
+            for row in srows:
+                aid = row.get("assumption_id", "?")
+                if str(aid).strip().upper() in {"", "TBD"}:
+                    continue
                 status = str(row.get("support_status", "")).strip().lower()
-                if weight < weight_floor or status == "scenario_only":
+                delta = str(row.get("test_delta", "")).strip()
+                rev_impact, profit_impact = _pct(row.get("revenue_impact_pct")), _pct(row.get("profit_impact_pct"))
+                flips = str(row.get("changes_conclusion", "")).strip().lower() in {"yes", "true", "1"}
+                if not delta or (rev_impact == 0 and profit_impact == 0 and not flips):
+                    problems.append(f"{aid}: no computed sensitivity - state test_delta (the perturbation) and its "
+                                    "revenue/profit impact; importance is measured, not assigned")
+                    continue
+                is_material = rev_impact >= rev_floor or profit_impact >= profit_floor or flips
+                if not is_material or status == "scenario_only":
                     continue
                 ids = [i.strip() for i in re.split(r"[;,]", str(row.get("source_ids", ""))) if i.strip()]
                 lanes = set()
                 for i in ids:
                     lanes |= src_lane.get(i, set())
-                aid = row.get("assumption_id", "?")
+                why = f"moves revenue {rev_impact:.1f}% / profit {profit_impact:.1f}%" + (" and flips the conclusion" if flips else "")
                 if len(lanes) < 2:
-                    problems.append(f"{aid} (weight {weight:.2f}) supported by {len(lanes)} lane(s) - material assumptions need >=2 lanes")
+                    problems.append(f"{aid} ({why}) has {len(lanes)} lane(s) - needs >=2 research lanes")
                 elif not (lanes & anchoring):
-                    problems.append(f"{aid} has no anchoring lane (filing/management/cross-company)")
-                if status in {"single_lane", ""} and weight >= weight_floor:
+                    problems.append(f"{aid} ({why}) has no anchoring lane (filing/management/cross-company)")
+                if status in {"single_lane", ""}:
                     problems.append(f"{aid} support_status '{status or 'blank'}' cannot carry a Base number")
+                if flips and not str(row.get("falsification_trigger", "")).strip():
+                    problems.append(f"{aid} flips the conclusion but states no falsification trigger")
             if problems:
                 fail_record(checks, "research:material-corroboration", "; ".join(problems[:6]),
                             "error" if args.strict else "warning")

@@ -152,6 +152,25 @@ assumption mapped to {series, source, frequency, current value, trigger
 level, action if breached}. This is the operational form of breakpoints -
 a forecast whose drivers cannot be monitored cannot be maintained.
 
+## No assigned weights anywhere in the method
+
+`mechanism_weights` was the first offender; assumption `materiality_weight`
+was the second. The rule is general: **importance is never a number someone
+assigns - it is a derivative someone computes.**
+
+- Which mechanism matters? The one whose branch carries the revenue - visible
+  in the driver tree's arithmetic, not in a weight vector.
+- Which assumption matters? The one whose perturbation moves the output -
+  measured via `test_delta` and its impact, not via a 0-1 weight.
+- Which evidence matters? The one attached to a material driver parameter -
+  traced through the transmission chain, not scored.
+
+Descriptive tags on SignalCards (specificity, causal proximity, falsifiability,
+incentive bias) are exactly that - tags for reading and filtering. They are
+never summed into a composite signal score. If a reviewer ever needs to ask
+"where did that number come from", the answer must be an arithmetic path, not
+a scoring rubric.
+
 ## What replaced mechanism weights
 
 `mechanism_weights` (sum-to-1) is retired as a modeling concept. It made the

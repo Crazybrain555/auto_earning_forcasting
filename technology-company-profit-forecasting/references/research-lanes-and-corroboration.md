@@ -44,13 +44,32 @@ gap. Record the queries that failed - they show where evidence does not exist.
 
 ## The corroboration rule
 
-A **material assumption** (materiality_weight ≥ 0.10, or any assumption whose
-±20% move shifts FY+1 revenue >2% or EPS >5%) requires:
+**Materiality is computed, never assigned.** An assumption does not become
+important because someone typed 0.15 next to it - that is factor scoring in
+disguise. It is important if perturbing it moves the answer. Every row of
+`material_assumption_support.csv` therefore states:
+
+- `test_delta` - the perturbation actually tested ("-5pp ASP", "ramp slips
+  two quarters", "share holds flat instead of +3pp"), and
+- `revenue_impact_pct` / `profit_impact_pct` - what the model does under it,
+  and
+- `changes_conclusion` - whether the rating or buy price flips.
+
+An assumption is **material** when the tested perturbation moves FY+1 revenue
+≥2%, profit ≥5%, or flips the conclusion. Those thresholds are on measured
+output, so a reviewer can re-run the test and disagree with a number rather
+than with a weight.
+
+A material assumption requires:
 
 - support from **≥2 independent source clusters** spanning **≥2 different
   lanes**, and
 - at least one of those from an **anchoring lane** (L1, L2, L3, or a direct
   measurement), unless the assumption is explicitly labeled `scenario_only`.
+
+An assumption that flips the conclusion must additionally state its
+falsification trigger - if the whole call turns on it, the reader is owed the
+observation that would kill it.
 
 `support_status` values in `material_assumption_support.csv`:
 

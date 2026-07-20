@@ -1,2 +1,2 @@
-assumption_id,metric,horizon,scenario,materiality_weight,sensitivity_to_output,support_status,evidence_cluster_count,source_ids,allowed_horizon,falsification_trigger,notes
-TBD,TBD,FY+1,Base,0.0,high,analyst_only,0,,FY+1,,
+assumption_id,claim,driver_link,test_delta,revenue_impact_pct,profit_impact_pct,changes_conclusion,support_status,source_ids,lanes,falsification_trigger,horizon,scenario,notes
+TBD,state the assumption as a testable sentence,driver_tree segment or parameter it sets,the perturbation tested e.g. -5pp ASP or ramp slips 2 quarters,0.0,0.0,no,single_lane,,,what observation would falsify it,FY+1,Base,
