@@ -308,6 +308,39 @@ def main() -> int:
                 pass_record(checks, "snapshot:scenario-probabilities")
             else:
                 fail_record(checks, "snapshot:scenario-probabilities", "probabilities must sum to 1")
+            # Canonical outputs contract: every horizon must use canonical keys.
+            # Dialect keys (revenue_M / revenue_base / revenue_p50 / nested scenario
+            # dicts / non_gaap_eps_*) are a delivery failure - downstream consumers
+            # (dashboard, scorer, exports) read canonical keys only.
+            relaxed_outputs = bool(manifest.get("outputs_canonical_relaxed", False))
+            outputs = snap.get("outputs") or {}
+            def _num(value):
+                return isinstance(value, (int, float)) and not isinstance(value, bool)
+            for period_key, needs_range in (("year_1", False), ("year_2", True), ("year_3_distribution", True)):
+                out = outputs.get(period_key)
+                label = f"snapshot:canonical-{period_key}"
+                if not isinstance(out, dict):
+                    fail_record(checks, label, "period missing from outputs", "error" if args.strict else "warning")
+                    continue
+                has_numbers = any(
+                    _num(value) or (isinstance(value, dict) and any(_num(x) for x in value.values()))
+                    for key, value in out.items() if key not in ("period", "point_evaluable"))
+                canonical = _num(out.get("revenue_point")) and (_num(out.get("profit_point")) or _num(out.get("eps_point")))
+                if needs_range and canonical:
+                    canonical = (_num(out.get("revenue_low")) and _num(out.get("revenue_high")) and
+                                 ((_num(out.get("profit_low")) and _num(out.get("profit_high"))) or
+                                  (_num(out.get("eps_low")) and _num(out.get("eps_high")))))
+                if canonical:
+                    pass_record(checks, label)
+                elif has_numbers:
+                    fail_record(checks, label,
+                                "dialect output keys - canonical keys required: revenue_point/low/high plus "
+                                "profit_point(/low/high, GAAP net income $M) or eps_point(/low/high); "
+                                "point = Base scenario or p50, low/high = Bear~Bull or p10~p90")
+                elif relaxed_outputs:
+                    pass_record(checks, label)
+                else:
+                    fail_record(checks, label, "outputs not populated with canonical keys", "error" if args.strict else "warning")
         except Exception as exc:
             fail_record(checks, "snapshot:json", str(exc))
 

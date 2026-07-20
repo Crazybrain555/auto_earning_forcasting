@@ -22,7 +22,10 @@
       "profit_point": null,
       "profit_low": null,
       "profit_high": null,
-      "point_evaluable": true
+      "point_evaluable": true,
+      "eps_point": null,
+      "eps_low": null,
+      "eps_high": null
     },
     "year_2": {
       "period": null,
@@ -32,7 +35,10 @@
       "profit_point": null,
       "profit_low": null,
       "profit_high": null,
-      "point_evaluable": true
+      "point_evaluable": true,
+      "eps_point": null,
+      "eps_low": null,
+      "eps_high": null
     },
     "year_3_distribution": {
       "period": null,
@@ -42,7 +48,10 @@
       "profit_point": null,
       "profit_low": null,
       "profit_high": null,
-      "point_evaluable": false
+      "point_evaluable": false,
+      "eps_point": null,
+      "eps_low": null,
+      "eps_high": null
     },
     "long_term_normalized": {},
     "market_implied": {}

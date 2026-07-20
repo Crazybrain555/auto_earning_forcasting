@@ -58,7 +58,7 @@ class DeliveryValidatorTest(unittest.TestCase):
             red='''# Red-team review\n\n| ID | Severity | Area | Finding | Evidence | Model impact | Required action | Status |\n|---|---|---|---|---|---|---|---|\n| RT-001 | P1 | double counting | Double-count capex and COGS test | SRC0 | FCF | reconcile | closed |\n| RT-002 | P1 | valuation | Normalization and terminal valuation challenge | SRC0 | value | stress | closed |\n| RT-003 | P1 | demand | Base demand share unsupported | SRC1 | revenue | cap share | closed |\n| RT-004 | P1 | supply | Capacity constraint omitted | SRC2 | revenue | add supply | closed |\n| RT-005 | P1 | accounting | GAAP cash bridge incomplete | SRC0 | profit | bridge | closed |\n| RT-006 | P1 | source independence | Repeated reports may share one original source cluster | SIG1/SIG2 | Base | map source chains | closed |\n'''
             (workspace/'red_team.md').write_text(red,encoding='utf-8')
             report=(SKILL/'assets/examples/sandisk_v73/Sandisk_SNDK_v7.3_模型报告.md').read_text(encoding='utf-8')
-            report+='\n\n## Forward evidence and research synthesis\nInvestor dialogue, independent research, technical papers, source independence clusters, rejected signals and falsification triggers were reviewed.\n\n## 买入纪律\nRecommended buy price derives from Bear fair value with margin of safety.\n\n## 一致性检查\nArithmetic consistency: implied tax rate, segment sums, EPS x shares reconcile.\n'
+            report+='\n\n## Forward evidence and research synthesis\nInvestor dialogue, independent research, technical papers, source independence clusters, rejected signals and falsification triggers were reviewed.\n\n## 买入纪律\nRecommended buy price derives from Bear fair value with margin of safety.\n\n## 一致性检查\nArithmetic consistency: implied tax rate, segment sums, EPS x shares reconcile. FY+1 base revenue point 100,000.\n'
             (workspace/'report.md').write_text(report,encoding='utf-8')
             (workspace/'model').mkdir(exist_ok=True)
             (workspace/'model/model.xlsx').write_bytes((SKILL/'assets/examples/sandisk_v73/Sandisk_SNDK_v7.3_五年财务模型.xlsx').read_bytes())
@@ -67,6 +67,10 @@ class DeliveryValidatorTest(unittest.TestCase):
             snapshot['source_pack_hash']='sha256:test'
             snapshot['mechanism_weights']={'unit-volume-price-cost':1.0}
             snapshot['scenario_probabilities']={'bear':0.2,'base':0.55,'bull':0.2,'regime_break':0.05}
+            # canonical outputs contract: point = Base/p50, low/high = Bear~Bull / p10~p90
+            snapshot['outputs']['year_1'].update({'revenue_point':100000,'profit_point':20000,'eps_point':5.0})
+            snapshot['outputs']['year_2'].update({'revenue_point':110000,'revenue_low':90000,'revenue_high':130000,'profit_point':22000,'profit_low':15000,'profit_high':30000})
+            snapshot['outputs']['year_3_distribution'].update({'revenue_point':120000,'revenue_low':95000,'revenue_high':150000,'eps_point':6.0,'eps_low':3.0,'eps_high':9.0})
             (workspace/'forecast_snapshot.json').write_text(json.dumps(snapshot,indent=2),encoding='utf-8')
 
             validate=[sys.executable,str(SKILL/'scripts/validate_delivery.py'),'--workspace',str(workspace),'--strict']
