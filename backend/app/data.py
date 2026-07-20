@@ -8,6 +8,8 @@ is tolerant: partial or in-progress workspaces must render, not crash.
 """
 from __future__ import annotations
 
+import copy
+import csv
 import datetime as dt
 import json
 import shutil
@@ -33,6 +35,14 @@ def read_json(path: Path):
         return json.loads(path.read_text(encoding="utf-8"))
     except Exception:
         return None
+
+
+def read_csv_rows(path: Path) -> list[dict[str, str]]:
+    try:
+        with path.open(encoding="utf-8-sig", newline="") as handle:
+            return list(csv.DictReader(handle))
+    except Exception:
+        return []
 
 
 def _safe_name(name: str) -> bool:
@@ -117,6 +127,11 @@ def case_detail(round_id: str, case_id: str) -> dict | None:
             payload = {k: v for k, v in payload.items() if k != "files"} | {"file_count": len(payload.get("files", []) or [])}
         detail[name.replace(".json", "")] = payload
     detail["outputs_normalized"] = normalize_outputs(detail.get("forecast_snapshot"))
+    detail["model_view"] = build_model_view(
+        detail.get("forecast_snapshot"),
+        read_json(case_dir / "model_graph.json"),
+        read_csv_rows(case_dir / "driver_monitoring.csv"),
+    )
     detail["files"] = sorted(
         str(p.relative_to(case_dir)) for p in case_dir.rglob("*") if p.is_file()
     )
@@ -215,6 +230,245 @@ def normalize_outputs(snapshot: dict | None) -> dict:
                 profit[role] = round(eps[role] * shares)
         profit["derived"] = True
     return norm
+
+
+# ---------- stable v1/v2 investment-model adapter ----------
+
+def _contract_major(snapshot: dict) -> str:
+    version = snapshot.get("forecast_contract_version") or snapshot.get("schema_version")
+    if version not in (None, ""):
+        return str(version).split(".", 1)[0]
+    forecast_id = str(snapshot.get("forecast_id") or "")
+    return "2" if forecast_id.endswith("/v2") else "1"
+
+
+def _id_list(value) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [str(item) for item in value if item not in (None, "")]
+
+
+def _unique(items) -> list:
+    out = []
+    for item in items:
+        if item not in out:
+            out.append(item)
+    return out
+
+
+def _profit_causal_chain(graph: dict, carriers: list[str], targets: list[str]) -> dict:
+    """Select equations and context nodes on carrier-to-profit paths."""
+    nodes = graph.get("nodes") if isinstance(graph.get("nodes"), list) else []
+    equations = (
+        graph.get("equations") if isinstance(graph.get("equations"), list) else []
+    )
+    equations = [equation for equation in equations if isinstance(equation, dict)]
+    node_by_id = {
+        str(node.get("id")): node
+        for node in nodes
+        if isinstance(node, dict) and node.get("id") not in (None, "")
+    }
+
+    if not targets:
+        targets = [
+            node_id
+            for node_id, node in node_by_id.items()
+            if str(node.get("financial_role") or "").lower()
+            in {"profit", "net_income", "free_cash_flow", "fcf"}
+        ]
+    if not carriers or not targets:
+        return {"nodes": [], "equations": []}
+
+    forward = set(carriers)
+    changed = True
+    while changed:
+        changed = False
+        for equation in equations:
+            inputs = set(_id_list(equation.get("inputs")))
+            output = equation.get("output")
+            if output not in (None, "") and inputs & forward and output not in forward:
+                forward.add(str(output))
+                changed = True
+
+    backward = set(targets)
+    changed = True
+    while changed:
+        changed = False
+        for equation in equations:
+            output = str(equation.get("output") or "")
+            if output in backward:
+                for input_id in _id_list(equation.get("inputs")):
+                    if input_id not in backward:
+                        backward.add(input_id)
+                        changed = True
+
+    path_outputs = forward & backward
+    selected_equations = [
+        equation
+        for equation in equations
+        if str(equation.get("output") or "") in path_outputs
+        and set(_id_list(equation.get("inputs"))) & forward
+    ]
+    selected_ids = set(carriers) | set(targets)
+    for equation in selected_equations:
+        selected_ids.add(str(equation.get("output")))
+        selected_ids.update(_id_list(equation.get("inputs")))
+
+    return {
+        "nodes": [
+            copy.deepcopy(node)
+            for node_id, node in node_by_id.items()
+            if node_id in selected_ids
+        ],
+        "equations": copy.deepcopy(selected_equations),
+    }
+
+
+def build_model_view(
+    snapshot: dict | None,
+    model_graph: dict | None = None,
+    driver_monitoring: list[dict] | None = None,
+) -> dict:
+    """Adapt immutable forecast artifacts to one dashboard-facing model view.
+
+    v2 exposes the typed causal and value model.  v1 remains readable but is
+    explicitly labelled as legacy decomposition metadata; historical weights
+    are never copied into the reasoning view.
+    """
+    snapshot = snapshot if isinstance(snapshot, dict) else {}
+    from . import db
+
+    valuation_summary = db.extract_valuation(snapshot)
+    if _contract_major(snapshot) != "2":
+        legacy_components = snapshot.get("mechanism_weights")
+        legacy_components = (
+            sorted(str(key) for key in legacy_components)
+            if isinstance(legacy_components, dict)
+            else []
+        )
+        summary_thesis = valuation_summary.get("one_line_thesis") or None
+        market_implied = (snapshot.get("outputs") or {}).get("market_implied")
+        return {
+            "contract_version": "legacy-v1",
+            "mode": "legacy_decomposition",
+            "legacy": True,
+            "investment_case": {
+                "decision_question": None,
+                "variant_view": None,
+                "one_line_thesis": summary_thesis,
+                "margin_of_safety_pct": None,
+                "permanent_loss_paths": [],
+            },
+            "main_line": {
+                "id": None,
+                "carrier_node_ids": [],
+                "target_node_ids": [],
+                "thesis_carriers": [],
+                "profit_causal_chain": {"nodes": [], "equations": []},
+                "competitor_response_node_ids": [],
+            },
+            "value_creation": {},
+            "valuation": {"summary": valuation_summary, "methods": {}},
+            "market_implied_expectations": copy.deepcopy(market_implied)
+            if isinstance(market_implied, dict)
+            else {},
+            "monitoring": {},
+            "falsification": {
+                "ids": [],
+                "triggers": [],
+                "breakpoints": copy.deepcopy(snapshot.get("breakpoints") or []),
+            },
+            "legacy_decomposition": {
+                "label": "legacy decomposition metadata",
+                "components": legacy_components,
+                "company_lenses": copy.deepcopy(snapshot.get("company_lenses") or []),
+            },
+        }
+
+    graph = model_graph if isinstance(model_graph, dict) else snapshot.get("model_graph")
+    graph = graph if isinstance(graph, dict) else {}
+    graph_main_line = graph.get("main_line")
+    graph_main_line = graph_main_line if isinstance(graph_main_line, dict) else {}
+    investment = snapshot.get("investment_case")
+    investment = investment if isinstance(investment, dict) else {}
+    driver_tree = snapshot.get("driver_tree")
+    driver_tree = driver_tree if isinstance(driver_tree, dict) else {}
+
+    carriers = _id_list(graph_main_line.get("carrier_node_ids")) or _id_list(
+        investment.get("main_line_node_ids")
+    )
+    targets = _id_list(graph_main_line.get("target_node_ids"))
+    if not targets:
+        graph_nodes = graph.get("nodes") if isinstance(graph.get("nodes"), list) else []
+        targets = [
+            str(node.get("id"))
+            for node in graph_nodes
+            if isinstance(node, dict)
+            and node.get("id") not in (None, "")
+            and str(node.get("financial_role") or "").lower()
+            in {"profit", "net_income", "free_cash_flow", "fcf"}
+        ]
+
+    falsification_ids = _unique(
+        _id_list(investment.get("falsification_ids"))
+        + _id_list(graph_main_line.get("falsification_ids"))
+    )
+    graph_nodes = graph.get("nodes") if isinstance(graph.get("nodes"), list) else []
+    trigger_texts = []
+    for node in graph_nodes:
+        if not isinstance(node, dict) or str(node.get("id")) not in falsification_ids:
+            continue
+        for key in ("trigger", "condition", "description", "label"):
+            if isinstance(node.get(key), str) and node[key].strip():
+                trigger_texts.append(node[key].strip())
+                break
+    market_implied = snapshot.get("market_implied_expectations")
+    market_implied = market_implied if isinstance(market_implied, dict) else {}
+    if isinstance(market_implied.get("falsification_trigger"), str):
+        trigger_texts.append(market_implied["falsification_trigger"])
+
+    valuation = snapshot.get("valuation")
+    valuation = valuation if isinstance(valuation, dict) else {}
+    return {
+        "contract_version": str(
+            snapshot.get("forecast_contract_version")
+            or snapshot.get("schema_version")
+            or "2.0"
+        ),
+        "mode": "causal_value_model",
+        "legacy": False,
+        "investment_case": copy.deepcopy(investment),
+        "main_line": {
+            "id": driver_tree.get("main_line_id"),
+            "carrier_node_ids": carriers,
+            "target_node_ids": targets,
+            "thesis_carriers": copy.deepcopy(driver_tree.get("thesis_carriers") or []),
+            "profit_causal_chain": _profit_causal_chain(graph, carriers, targets),
+            "competitor_response_node_ids": _id_list(
+                graph_main_line.get("competitor_response_node_ids")
+            ),
+        },
+        "value_creation": copy.deepcopy(snapshot.get("value_creation") or {}),
+        "valuation": {
+            "summary": valuation_summary,
+            "methods": copy.deepcopy(valuation),
+        },
+        "market_implied_expectations": copy.deepcopy(market_implied),
+        "monitoring": {
+            **copy.deepcopy(
+                snapshot.get("monitoring")
+                if isinstance(snapshot.get("monitoring"), dict)
+                else {}
+            ),
+            "drivers": copy.deepcopy(driver_monitoring or []),
+        },
+        "falsification": {
+            "ids": falsification_ids,
+            "triggers": _unique(trigger_texts),
+            "breakpoints": copy.deepcopy(snapshot.get("breakpoints") or []),
+        },
+        "legacy_decomposition": None,
+    }
 
 
 
@@ -326,7 +580,8 @@ def case_valuation(round_id: str, case_id: str) -> dict | None:
     if case_dir is None:
         return None
     snap = read_json(case_dir / "forecast_snapshot.json") or {}
-    return snap.get("valuation_summary")
+    from . import db
+    return db.extract_valuation(snap) or None
 
 
 def _sec_key(value) -> str:
@@ -376,6 +631,7 @@ def portfolio(watchlist: list[dict], running_jobs: list[dict]) -> list[dict]:
 def security_history(security: str) -> list[dict]:
     """Every run of one security, newest first, with its valuation conclusion -
     the version trail of the watchboard as the method evolves."""
+    from . import db
     sec = _sec_key(security)
     entries = []
     for c in list_cases():
@@ -388,7 +644,7 @@ def security_history(security: str) -> list[dict]:
             "round_id": c["round_id"], "case_id": c["case_id"], "as_of": c.get("as_of"),
             "run_mode": c.get("run_mode"), "method_commit": c.get("method_commit"),
             "last_activity": c.get("last_activity"), "sealed": c.get("sealed"),
-            "valuation": (snap or {}).get("valuation_summary"),
+            "valuation": db.extract_valuation(snap),
             "fy1_revenue_point": fy1.get("revenue_point"), "fy1_profit_point": fy1.get("profit_point"),
             "metrics": c.get("metrics"),
         })

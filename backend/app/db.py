@@ -83,6 +83,119 @@ def _now() -> str:
     return dt.datetime.now(dt.timezone.utc).isoformat()
 
 
+def _present(value) -> bool:
+    return value is not None and value != ""
+
+
+def _first_present(*values):
+    return next((value for value in values if _present(value)), None)
+
+
+def _contract_major(snapshot: dict) -> str:
+    version = snapshot.get("forecast_contract_version") or snapshot.get("schema_version")
+    if _present(version):
+        return str(version).split(".", 1)[0]
+    forecast_id = str(snapshot.get("forecast_id") or "")
+    return "2" if forecast_id.endswith("/v2") else "1"
+
+
+def _scenario_values(payload) -> dict:
+    """Read scenario values without assuming one producer-specific nesting."""
+    if not isinstance(payload, dict):
+        return {}
+    for key in ("fair_value", "scenarios", "scenario_values"):
+        nested = payload.get(key)
+        if isinstance(nested, dict):
+            return {role: nested.get(role) for role in ("bear", "base", "bull")}
+    return {role: payload.get(role) for role in ("bear", "base", "bull")}
+
+
+def extract_valuation(snapshot: dict | None) -> dict:
+    """Return the stable portfolio valuation view for either snapshot contract.
+
+    Legacy snapshots already publish ``valuation_summary`` and are returned
+    unchanged.  For v2, structured valuation and market-implied fields are the
+    source of truth; the summary remains a fallback for optional presentation
+    fields and scenario values that the detailed model does not publish.
+    """
+    snapshot = snapshot if isinstance(snapshot, dict) else {}
+    summary = snapshot.get("valuation_summary")
+    summary = dict(summary) if isinstance(summary, dict) else {}
+    if _contract_major(snapshot) != "2":
+        return summary
+
+    valuation = snapshot.get("valuation")
+    valuation = valuation if isinstance(valuation, dict) else {}
+    per_share = valuation.get("per_share")
+    per_share = per_share if isinstance(per_share, dict) else {}
+    market = snapshot.get("market_implied_expectations")
+    market = market if isinstance(market, dict) else {}
+    investment = snapshot.get("investment_case")
+    investment = investment if isinstance(investment, dict) else {}
+
+    legacy_fair = summary.get("fair_value")
+    legacy_fair = legacy_fair if isinstance(legacy_fair, dict) else {}
+    detailed_fair: dict = {}
+    for candidate in (
+        _scenario_values(valuation),
+        _scenario_values(per_share),
+    ):
+        for role, value in candidate.items():
+            if _present(value):
+                detailed_fair[role] = value
+    detailed_base = _first_present(
+        per_share.get("value_per_share"),
+        per_share.get("base_value_per_share"),
+        (valuation.get("dcf") or {}).get("value_per_share")
+        if isinstance(valuation.get("dcf"), dict)
+        else None,
+    )
+    if _present(detailed_base):
+        detailed_fair["base"] = detailed_base
+    fair_value = {
+        role: _first_present(detailed_fair.get(role), legacy_fair.get(role))
+        for role in ("bear", "base", "bull")
+    }
+
+    margin_of_safety = investment.get("margin_of_safety_pct")
+    recommended_buy_price = _first_present(
+        per_share.get("recommended_buy_price"),
+        valuation.get("recommended_buy_price"),
+    )
+    if (
+        not _present(recommended_buy_price)
+        and isinstance(fair_value.get("base"), (int, float))
+        and not isinstance(fair_value.get("base"), bool)
+        and isinstance(margin_of_safety, (int, float))
+        and not isinstance(margin_of_safety, bool)
+    ):
+        recommended_buy_price = round(
+            fair_value["base"] * (1.0 - margin_of_safety / 100.0), 6
+        )
+    if not _present(recommended_buy_price):
+        recommended_buy_price = summary.get("recommended_buy_price")
+
+    return {
+        "current_price": _first_present(
+            market.get("observed_price"), summary.get("current_price")
+        ),
+        "price_currency": _first_present(
+            valuation.get("currency"), summary.get("price_currency")
+        ),
+        "price_as_of": _first_present(
+            market.get("price_as_of"), summary.get("price_as_of")
+        ),
+        "current_valuation_note": summary.get("current_valuation_note", ""),
+        "fair_value": fair_value,
+        "recommended_buy_price": recommended_buy_price,
+        "action": summary.get("action", "watch"),
+        "one_line_thesis": _first_present(
+            investment.get("one_line_thesis"), summary.get("one_line_thesis")
+        )
+        or "",
+    }
+
+
 def _job_index() -> dict[str, dict]:
     """Map workspace -> {engine, model, effort} from job records (best effort)."""
     jobs_dir = Path(CONFIG["jobs_dir"])
@@ -111,7 +224,7 @@ def ingest_case(case: dict, snapshot: dict | None, outputs_normalized: dict | No
         return
     canonical = json.dumps(snapshot, sort_keys=True, ensure_ascii=False)
     content_hash = "sha256:" + hashlib.sha256(canonical.encode()).hexdigest()
-    valuation = snapshot.get("valuation_summary") or {}
+    valuation = extract_valuation(snapshot)
     has_val = bool((valuation.get("fair_value") or {}).get("base") is not None)
     job = (jobs_by_workspace or {}).get(str(case.get("workspace") or "")) or \
           (jobs_by_workspace or {}).get(str(Path(CONFIG["runs_root"]) / case["round_id"] / case["case_id"])) or {}

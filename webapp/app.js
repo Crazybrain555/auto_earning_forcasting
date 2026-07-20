@@ -1,7 +1,7 @@
 /* 科技公司预测系统 — 实战版前端(投资看板 + 自训练控制台) */
 "use strict";
 
-const $view = document.getElementById("view");
+const $view = typeof document === "undefined" ? null : document.getElementById("view");
 const api = (path, opts) => {
   opts = { cache: "no-store", ...(opts || {}) };   // 状态接口永远实时,绕过一切浏览器缓存
   if (opts.method && opts.method !== "GET") {
@@ -142,6 +142,212 @@ const metricValue = (k, v) => {
   if (/eps/.test(k) || k === "current_price") return "$" + v.toFixed(2);
   return v.toLocaleString("en-US");
 };
+
+/* ---------- v2 causal/value model view ---------- */
+const isObject = value => value !== null && typeof value === "object" && !Array.isArray(value);
+const firstDefined = (...values) => values.find(value => value !== undefined && value !== null && value !== "");
+const firstArray = (...values) => values.find(value => Array.isArray(value) && value.length) || values.find(Array.isArray) || [];
+const uniqueText = values => [...new Set(values.map(modelItemText).filter(Boolean))];
+
+function modelItemText(item) {
+  if (item == null) return "";
+  if (typeof item !== "object") return String(item);
+  const identity = firstDefined(item.label, item.name, item.title, item.id, item.node_id, item.driver_id, item.metric, item.indicator, item.driver);
+  const label = item.driver_id && item.series ? `${item.driver_id} / ${item.series}` : identity;
+  const value = firstDefined(item.value, item.current, item.current_value, item.model_value, item.point, item.status);
+  const unit = item.unit ? ` ${item.unit}` : "";
+  const trigger = firstDefined(
+    item.trigger,
+    item.falsification_trigger,
+    item.threshold,
+    item.condition,
+    item.trigger_value != null ? `${item.trigger_operator || "breach"} ${item.trigger_value}${unit}` : null,
+  );
+  const parts = [];
+  if (label != null) parts.push(String(label));
+  if (value != null) parts.push(`${modelScalar(value)}${unit}`);
+  if (item.frequency) parts.push(`频率: ${item.frequency}`);
+  if (trigger != null) parts.push(`触发: ${trigger}`);
+  if (item.action_if_breached) parts.push(`动作: ${item.action_if_breached}`);
+  return parts.join(" · ") || Object.keys(item).join(" / ");
+}
+
+function modelScalar(value) {
+  if (value == null || value === "") return "—";
+  if (typeof value === "number") return Number(value).toLocaleString("en-US", { maximumFractionDigits: 3 });
+  return String(value);
+}
+
+function modelRatio(value) {
+  if (value == null || value === "" || Number.isNaN(Number(value))) return "—";
+  const number = Number(value);
+  const percent = Math.abs(number) <= 1.5 ? number * 100 : number;
+  return `${percent.toFixed(1)}%`;
+}
+
+function modelList(value, nestedKeys = []) {
+  if (value == null) return [];
+  if (Array.isArray(value)) return value;
+  if (!isObject(value)) return [value];
+  for (const key of nestedKeys) {
+    if (Array.isArray(value[key])) return value[key];
+  }
+  return Object.entries(value).map(([key, child]) => isObject(child) ? { name: key, ...child } : `${metricLabel(key)}: ${modelScalar(child)}`);
+}
+
+function isV2ModelView(modelView, snapshot) {
+  const view = isObject(modelView) ? modelView : {};
+  const snap = isObject(snapshot) ? snapshot : {};
+  const version = String(firstDefined(view.contract_version, view.version, view.schema_version, "")).toLowerCase();
+  if (view.legacy === true || view.mode === "legacy_decomposition" || version.includes("legacy")) return false;
+  if (/^v?2(?:\.|$)/.test(version)) return true;
+  if (view.legacy === false || view.main_line || view.value_creation || view.market_implied || view.market_implied_expectations) return true;
+  return Boolean(snap.investment_case || snap.integrated_model || snap.value_creation || snap.valuation || snap.market_implied_expectations || snap.monitoring);
+}
+
+function renderFlow(items) {
+  const values = uniqueText(items);
+  return values.map((item, index) => `${index ? `<span class="cellnote" aria-hidden="true">→</span>` : ""}<span class="chip">${esc(item)}</span>`).join(" ");
+}
+
+function renderLegacyDecomposition(modelView, snapshot) {
+  const view = isObject(modelView) ? modelView : {};
+  const snap = isObject(snapshot) ? snapshot : {};
+  const legacy = isObject(view.legacy_decomposition) ? view.legacy_decomposition : {};
+  const metadata = firstDefined(view.legacy_decomposition_metadata, legacy.components, isObject(view.legacy) ? view.legacy : null, snap.mechanism_weights);
+  const names = Array.isArray(metadata)
+    ? uniqueText(metadata)
+    : isObject(metadata)
+      ? Object.keys(metadata)
+      : [];
+  if (!names.length && !view.legacy) return "";
+  return `<div class="dsec"><h3>历史拆分元数据 <span class="cellnote">legacy v1</span></h3>
+    <div class="notice">仅用于兼容旧快照和定位当时采用过的拆分模板，不作为因果推理、证据强度或预测结论。</div>
+    ${names.length ? `<div class="seglegend">${names.map(name => `<span class="chip">${esc(name)}</span>`).join(" ")}</div>` : ""}</div>`;
+}
+
+function renderForecastModelView(modelView, snapshot = {}) {
+  const viewBase = isObject(modelView) ? modelView : {};
+  const view = isObject(viewBase.sections) ? { ...viewBase.sections, ...viewBase } : viewBase;
+  const snap = isObject(snapshot) ? snapshot : {};
+  if (!isV2ModelView(view, snap)) return renderLegacyDecomposition(view, snap);
+
+  const driverTree = isObject(view.driver_tree) ? view.driver_tree : (isObject(snap.driver_tree) ? snap.driver_tree : {});
+  const causal = isObject(view.causal_lineage) ? view.causal_lineage : {};
+  const mainRaw = firstDefined(view.main_line, causal.main_line, driverTree.main_line);
+  const main = isObject(mainRaw) ? mainRaw : {};
+  const mainName = firstDefined(main.name, main.label, main.id, typeof mainRaw === "string" ? mainRaw : null, "尚未命名主线");
+  const mainSegments = firstArray(main.segments, driverTree.segments);
+  const carriers = firstArray(
+    main.carrier_node_ids,
+    main.thesis_carriers,
+    view.thesis_carriers,
+    driverTree.thesis_carriers,
+    mainSegments.filter(segment => segment && segment.main_line).map(segment => firstDefined(segment.name, segment.id)),
+  );
+  const targets = firstArray(main.target_node_ids, view.target_node_ids, driverTree.target_node_ids);
+  const profitChain = isObject(main.profit_causal_chain) ? main.profit_causal_chain : {};
+  const lineage = firstArray(
+    main.lineage,
+    main.steps,
+    view.lineage,
+    causal.lineage,
+    driverTree.lineage,
+    [...modelList(profitChain.nodes), ...modelList(profitChain.equations)],
+  );
+  const investment = isObject(view.investment_case) ? view.investment_case : (isObject(snap.investment_case) ? snap.investment_case : {});
+  const valueCreation = isObject(view.value_creation) ? view.value_creation : (isObject(snap.value_creation) ? snap.value_creation : {});
+  const valuationEnvelope = isObject(view.valuation) ? view.valuation : (isObject(snap.valuation) ? snap.valuation : {});
+  const valuation = isObject(valuationEnvelope.methods) && Object.keys(valuationEnvelope.methods).length
+    ? valuationEnvelope.methods
+    : valuationEnvelope;
+  const implied = isObject(view.market_implied)
+    ? view.market_implied
+    : isObject(view.market_implied_expectations)
+      ? view.market_implied_expectations
+      : (isObject(snap.market_implied_expectations) ? snap.market_implied_expectations : {});
+  const monitoring = firstDefined(view.monitoring, snap.monitoring, {});
+
+  let html = `<div class="dsec"><h3>利润驱动主线 · 变量 → 利润 / FCF <span class="cellnote">v2 causal model</span></h3>
+    <div class="verdict"><div class="verdict-main"><b>${esc(mainName)}</b></div>
+    ${investment.decision_question ? `<div class="verdict-fv">决策问题: ${esc(investment.decision_question)}</div>` : ""}
+    ${investment.variant_view ? `<div class="verdict-fv">差异观点: ${esc(investment.variant_view)}</div>` : ""}
+    ${investment.margin_of_safety_pct != null ? `<div class="verdict-fv">安全边际: ${modelRatio(investment.margin_of_safety_pct)}</div>` : ""}</div>`;
+  if (carriers.length || targets.length) {
+    html += `<div class="seglegend">${renderFlow([...carriers, ...(targets.length ? targets : ["利润 / FCF"])])}</div>`;
+  }
+  if (lineage.length) html += `<div class="cellnote" style="margin-top:7px">完整 lineage: ${renderFlow(lineage)}</div>`;
+  if (mainSegments.length) {
+    html += `<table class="grid"><thead><tr><th>分支</th><th>拆分基础</th><th>主线</th></tr></thead><tbody>${mainSegments.map(segment => `<tr>
+      <td>${esc(firstDefined(segment.name, segment.id, "—"))}</td><td>${esc(firstDefined(segment.basis, segment.equation, "—"))}</td>
+      <td>${segment.main_line ? statusChip("accent", "是") : "—"}</td></tr>`).join("")}</tbody></table>`;
+  }
+  html += `</div>`;
+
+  const valuePeriods = Array.isArray(valueCreation.periods) && valueCreation.periods.length
+    ? valueCreation.periods.filter(isObject)
+    : (Object.keys(valueCreation).length ? [valueCreation] : []);
+  const fade = isObject(valueCreation.fade) ? valueCreation.fade : (isObject(valueCreation.competitive_fade) ? valueCreation.competitive_fade : {});
+  if (valuePeriods.length || Object.keys(fade).length || valueCreation.wacc != null) {
+    html += `<div class="dsec"><h3>价值创造 · ROIC、再投资与增长</h3>`;
+    if (valuePeriods.length) {
+      html += `<table class="grid"><thead><tr><th>期间</th><th class="num">ROIC</th><th class="num">增量 ROIC</th><th class="num">再投资率</th><th class="num">基本面增长</th><th class="num">WACC</th></tr></thead><tbody>` +
+        valuePeriods.map(period => `<tr><td>${esc(firstDefined(period.period, period.year, "当前"))}</td>
+          <td class="num">${modelRatio(period.roic)}</td><td class="num">${modelRatio(period.incremental_roic)}</td>
+          <td class="num">${modelRatio(period.reinvestment_rate)}</td><td class="num">${modelRatio(period.fundamental_growth)}</td>
+          <td class="num">${modelRatio(firstDefined(period.wacc, valueCreation.wacc))}</td></tr>`).join("") + `</tbody></table>`;
+    }
+    if (Object.keys(fade).length) {
+      html += `<div class="notice"><b>竞争衰减</b> · 终局 ROIC ${modelRatio(fade.terminal_roic)}${fade.years_to_fade != null ? ` · ${esc(fade.years_to_fade)} 年衰减` : ""}${fade.competitive_response ? ` · ${esc(fade.competitive_response)}` : ""}</div>`;
+    }
+    html += `</div>`;
+  }
+
+  const dcf = isObject(valuation.dcf) ? valuation.dcf : {};
+  const residual = isObject(valuation.residual_income) ? valuation.residual_income : {};
+  const bridge = isObject(valuation.enterprise_to_equity) ? valuation.enterprise_to_equity : {};
+  const perShare = isObject(valuation.per_share) ? valuation.per_share : {};
+  const reconciliation = isObject(valuation.reconciliation) ? valuation.reconciliation : {};
+  const terminal = isObject(valuation.terminal) ? valuation.terminal : {};
+  if (Object.keys(valuation).length || Object.keys(implied).length) {
+    html += `<div class="dsec"><h3>估值与市场反向隐含${valuation.currency ? ` <span class="cellnote">${esc(valuation.currency)}</span>` : ""}</h3>`;
+    if (Object.keys(valuation).length) {
+      html += `<table class="grid"><thead><tr><th>方法 / 桥接</th><th class="num">企业价值</th><th class="num">股权价值</th><th class="num">每股价值</th></tr></thead><tbody>
+        <tr><td>DCF</td><td class="num">${modelScalar(dcf.enterprise_value)}</td><td class="num">${modelScalar(firstDefined(dcf.equity_value, bridge.equity_value))}</td><td class="num">${modelScalar(firstDefined(dcf.value_per_share, perShare.value_per_share))}</td></tr>
+        <tr><td>Residual Income</td><td class="num">—</td><td class="num">${modelScalar(residual.equity_value)}</td><td class="num">${modelScalar(residual.value_per_share)}</td></tr></tbody></table>`;
+      if (Object.keys(reconciliation).length) {
+        html += `<div class="cellnote">DCF / RI 对账差异 ${modelRatio(reconciliation.difference_pct)}${reconciliation.explanation ? ` · ${esc(reconciliation.explanation)}` : ""}</div>`;
+      }
+      if (Object.keys(terminal).length) {
+        html += `<div class="cellnote">终值约束: g ${modelRatio(terminal.growth_rate)} &lt; WACC ${modelRatio(terminal.wacc)} · 终局 ROIC ${modelRatio(terminal.terminal_roic)}</div>`;
+      }
+    }
+    if (Object.keys(implied).length) {
+      html += `<div class="notice"><b>市场反向隐含</b> · ${esc(firstDefined(implied.named_driver, "未命名变量"))}: 市场要求 ${esc(modelScalar(implied.implied_driver_value))}${implied.unit ? ` ${esc(implied.unit)}` : ""}${implied.model_driver_value != null ? ` · 模型判断 ${esc(modelScalar(implied.model_driver_value))}${implied.unit ? ` ${esc(implied.unit)}` : ""}` : ""}</div>`;
+    }
+    html += `</div>`;
+  }
+
+  const falsification = uniqueText([
+    ...firstArray(main.falsification_ids, driverTree.falsification_ids),
+    ...firstArray(investment.falsification_ids),
+    ...firstArray(view.falsification?.ids),
+    ...firstArray(view.falsification?.triggers),
+    ...modelList(view.falsification?.breakpoints),
+    ...modelList(investment.permanent_loss_paths),
+    ...(implied.falsification_trigger ? [implied.falsification_trigger] : []),
+  ]);
+  const competitorResponses = uniqueText(firstArray(main.competitor_response_node_ids, driverTree.competitor_response_node_ids));
+  const monitorItems = uniqueText(modelList(monitoring, ["drivers", "driver_ids", "indicators", "items", "signals"]));
+  if (falsification.length || competitorResponses.length || monitorItems.length) {
+    html += `<div class="dsec"><h3>证伪与监测</h3>`;
+    if (falsification.length) html += `<div class="cellnote" style="margin-bottom:5px">证伪 / 永久损失</div><div class="seglegend">${falsification.map(item => `<span class="chip">${esc(item)}</span>`).join(" ")}</div>`;
+    if (competitorResponses.length) html += `<div class="cellnote" style="margin:8px 0 5px">竞争响应</div><div class="seglegend">${competitorResponses.map(item => `<span class="chip">${esc(item)}</span>`).join(" ")}</div>`;
+    if (monitorItems.length) html += `<div class="cellnote" style="margin:8px 0 5px">监测驱动</div><div class="seglegend">${monitorItems.map(item => `<span class="chip">${esc(item)}</span>`).join(" ")}</div>`;
+    html += `</div>`;
+  }
+  return html;
+}
 
 /* ---------- minimal markdown renderer ---------- */
 function mdRender(src) {
@@ -494,7 +700,7 @@ function paintPortfolio() {
       ${isOpen ? `<div class="pcbody"><div class="dwrap" id="d-${esc(r.security)}">加载中…</div></div>` : ""}
     </div>`;
   }
-  html += `<div class="notice">折叠看结论 · 展开看理由(论点、预测输出、情景概率、机制权重、运行记录、版本对比、完整报告)。估值区间条:黑标 = 现价,蓝标 = AI 目标价(基准情景),金标 = 建议买入价,蓝底 = 悲观↔乐观区间。实时价源自 Yahoo,取不到时回退研究时点价格。</div>`;
+  html += `<div class="notice">折叠看结论 · 展开看理由(利润驱动主线、预测输出、价值创造、估值与市场隐含、证伪监测、运行记录、版本对比、完整报告)。估值区间条:黑标 = 现价,蓝标 = AI 目标价(基准情景),金标 = 建议买入价,蓝底 = 悲观↔乐观区间。实时价源自 Yahoo,取不到时回退研究时点价格。</div>`;
   $view.innerHTML = html;
   if (saved.e || saved.s || saved.n) { document.getElementById("w-entity").value = saved.e; document.getElementById("w-sec").value = saved.s; document.getElementById("w-note").value = saved.n; }
   if (saved.h) { const el = document.getElementById("sug-hint"); if (el) el.value = saved.h; }
@@ -514,9 +720,9 @@ function suggestCardHtml() {
       ${watched.has(sec) ? statusChip("good", "已在关注") : `<button class="btn btn-sm" data-sugadd="${i}">加入关注</button>`}</div>`;
   }).join("");
   return `<div class="card"><h2>AI 推荐关注</h2>
-    <div class="card-sub">让 agent 结合方法机制覆盖面和当前关注列表推荐候选,你来挑。可给方向提示,如「光模块」「存储上游」。</div>
+    <div class="card-sub">让 agent 结合因果驱动、行业价值链和当前关注列表的研究缺口推荐候选,你来挑。可给方向提示,如「光模块」「存储上游」。</div>
     <div class="form-row" style="margin-bottom:${list.length ? "10px" : "0"}">
-      <div class="field"><label>方向提示(可选)</label><input id="sug-hint" placeholder="留空 = 自动按机制覆盖推荐"></div>
+      <div class="field"><label>方向提示(可选)</label><input id="sug-hint" placeholder="留空 = 自动按研究缺口推荐"></div>
       <button class="btn" id="sug-run" ${sugTimer ? "disabled" : ""}>${sugTimer ? "生成中…" : "让 AI 推荐一批"}</button>
       ${list.length ? `<button class="btn btn-sm" id="sug-clear">清空</button>` : ""}
       <span id="sug-msg" class="formmsg">${sugTimer ? "生成中,约 1~3 分钟,完成后自动出现" : ""}</span>
@@ -814,12 +1020,7 @@ async function renderDetail(sec, rows) {
         `</div><div class="seglegend">` +
         probs.map(([k, p], i) => `<span class="status"><span class="dot" style="background:${segColor(k, i)}"></span>${esc(k)} ${pct(p, 0)}</span>`).join("") + `</div></div>`;
     }
-    const weights = Object.entries(snap.mechanism_weights || {});
-    if (weights.length) {
-      html += `<div class="dsec"><h3>机制权重</h3>` + weights.map(([k, w]) => `<div class="mech-row">
-        <div class="mech-head"><span class="lb">${esc(k)}</span><span class="pc">${pct(w, 0)}</span></div>
-        <div class="mech-track"><div class="mech-fill" style="width:${Math.min(100, (Number(w) || 0) * 100)}%"></div></div></div>`).join("") + `</div>`;
-    }
+    html += renderForecastModelView(detail.model_view, snap);
     if (detail.metrics) {
       const m = detail.metrics;
       html += `<div class="dsec"><h3>对照真值(训练案例)</h3><span class="chip">收入MAPE ${pct(m.revenue_mape)}</span> <span class="chip">利润率误差 ${num(m.profit_margin_mae_pp, 1)}pp</span> <span class="chip">区间覆盖 ${pct(m.revenue_coverage, 0)}</span></div>`;
@@ -1223,28 +1424,28 @@ const PIPE_SVG = `
     .pe{stroke:#8a8c92;stroke-width:1.5;fill:none;marker-end:url(#par)}
   </style>
   <rect class="pbx" x="10" y="30" width="212" height="66" rx="7"/><text class="pno" x="24" y="48">01</text>
-  <text class="pbt" x="116" y="60" text-anchor="middle">范围与时间边界</text><text class="pbs" x="116" y="78" text-anchor="middle">公司口径 · 财历 · as_of 锁定</text>
+  <text class="pbt" x="116" y="60" text-anchor="middle">决策问题与时点边界</text><text class="pbs" x="116" y="78" text-anchor="middle">投资问题 · 公司口径 · as_of 锁定</text>
   <rect class="pbx" x="246" y="30" width="212" height="66" rx="7"/><text class="pno" x="260" y="48">02</text>
-  <text class="pbt" x="352" y="60" text-anchor="middle">点时点 Source Pack</text><text class="pbs" x="352" y="78" text-anchor="middle">E0–E4 分级证据 · 哈希留痕</text>
+  <text class="pbt" x="352" y="60" text-anchor="middle">数据规范化与证据权限</text><text class="pbs" x="352" y="78" text-anchor="middle">事实/主张/假设分离 · 时点留痕</text>
   <rect class="pbx" x="482" y="30" width="212" height="66" rx="7"/><text class="pno" x="496" y="48">03</text>
-  <text class="pbt" x="588" y="60" text-anchor="middle">前瞻证据 SignalCards</text><text class="pbs" x="588" y="78" text-anchor="middle">≥6 信号 · ≥3 家族 · 独立源约束</text>
+  <text class="pbt" x="588" y="60" text-anchor="middle">行业与技术商业化</text><text class="pbs" x="588" y="78" text-anchor="middle">利润池 · 周期 · 技术到收入门槛</text>
   <rect class="pbx" x="718" y="30" width="212" height="66" rx="7"/><text class="pno" x="732" y="48">04</text>
-  <text class="pbt" x="824" y="60" text-anchor="middle">机制路由与建模</text><text class="pbs" x="824" y="78" text-anchor="middle">9+1 机制模块 × 8 行业透镜 · 权重</text>
+  <text class="pbt" x="824" y="60" text-anchor="middle">因果主线与驱动图</text><text class="pbs" x="824" y="78" text-anchor="middle">证据 → 主线变量 → 利润 / FCF</text>
   <rect class="pbx" x="954" y="30" width="196" height="66" rx="7"/><text class="pno" x="968" y="48">05</text>
-  <text class="pbt" x="1052" y="60" text-anchor="middle">公式化三表模型</text><text class="pbs" x="1052" y="78" text-anchor="middle">model.xlsx · ≥30 公式驱动</text>
+  <text class="pbt" x="1052" y="60" text-anchor="middle">分部经营与三表联动</text><text class="pbs" x="1052" y="78" text-anchor="middle">量价成本 · 营运资本 · 现金闭环</text>
   <line class="pe" x1="222" y1="63" x2="242" y2="63"/><line class="pe" x1="458" y1="63" x2="478" y2="63"/>
   <line class="pe" x1="694" y1="63" x2="714" y2="63"/><line class="pe" x1="930" y1="63" x2="950" y2="63"/>
   <path class="pe" d="M 1052 96 V 130 Q 1052 138 1044 138 H 124 Q 116 138 116 146 V 178"/>
   <rect class="pbx" x="10" y="182" width="212" height="66" rx="7"/><text class="pno" x="24" y="200">06</text>
-  <text class="pbt" x="116" y="212" text-anchor="middle">情景与分布输出</text><text class="pbs" x="116" y="230" text-anchor="middle">FY+1 点 · FY+2 情景 · FY+3 分位</text>
+  <text class="pbt" x="116" y="212" text-anchor="middle">价值创造与竞争衰减</text><text class="pbs" x="116" y="230" text-anchor="middle">ROIC · 再投资 · 增长 · fade</text>
   <rect class="pbx" x="246" y="182" width="212" height="66" rx="7"/><text class="pno" x="260" y="200">07</text>
-  <text class="pbt" x="352" y="212" text-anchor="middle">估值与买入纪律</text><text class="pbs" x="352" y="230" text-anchor="middle">DCF/倍数 · 市场隐含反推 · 买点</text>
+  <text class="pbt" x="352" y="212" text-anchor="middle">估值与市场隐含</text><text class="pbs" x="352" y="230" text-anchor="middle">DCF · RI · 反向隐含 · 安全边际</text>
   <rect class="pbx" x="482" y="182" width="212" height="66" rx="7"/><text class="pno" x="496" y="200">08</text>
-  <text class="pbt" x="588" y="212" text-anchor="middle">独立红队</text><text class="pbs" x="588" y="230" text-anchor="middle">开放 P0/P1 不闭环 = 不许交付</text>
+  <text class="pbt" x="588" y="212" text-anchor="middle">情景、证伪与红队</text><text class="pbs" x="588" y="230" text-anchor="middle">主线首攻 · 永久损失 · 竞争响应</text>
   <rect class="pbx" x="718" y="182" width="212" height="66" rx="7"/><text class="pno" x="732" y="200">09</text>
-  <text class="pbt" x="824" y="212" text-anchor="middle">严格交付校验</text><text class="pbs" x="824" y="230" text-anchor="middle">validate_delivery --strict 全门槛</text>
+  <text class="pbt" x="824" y="212" text-anchor="middle">模型图与严格校验</text><text class="pbs" x="824" y="230" text-anchor="middle">单位 · lineage · 三表 · 估值恒等式</text>
   <rect class="pbx" x="954" y="182" width="196" height="66" rx="7"/><text class="pno" x="968" y="200">10</text>
-  <text class="pbt" x="1052" y="212" text-anchor="middle">封存与入库</text><text class="pbs" x="1052" y="230" text-anchor="middle">快照哈希 · 版本入库 · 上看板</text>
+  <text class="pbt" x="1052" y="212" text-anchor="middle">封存、监测与学习</text><text class="pbs" x="1052" y="230" text-anchor="middle">快照哈希 · 驱动监测 · 误差归因</text>
   <line class="pe" x1="222" y1="215" x2="242" y2="215"/><line class="pe" x1="458" y1="215" x2="478" y2="215"/>
   <line class="pe" x1="694" y1="215" x2="714" y2="215"/><line class="pe" x1="930" y1="215" x2="950" y2="215"/>
 </svg>`;
@@ -1331,7 +1532,13 @@ async function route() {
   }
 }
 
-window.addEventListener("hashchange", route);
-route();
-refreshHeader();
-setInterval(refreshHeader, 5000);
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { isV2ModelView, renderForecastModelView };
+}
+
+if (typeof window !== "undefined" && typeof document !== "undefined") {
+  window.addEventListener("hashchange", route);
+  route();
+  refreshHeader();
+  setInterval(refreshHeader, 5000);
+}

@@ -1,0 +1,220 @@
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const test = require("node:test");
+
+const APP = path.resolve(__dirname, "..", "app.js");
+
+
+test("v2 model view renders causal profit line, value creation, valuation and monitoring", () => {
+  const { renderForecastModelView } = require(APP);
+  const html = renderForecastModelView({
+    version: "v2",
+    main_line: {
+      name: "AI capacity ramp",
+      carrier_node_ids: ["AI shipments", "AI ASP"],
+      target_node_ids: ["operating profit", "free cash flow"],
+      lineage: ["qualification", "yield", "revenue", "operating profit"],
+      falsification_ids: ["qualification_slip"],
+      competitor_response_node_ids: ["new_supply"],
+    },
+    value_creation: {
+      wacc: 0.10,
+      periods: [{
+        period: "FY2028",
+        roic: 0.20,
+        incremental_roic: 0.18,
+        reinvestment_rate: 0.40,
+        fundamental_growth: 0.072,
+      }],
+      fade: {
+        terminal_roic: 0.14,
+        years_to_fade: 8,
+        competitive_response: "Competitor supply compresses the price-cost spread.",
+      },
+    },
+    valuation: {
+      dcf: { enterprise_value: 1000 },
+      residual_income: { equity_value: 930 },
+      enterprise_to_equity: { equity_value: 910 },
+      per_share: { value_per_share: 9.10 },
+      reconciliation: { difference_pct: 0.022, explanation: "Different fade timing." },
+      terminal: { wacc: 0.10, growth_rate: 0.03, terminal_roic: 0.14 },
+    },
+    market_implied_expectations: {
+      named_driver: "AI ASP",
+      implied_driver_value: 42,
+      model_driver_value: 50,
+      unit: "USD/unit",
+    },
+    monitoring: {
+      indicators: [{ name: "qualification", trigger: "slips by two quarters" }],
+    },
+  }, {});
+
+  for (const expected of [
+    "利润 / FCF",
+    "AI capacity ramp",
+    "AI shipments",
+    "operating profit",
+    "价值创造",
+    "ROIC",
+    "再投资率",
+    "基本面增长",
+    "竞争衰减",
+    "DCF",
+    "Residual Income",
+    "市场反向隐含",
+    "AI ASP",
+    "证伪与监测",
+    "qualification_slip",
+  ]) assert.match(html, new RegExp(expected.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+
+  assert.doesNotMatch(html, /机制权重|mech-track/);
+});
+
+
+test("snapshot-native v2 fields render when backend model_view is absent", () => {
+  const { renderForecastModelView } = require(APP);
+  const html = renderForecastModelView(null, {
+    driver_tree: {
+      main_line: "subscriber retention",
+      thesis_carriers: ["paid members", "ARPU"],
+      target_node_ids: ["free cash flow"],
+      falsification_ids: ["churn_break"],
+      competitor_response_node_ids: ["price_response"],
+    },
+    investment_case: { variant_view: "Churn stays below the market-implied level." },
+    value_creation: { roic: 0.16, reinvestment_rate: 0.25, fundamental_growth: 0.04 },
+    valuation: { dcf: { enterprise_value: 500 }, residual_income: { equity_value: 430 } },
+    market_implied_expectations: { named_driver: "churn", implied_driver_value: 0.08 },
+    monitoring: ["monthly churn"],
+  });
+  assert.match(html, /subscriber retention/);
+  assert.match(html, /paid members/);
+  assert.match(html, /Churn stays below/);
+  assert.match(html, /monthly churn/);
+});
+
+
+test("backend adapter model_view wrapper renders methods, causal chain and falsification", () => {
+  const { renderForecastModelView } = require(APP);
+  const html = renderForecastModelView({
+    contract_version: "2.0",
+    legacy: false,
+    main_line: {
+      id: "ai-price-duration",
+      carrier_node_ids: ["ai_asp"],
+      target_node_ids: ["profit"],
+      thesis_carriers: ["AI ASP"],
+      profit_causal_chain: {
+        nodes: [{ id: "ai_asp" }, { id: "ai_revenue" }, { id: "profit" }],
+        equations: [{ id: "eq_revenue" }, { id: "eq_profit" }],
+      },
+      competitor_response_node_ids: ["competitive_supply"],
+    },
+    investment_case: { variant_view: "Price duration is longer than implied." },
+    value_creation: { periods: [{ period: "FY2028", roic: 0.20, reinvestment_rate: 0.40, fundamental_growth: 0.08 }] },
+    valuation: {
+      summary: { fair_value: { base: 9.1 } },
+      methods: {
+        dcf: { enterprise_value: 1000 },
+        residual_income: { equity_value: 930 },
+        per_share: { value_per_share: 9.1 },
+      },
+    },
+    market_implied_expectations: { named_driver: "AI ASP", implied_driver_value: 42 },
+    monitoring: { driver_ids: ["ai_asp"] },
+    falsification: { ids: ["asp_break"], triggers: ["ASP below 42"] },
+  }, {});
+  for (const expected of ["ai-price-duration", "ai_revenue", "eq_profit", "1,000", "930", "9.1", "asp_break", "ASP below 42"]) {
+    assert.match(html, new RegExp(expected.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+});
+
+test("monitoring rows expose series frequency threshold and breach action", () => {
+  const { renderForecastModelView } = require(APP);
+  const html = renderForecastModelView({
+    contract_version: "2.0",
+    legacy: false,
+    monitoring: { drivers: [{
+      driver_id: "ai_asp",
+      series: "Contract ASP",
+      current_value: 48,
+      model_value: 50,
+      unit: "USD/unit",
+      frequency: "quarterly",
+      trigger_operator: "below",
+      trigger_value: 42,
+      action_if_breached: "re-underwrite price path",
+    }] },
+  }, {});
+  assert.match(html, /ai_asp \/ Contract ASP/);
+  assert.match(html, /频率: quarterly/);
+  assert.match(html, /触发: below 42 USD\/unit/);
+  assert.match(html, /动作: re-underwrite price path/);
+});
+
+
+test("legacy weights are names-only compatibility metadata, never a reasoning chart", () => {
+  const { renderForecastModelView } = require(APP);
+  const html = renderForecastModelView(null, {
+    mechanism_weights: { "capacity-ramp": 0.75, "orders-backlog": 0.25 },
+  });
+  assert.match(html, /历史拆分元数据/);
+  assert.match(html, /仅用于兼容旧快照/);
+  assert.match(html, /capacity-ramp/);
+  assert.match(html, /orders-backlog/);
+  assert.doesNotMatch(html, /机制权重|75%|25%|mech-track|mech-fill/);
+});
+
+
+test("backend legacy adapter exposes component names without numeric weights", () => {
+  const { renderForecastModelView } = require(APP);
+  const html = renderForecastModelView({
+    contract_version: "legacy-v1",
+    mode: "legacy_decomposition",
+    legacy: true,
+    main_line: { carrier_node_ids: [], target_node_ids: [], thesis_carriers: [] },
+    investment_case: { one_line_thesis: "Legacy thesis" },
+    value_creation: {},
+    valuation: { summary: { fair_value: { base: 100 } }, methods: {} },
+    market_implied_expectations: { implied_revenue: 100 },
+    legacy_decomposition: {
+      label: "legacy decomposition metadata",
+      components: ["capacity-utilization-yield", "orders-backlog-recognition"],
+      company_lenses: ["lens-equipment-process-control"],
+    },
+  }, {});
+  assert.match(html, /capacity-utilization-yield/);
+  assert.match(html, /orders-backlog-recognition/);
+  assert.doesNotMatch(html, /75%|25%|0\.75|0\.25/);
+});
+
+
+test("model-view text is escaped", () => {
+  const { renderForecastModelView } = require(APP);
+  const html = renderForecastModelView({
+    version: "v2",
+    main_line: {
+      name: '<img src=x onerror="alert(1)">',
+      carrier_node_ids: ["units"],
+      target_node_ids: ["profit"],
+      falsification_ids: ["break"],
+      competitor_response_node_ids: ["response"],
+    },
+  }, {});
+  assert.doesNotMatch(html, /<img/);
+  assert.match(html, /&lt;img/);
+});
+
+
+test("static method pipeline describes a general causal-value chain", () => {
+  const source = fs.readFileSync(APP, "utf8");
+  for (const oldText of ["9+1 机制模块", "8 行业透镜", "机制权重"]) {
+    assert.doesNotMatch(source, new RegExp(oldText.replace(/[+]/g, "\\+")));
+  }
+  for (const newText of ["因果主线", "利润 / FCF", "价值创造", "市场隐含", "证伪"]) {
+    assert.match(source, new RegExp(newText.replace("/", "\\/")));
+  }
+});

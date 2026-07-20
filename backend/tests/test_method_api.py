@@ -57,11 +57,44 @@ def live_skill(monkeypatch, tmp_path: Path) -> Path:
     root = skills_repo / "technology-company-profit-forecasting"
     (root / "references").mkdir(parents=True)
     (root / "scripts").mkdir()
+    (root / "assets").mkdir()
     (root / "SKILL.md").write_text("# Live forecasting skill\nbody\n", encoding="utf-8")
     (root / "references" / "module-test.md").write_text(
         "# Test mechanism\nrule\n", encoding="utf-8"
     )
     (root / "scripts" / "private.txt").write_text("not public", encoding="utf-8")
+    (root / "assets" / "method_system.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "forecast-method-system/v1",
+                "method_id": "test-causal-value-system",
+                "method_version": "9.0.0-test",
+                "title": "Test method",
+                "canonical_flow": ["evidence", "causal_graph", "valuation"],
+                "judgment_boundary": {"allowed": ["thesis"], "prohibited": ["manual_weights"]},
+                "optional_calibration": {"glob": "references/lens-*.md", "core_dependency": False},
+                "stages": [
+                    {
+                        "no": 1,
+                        "id": "contract",
+                        "name": "Decision contract",
+                        "purpose": "Freeze the boundary.",
+                        "gates": ["dated"],
+                        "files": ["SKILL.md", "references/mode-router-and-time-boundary.md"],
+                    },
+                    {
+                        "no": 2,
+                        "id": "operating_model",
+                        "name": "Operating model",
+                        "purpose": "Build equations.",
+                        "gates": ["units"],
+                        "files": ["references/module-*.md"],
+                    },
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
     monkeypatch.setattr(method, "SKILLS_REPO", skills_repo)
     return root
 
@@ -71,7 +104,9 @@ def test_skill_map_reports_existing_missing_and_globbed_responsibility_files(liv
 
     assert result["skill"] == "technology-company-profit-forecasting"
     assert result["root"] == str(live_skill)
-    assert len(result["stages"]) == 10
+    assert result["method_id"] == "test-causal-value-system"
+    assert result["method_version"] == "9.0.0-test"
+    assert len(result["stages"]) == 2
 
     scope_files = result["stages"][0]["files"]
     assert scope_files[0] == {
@@ -88,7 +123,7 @@ def test_skill_map_reports_existing_missing_and_globbed_responsibility_files(liv
         for item in scope_files
     )
 
-    mechanism_files = result["stages"][3]["files"]
+    mechanism_files = result["stages"][1]["files"]
     assert {
         "path": "references/module-test.md",
         "exists": True,

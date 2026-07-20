@@ -4,7 +4,7 @@ FastAPI service the leadership dashboard calls. It has exactly three powers:
 
 1. **Read** the `training-runs/` case tree and the skills git repo (per-company results, method-evolution timeline, live status).
 2. **Write one file**: `training-runs/control.json` — the pause/resume switch training sessions obey.
-3. **Launch/stop agent jobs**: spawn a headless agent to run a live forecast, one training case, or a full autonomous training round. Engine is selectable per job: `claude` (active) or `codex` (reserved slot, returns 501 until the Codex skill port is finalized — flip `engines.codex.available` in `config.json` then, and make sure the v2rayN proxy it needs is running).
+3. **Launch/stop agent jobs**: spawn a headless agent to run a live forecast, one training case, or a full autonomous training round. The local console keeps both `claude` and `codex` active. Both resolve to the same canonical forecasting method through the project skill links; engine-specific CLI settings stay in `config.json`.
 
 ## Run
 
@@ -16,10 +16,10 @@ backend/run.sh          # first run creates backend/.venv and installs fastapi+u
 API reference for the frontend: `API.md`.
 
 The same port also serves the **local dashboard** (`webapp/` at the project
-root, mounted at `/`): three Chinese-language pages — 公司成果 (per-company
-results with metrics, scenario bar, report and model download), 方法与理念
-(self-training philosophy, loop diagram, git method timeline), 运行与控制
-(pause switch, job launcher with engine picker, live job logs). Pure static
+root, mounted at `/`): four Chinese-language views — 投资组合 (per-company
+results with causal/value model, report and model download), 方法体系
+(the canonical ten-stage method and git evolution), 训练控制, and 运行任务
+(pause switch, dual-engine job launcher and live logs). Pure static
 HTML/JS, no build step, works offline for presentations.
 
 ## Layout
@@ -31,13 +31,14 @@ HTML/JS, no build step, works offline for presentations.
 ## Security notes
 
 - Binds to 127.0.0.1 only; no auth. Do not expose the port beyond localhost without adding auth.
-- The `claude` engine runs with `--permission-mode bypassPermissions` so autonomous research/training runs are not blocked by permission prompts. That means a launched job can edit files and run commands in this project like an unattended operator. Tighten to `acceptEdits` in `config.json` if you want file-edit-only autonomy, at the cost of training rounds not being able to git-commit on their own.
+- The configured headless engines run with unattended permissions so research/training rounds are not blocked by prompts. A launched job can therefore edit files and run commands in this project like an unattended operator. Tighten the engine arguments in `config.json` if a less autonomous deployment is required.
+- Codex is deliberately launched without the stale localhost proxy variables recorded in older notes; the current direct configuration is the tested path.
 - Jobs run with cwd = project root, so the project `CLAUDE.md` operating notes (runs root, control.json, "skills repo only via git") load automatically.
 
 ## Smoke test
 
 ```bash
-backend/.venv/bin/python -m pytest ...   # (no unit tests yet; use the curl smoke below)
+PYTHONPATH=backend/.venv/lib/python3.13/site-packages python -m pytest -q backend/tests
 FORECAST_BACKEND_CONFIG=/tmp/test-config.json backend/.venv/bin/uvicorn app.main:app --port 8791
 curl -s http://127.0.0.1:8791/api/health
 ```
