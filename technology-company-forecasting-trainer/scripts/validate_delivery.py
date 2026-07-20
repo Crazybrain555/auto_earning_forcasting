@@ -299,11 +299,39 @@ def main() -> int:
                 fail_record(checks, "snapshot:fields", ", ".join(missing))
             else:
                 pass_record(checks, "snapshot:fields")
-            weights = snap.get("mechanism_weights", {})
-            if weights and abs(sum(float(v) for v in weights.values())-1.0) <= 0.0001:
-                pass_record(checks, "snapshot:mechanism-weights")
+            # Driver tree replaces mechanism weights (weights = factor-scoring
+            # smell; a model is one arithmetic tree, see driver-tree-modeling.md).
+            tree = snap.get("driver_tree") or {}
+            segments = tree.get("segments") if isinstance(tree, dict) else None
+            relaxed_tree = bool(manifest.get("driver_tree_relaxed", False))
+            if isinstance(segments, list) and segments:
+                seg_errors = []
+                if not (tree.get("main_line") or any(s.get("main_line") for s in segments)):
+                    seg_errors.append("main line (主线) not declared")
+                known_basis = {"volume_price", "capacity_ramp", "subscriber_economics",
+                               "usage_economics", "orders_backlog", "program_conversion",
+                               "ratio_carry", "other"}
+                for seg in segments:
+                    if not seg.get("name"):
+                        seg_errors.append("segment missing name")
+                    if seg.get("basis") not in known_basis:
+                        seg_errors.append(f"segment {seg.get('name')}: basis must be one of {sorted(known_basis)}")
+                seg_sum = sum(float(s.get("revenue_point") or 0) for s in segments)
+                y1_rev = ((snap.get("outputs") or {}).get("year_1") or {}).get("revenue_point")
+                if isinstance(y1_rev, (int, float)) and y1_rev and abs(seg_sum - y1_rev) / abs(y1_rev) > 0.01:
+                    seg_errors.append(f"segments sum {seg_sum:,.0f} != year_1 revenue_point {y1_rev:,.0f} (>1%)")
+                if seg_errors:
+                    fail_record(checks, "snapshot:driver-tree", "; ".join(seg_errors))
+                else:
+                    pass_record(checks, "snapshot:driver-tree")
+            elif relaxed_tree:
+                pass_record(checks, "snapshot:driver-tree")
             else:
-                fail_record(checks, "snapshot:mechanism-weights", "weights must sum to 1")
+                fail_record(checks, "snapshot:driver-tree",
+                            "driver_tree.segments required: revenue must decompose into segment leaves "
+                            "(volume x price / capacity ramp / subscriber economics...), with the main line declared - "
+                            "see references/driver-tree-modeling.md",
+                            "error" if args.strict else "warning")
             probs = snap.get("scenario_probabilities", {})
             if probs and abs(sum(float(v) for v in probs.values())-1.0) <= 0.0001:
                 pass_record(checks, "snapshot:scenario-probabilities")

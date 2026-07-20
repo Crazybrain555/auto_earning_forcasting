@@ -384,6 +384,7 @@ def delivery_smoke_test(skill: Path, profile: str, td: Path) -> None:
     manifest["forward_evidence_min_signals"] = 3  # smoke exercises plumbing, not research policy
     manifest["workbook_formula_min"] = 0  # synthetic/legacy example workbooks carry no formulas
     manifest["outputs_canonical_relaxed"] = True  # smoke snapshot keeps template nulls
+    manifest["driver_tree_relaxed"] = True  # smoke exercises plumbing, not modeling doctrine
     manifest["selected_mechanisms"] = ["unit-volume-price-cost"]
     manifest["phase_status"] = {key: "complete" for key in manifest["phase_status"]}
     (workspace / "run_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")

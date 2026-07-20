@@ -85,5 +85,9 @@
     "recommended_buy_price": null,
     "action": "watch",
     "one_line_thesis": ""
+  },
+  "driver_tree": {
+    "main_line": null,
+    "segments": []
   }
 }

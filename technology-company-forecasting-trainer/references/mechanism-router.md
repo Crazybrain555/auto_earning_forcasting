@@ -1,6 +1,11 @@
 # Mechanism router
 
-Modules are composable references inside this single Skill. They are not separate Skills.
+Modules are DECOMPOSITION TEMPLATES: each one tells you how to split a
+specific business line into drivers (volume × price, capacity ramp,
+subscribers × ARPU, orders → recognition...). They are selected per branch of
+the driver tree - never scored, weighted, or blended. Read
+`driver-tree-modeling.md` first: it defines the tree these templates plug
+into, the explicit main line (主线), and the historical-base-first rule.
 
 ## Selection questions
 

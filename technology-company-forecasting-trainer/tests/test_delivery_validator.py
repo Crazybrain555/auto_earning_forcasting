@@ -71,6 +71,10 @@ class DeliveryValidatorTest(unittest.TestCase):
             snapshot['outputs']['year_1'].update({'revenue_point':100000,'profit_point':20000,'eps_point':5.0})
             snapshot['outputs']['year_2'].update({'revenue_point':110000,'revenue_low':90000,'revenue_high':130000,'profit_point':22000,'profit_low':15000,'profit_high':30000})
             snapshot['outputs']['year_3_distribution'].update({'revenue_point':120000,'revenue_low':95000,'revenue_high':150000,'eps_point':6.0,'eps_low':3.0,'eps_high':9.0})
+            # driver tree: segments must sum to year_1 revenue_point, main line declared
+            snapshot['driver_tree']={'main_line':'AI capacity ramp','segments':[
+                {'name':'Segment-Trad','basis':'volume_price','revenue_point':80000,'main_line':False},
+                {'name':'Segment-AI','basis':'capacity_ramp','revenue_point':20000,'main_line':True}]}
             (workspace/'forecast_snapshot.json').write_text(json.dumps(snapshot,indent=2),encoding='utf-8')
 
             validate=[sys.executable,str(SKILL/'scripts/validate_delivery.py'),'--workspace',str(workspace),'--strict']
