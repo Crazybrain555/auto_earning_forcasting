@@ -75,6 +75,8 @@ When observable evidence at `as_of` shows a technology inflection driving struct
 
 **Rule.** When applicable, set the FY+2 and FY+3 Base expansion rate at or above the higher of (a) the trailing four-quarter organic expansion rate and (b) the inflection-driven floor implied by the measured adoption signals. The floor is not a point estimate — it sets the lower bound of the Base case; upside scenarios may exceed it.
 
+**Floor inputs — provenance requirements.** Input (a) must be computed from reported recurring/subscription revenue for the four quarters preceding `as_of`, and the derivation must appear where the floor is set (report and workbook): the four quarterly figures, the computed trailing rate, the inflection-implied floor, and the selected maximum. Management guidance is never admissible as input (a) — guided growth is an output constraint (§6), not a measured trailing rate, and labeling a guided rate as "trailing" is the exact anchoring failure this rule exists to prevent. When guided growth sits materially below the computed trailing rate without a quantified mechanism-level cause (capacity limit, churn event, quantified law-of-large-numbers drag), treat the gap as probable guidance conservatism: the floor stays at the computed trailing rate, and the gap itself becomes a monitor signal. A forecast that claims this rule applies but omits the derivation line is non-compliant with the rule.
+
 **Failure conditions — do not apply when:**
 
 - the transition evidence is analyst commentary or model memory only (no E0/E1 anchor);

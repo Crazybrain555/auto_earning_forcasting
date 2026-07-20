@@ -36,7 +36,7 @@ When observable utilization is elevated and supply is tight at `as_of`, the fore
 
 **Rule.** For FY+2 and FY+3:
 
-- Set the Bull-case revenue at least 15% above the Bear case (i.e., the upside range from Base is wider than the downside range from Base). The exact asymmetry derives from the measured pricing, mix, and capacity-addition evidence.
+- Two distinct requirements: (1) total interval width — Bull-case revenue at least 15% above the Bear case; and (2) asymmetry — the upside range from Base (Bull − Base) wider than the downside range (Base − Bear). The 15% width floor alone does not produce asymmetry; both must hold. The exact degree of asymmetry derives from the measured pricing, mix, and capacity-addition evidence.
 - The Base case itself should reflect the compounding effect: if utilization stays above 85%, ASP and mix trends observed in recent quarters persist into FY+2/FY+3 rather than mean-reverting to cycle-average levels by default.
 - When capacity additions have disclosed qualification timelines, include their incremental revenue contribution in the Base from the qualification date forward, not from the capex announcement date.
 
