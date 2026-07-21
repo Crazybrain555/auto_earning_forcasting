@@ -52,6 +52,10 @@ rsync_args=(
   --exclude=/training-runs
   --exclude=/backend/jobs
   --exclude=/backend/state
+  # The skills checkout reaches the runner only through git (fetch + clean
+  # checkout of the pushed method commit); rsyncing it turns the runner's
+  # working tree into an untracked "-dirty" method state.
+  --exclude=/forecasting-skills
   --exclude=.claude/settings.local.json
   # Local agent experiments must never reach production implicitly; the
   # runner's agent surface stays git-controlled (currently: none).

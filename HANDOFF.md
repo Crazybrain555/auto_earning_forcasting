@@ -38,10 +38,10 @@
 |---|------|------|-----------|
 | 1 | **证据数据库**：统一协议入库/查询/回灌；实现 `forecasting-system-contracts/protocol_manifest.json` 已定义的 ports；训练读取强制 `available_at ≤ cutoff` + 快照定格 | **v1a ✅ 本机已落地**（PG=已决策）：`backend/app/evidence.py`（register/query/bind/ingest/stats + CLI）+ `evidence` schema 四表 + 4 项测试（临时 PG 集群 fixture，含 cutoff 红线与未封存拒收台账两道机制测试）；真实入库：被杀 MRVL 运行的 77 个原件已入库绑定。**剩余**：v1b scaffold 回灌（改 skills）、db.scan 自动 ingest 挂钩、backup/replica 接 pg_dump、runner 装 PG（并入 #6 窗口） | backend/ 为宿主；skill 侧只经 scaffold 回灌与交付 ingest（宪法 #4） |
 | 2 | **MRVL 132MB 日志法证** → 系统缺陷清单 | ✅ 完成：报告在 `docs/2026-07-21-mrvl-run-log-forensics.md`（13 条缺陷分四类；关键数字：107 次单体重写=38.9% 日志、可见推理 0.01%、Q1 双计只被终局红队抓到）——#3 以此立项 | 只读分析 |
-| 3 | **系统瘦身 + SOP 重构**：以「财报拆解」为核心重写方法主线；砍检查占比；禁止单文件全量重生成模式（生成器应模块化、增量化）；简化 codex 写复杂的部分 | 未开始；以 #2 的证据清单立项；改动走 skills git 流程（编辑规范源→测试→重生成→commit→push）；**改完必须过对照盲测（#7）** | forecasting-skills/（训练轮授权流程） |
+| 3 | **系统瘦身 + SOP 重构**：以「财报拆解」为核心重写方法主线；砍检查占比；禁止单文件全量重生成模式（生成器应模块化、增量化）；简化 codex 写复杂的部分 | **设计稿 ✅**：`docs/plans/2026-07-21-statement-decomposition-method-redesign.md`（八步 SOP 带出处、现状审计、瘦身处置、训练研习阶段、实施六步）；三份调研已完成。**实施未开始**；改动走 skills git 流程（编辑规范源→测试→重生成→commit→push）；**改完必须过对照盲测（#7）** | forecasting-skills/（训练轮授权流程） |
 | 4 | **backend 修复**：a) `effective_valuation` 只认 sealed/delivery_passed（治半成品上板）b) `extract_valuation`/`has_valuation` 适配 v10 `fair_value_by_scenario_id` 方言 | a) ✅ b) ✅ 均已落地并 Fable 逐行验收（后端 116 + 前端 9 全绿；v10 视图绝不伪造 fair_value.base；行为变化：v10 行以参考情景值计入"平均上涨空间"）。**未提交、未部署** | backend/app/db.py；测试跑法见下「验收命令」 |
 | 5 | **前端适配**：webapp（本地）渲染 scenario-set 新形态；Site console 同步改动后部署=公开发布，**需用户明确批准** | webapp ✅（与 #4b 同批，卡片/结论区/版本抽屉三处，旧方言路径逐字节保留）；Site console 未动，待部署窗口 | webapp/app.js、sites/forecast-ops-console |
-| 6 | **runner 对齐**：skills checkout 清 dirty 对齐 origin/main；backend 部署对齐 root HEAD。**部署会杀 running job：先查任务看板确认无任务，再经用户同意** | 未开始 | deploy/forecast_runner/sync_to_runner.sh（默认 dry-run） |
+| 6 | **runner 对齐** | ✅ 完成（2026-07-21 深夜窗口，无任务在跑）：skills 重置为干净 cf46400（40 个 rsync 残留已核实可恢复并打保险包进 backups/ 后清理；sync 脚本已排除 forecasting-skills 防再脏）；代码同步；PG16 安装+forecast_evidence 建库；证据库 init+ingest（77 原件）；backend 服务重启验证 active；备份 bundle 冒烟含 pg_dump 无警告 | 本地与 runner 双端一致 |
 | 7 | **盲测复验**：新方法 vs 旧版 24/30 基线的对照盲测（不是六维结构审查）；#3 的每次方法改动都以此为门 | 未开始 | trainer 盲测流程；上次结果 training-runs/method-system-v9-evals/iteration-2/comparison.md |
 | 8 | **流程清晰化**：把 docs/plans/ 里已落地/已过期的方案标注状态，方法文档去重 | 未开始 | docs/plans/ |
 | 9 | **运行护栏**（法证缺陷 ⑫⑬）：job 日志体量护栏（截断/大 diff 折叠）；长跑 job 的检查点/续跑评估；codex 引擎侧全量回显与 compaction 问题主要靠 #3 工件瘦身缓解 | 未开始 | backend/app/jobs.py（注意与任务队列改动接力） |

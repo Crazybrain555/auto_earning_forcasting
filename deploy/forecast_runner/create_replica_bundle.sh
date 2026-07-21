@@ -48,11 +48,14 @@ if [[ -d "$runner_root/training-runs" ]]; then
 fi
 
 if [[ -d "$runner_root/backend/state" ]]; then
+  # evidence/ holds content-addressed original bytes already present inside the
+  # bundled case workspaces; the pg_dump below carries the store metadata.
   rsync -a \
     --exclude='.DS_Store' \
     --exclude='.env*' \
     --exclude='*.db' \
     --exclude='*.db-*' \
+    --exclude='evidence/' \
     "$runner_root/backend/state/" \
     "$payload_dir/backend/state/"
 fi
@@ -71,6 +74,19 @@ integrity="$(sqlite3 "$payload_dir/backend/state/forecast.db" 'PRAGMA integrity_
 if [[ "$integrity" != "ok" ]]; then
   echo "replica database integrity check failed: $integrity" >&2
   exit 1
+fi
+
+# Evidence store metadata (PostgreSQL). Soft-fail while hosts are still being
+# provisioned, but always say so - a silent gap here would hide broken backups.
+if command -v pg_dump >/dev/null 2>&1; then
+  evidence_dsn="${FORECAST_EVIDENCE_DSN:-postgresql:///forecast_evidence}"
+  if ! pg_dump --dbname="$evidence_dsn" --format=custom \
+      --file="$payload_dir/backend/state/evidence.pgdump" 2>/dev/null; then
+    rm -f "$payload_dir/backend/state/evidence.pgdump"
+    echo "WARNING: evidence pg_dump failed or database missing; bundle has no evidence-store backup" >&2
+  fi
+else
+  echo "WARNING: pg_dump not installed; bundle has no evidence-store backup" >&2
 fi
 
 root_commit="$(git -C "$runner_root" rev-parse HEAD 2>/dev/null || printf 'unknown')"
