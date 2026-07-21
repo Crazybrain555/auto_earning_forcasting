@@ -137,6 +137,27 @@ def test_legacy_two_plus_two_round_remains_a_valid_case_selection(monkeypatch, t
     assert [len(plan["group_a"]), len(plan["group_b"])] == [2, 2]
 
 
+def test_replanning_an_abandoned_round_reopens_it_as_planned(monkeypatch, tmp_path):
+    monkeypatch.setattr(data, "RUNS_ROOT", tmp_path)
+    round_dir = tmp_path / "round-reopen"
+    round_dir.mkdir()
+    (round_dir / "round.json").write_text(
+        json.dumps({"round_id": "round-reopen", "status": "abandoned", "abandoned_reason": "old hypothesis"}),
+        encoding="utf-8",
+    )
+
+    plan = data.save_round_plan(
+        "round-reopen",
+        [company("Development", "DEV", "2020-01-31")],
+        [company("Holdout", "HOLD", "2020-02-29")],
+        "new bounded hypothesis",
+        "abc123",
+    )
+
+    assert plan["status"] == "planned"
+    assert plan["abandoned_reason"] == "old hypothesis"
+
+
 def test_training_round_job_loads_a_case_selected_saved_plan(monkeypatch, tmp_path):
     monkeypatch.setattr(jobs, "RUNS_ROOT", tmp_path)
     round_dir = tmp_path / "round-flex"
@@ -172,3 +193,22 @@ def test_training_round_job_rejects_cross_group_case_reuse(monkeypatch, tmp_path
             "training_round",
             {"round_id": "round-overlap", "group_a": [same], "group_b": [same]},
         )
+
+
+def test_training_round_job_normalizes_inline_case_identity_and_roles():
+    prompt, normalized = jobs.build_prompt(
+        "training_round",
+        {
+            "round_id": "round-inline",
+            "group_a": [company("Development", "dev", "2020-01-31")],
+            "group_b": [
+                company("Holdout A", "ha", "2020-02-29"),
+                company("Holdout B", "hb", "2020-03-31"),
+            ],
+        },
+    )
+
+    assert normalized["group_a"][0]["case_id"] == "DEV@2020-01-31"
+    assert normalized["group_a"][0]["role"] == "development"
+    assert [item["role"] for item in normalized["group_b"]] == ["validation", "validation"]
+    assert "Holdout B" in prompt

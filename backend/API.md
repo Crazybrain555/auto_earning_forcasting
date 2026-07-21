@@ -9,7 +9,7 @@ The backend is read-only over case data; its only writes are
 - `GET /api/health` — `{status, runs_root, skills_repo, engines:[{engine, available, note}]}`
 - `GET /api/rounds` — array of `{round_id, round: <round.json|null>, case_count, cases:[case-summary]}`
 - `GET /api/cases` — flat array of case summaries:
-  `{round_id, case_id, entity, security, as_of, run_mode, case_role, method_commit, phase, sealed, sealed_at, evaluated, metrics, delivery_passed, has_report, has_model, last_activity}`
+  `{round_id, case_id, entity, security, as_of, run_mode, case_role, method_commit, phase, sealed, seal_status, sealed_at, evaluated, metrics, delivery_passed, has_report, has_model, last_activity}`. `seal_status` is `published`, `sealed_before_actuals`, `invalid`, or null; an arbitrary JSON file is never presented as a valid seal.
   where `metrics` = evaluation.json metrics: `{revenue_mape, profit_margin_mae_pp, revenue_coverage, profit_coverage, revenue_interval_score, profit_interval_score}` (nullable).
 - `GET /api/cases/{round_id}/{case_id}` — full detail: summary fields plus raw
   `run_manifest`, `forecast_snapshot`, `forecast_seal` (files list replaced by `file_count`),
@@ -75,7 +75,7 @@ The backend is read-only over case data; its only writes are
 ## Curriculum & round plans (自训练)
 
 - `GET /api/curriculum` — trainer skill's candidate library: `[{wave, pairs:[{pair_id, cases:[{company, security, proposed_as_of, role, mechanism, case_key}]}]}]`. Planners select the smallest sufficient development/untouched-validation set for the named failure hypothesis; curriculum pairing is context, not a fixed quota.
-- `POST /api/rounds` `{round_id, group_a[], group_b[], notes?}` — save/update a case-selected round plan (writes `round.json`, status `planned`). Group entries need `entity` + `as_of` (+`security`); each group needs at least one case and case identities must be unique within/across groups. Re-planning preserves unrelated top-level fields and retained cases' extension fields.
+- `POST /api/rounds` `{round_id, group_a[], group_b[], notes?}` — save/update a case-selected round plan (writes `round.json`, status `planned`; re-planning an abandoned round reopens it). Group entries need `entity` + `as_of` (+`security`); each group needs at least one case and case identities must be unique within/across groups. Identity is `UPPER(security or entity)@trim(as_of)`. Re-planning preserves unrelated top-level fields and retained cases' extension fields.
 - `DELETE /api/rounds/{round_id}` / `DELETE /api/cases/{round_id}/{case_id}` — soft delete: moves into `training-runs/_trash/` (recoverable by hand).
 - Job type `plan_round` (POST /api/jobs) — an agent reads the curriculum + past rounds and writes the next case-selected `round.json`, including its failure hypothesis, rival explanations and stopping rule.
 - Job type `training_round` now accepts `params:{round_id}` alone — groups load from the saved round plan.

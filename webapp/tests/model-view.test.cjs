@@ -22,7 +22,9 @@ test("v2 model view renders causal profit line, value creation, valuation and mo
       wacc: 0.10,
       periods: [{
         period: "FY2028",
-        roic: 0.20,
+        normalized_nopat: 18,
+        average_invested_capital: 85.5,
+        average_roic: 0.20,
         incremental_roic: 0.18,
         reinvestment_rate: 0.40,
         fundamental_growth: 0.072,
@@ -31,6 +33,14 @@ test("v2 model view renders causal profit line, value creation, valuation and mo
         terminal_roic: 0.14,
         years_to_fade: 8,
         competitive_response: "Competitor supply compresses the price-cost spread.",
+        schedule: [{
+          period: "Terminal",
+          average_roic: 0.14,
+          incremental_roic: 0.14,
+          reinvestment_rate: 0.21,
+          fundamental_growth: 0.03,
+          erosion_or_renewal_event: "Qualified supply narrows excess returns.",
+        }],
       },
     },
     valuation: {
@@ -59,9 +69,12 @@ test("v2 model view renders causal profit line, value creation, valuation and mo
     "operating profit",
     "价值创造",
     "ROIC",
+    "规范化 NOPAT",
+    "平均投入资本",
     "再投资率",
     "基本面增长",
     "竞争衰减",
+    "Qualified supply narrows excess returns.",
     "DCF",
     "Residual Income",
     "市场反向隐含",
@@ -143,16 +156,27 @@ test("monitoring rows expose series frequency threshold and breach action", () =
       current_value: 48,
       model_value: 50,
       unit: "USD/unit",
+      model_cell_or_formula: "Drivers!F18",
+      monitor_type: "continuous",
       frequency: "quarterly",
+      next_expected_at: "2026-09-30",
+      milestone_date: "2026-10-15",
       trigger_operator: "below",
       trigger_value: 42,
       action_if_breached: "re-underwrite price path",
+      owner: "analyst",
     }] },
   }, {});
   assert.match(html, /ai_asp \/ Contract ASP/);
   assert.match(html, /频率: quarterly/);
+  assert.match(html, /当前: 48 USD\/unit/);
+  assert.match(html, /模型: 50 USD\/unit/);
+  assert.match(html, /单元格: Drivers!F18/);
+  assert.match(html, /下次: 2026-09-30/);
+  assert.match(html, /里程碑: 2026-10-15/);
   assert.match(html, /触发: below 42 USD\/unit/);
   assert.match(html, /动作: re-underwrite price path/);
+  assert.match(html, /负责人: analyst/);
 });
 
 
@@ -209,12 +233,12 @@ test("model-view text is escaped", () => {
 });
 
 
-test("static method pipeline describes a general causal-value chain", () => {
+test("method pipeline is rendered from the canonical skill map", () => {
   const source = fs.readFileSync(APP, "utf8");
   for (const oldText of ["9+1 机制模块", "8 行业透镜", "机制权重"]) {
     assert.doesNotMatch(source, new RegExp(oldText.replace(/[+]/g, "\\+")));
   }
-  for (const newText of ["因果主线", "利润 / FCF", "价值创造", "市场隐含", "证伪"]) {
-    assert.match(source, new RegExp(newText.replace("/", "\\/")));
-  }
+  assert.match(source, /skillMap\.stages\.map/);
+  assert.match(source, /当前证据持续进入直到发布冻结/);
+  assert.doesNotMatch(source, /const PIPE_SVG/);
 });

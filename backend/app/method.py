@@ -66,7 +66,7 @@ _CATEGORY_RULES = [
     (re.compile(r"references/module-|references/mechanism"), "经济方程原语"),
     (re.compile(r"references/historical-training-loop|references/.*loop"), "训练闭环"),
     (re.compile(r"scripts/validate_|scripts/.*seal|scripts/score_|scripts/freeze_"), "校验与封箱"),
-    (re.compile(r"scripts/build_live_release|assets/live_release"), "发布链路"),
+    (re.compile(r"scripts/(?:build_skill_system|build_live_release)|assets/live_release"), "发布链路"),
     (re.compile(r"assets/templates|assets/schemas"), "输出契约"),
     (re.compile(r"scripts/scaffold|scripts/package_self_test|scripts/"), "工具链"),
     (re.compile(r"tests/"), "测试"),
@@ -193,7 +193,7 @@ def skill_map() -> dict:
         "optional_calibration": method_system.get("optional_calibration", {}),
         "source": source,
         "stages": stages,
-        "how_to_change": "方法只在 trainer 的 assets/method_system.json 与对应专业文档中修改 → 跑全套契约/回归 → commit → push → 用 build_live_release.py 重建生产 skill；不要直接改生产副本。",
+        "how_to_change": "方法只在 trainer 的 canonical 源（协调器 SKILL.md、references/、templates/、assets/method_system.json，以及 assets/skill_system/ 的 specialists/contracts）中修改 → 用 scripts/build_skill_system.py 生成并自检全部 skill → 跑全套正交契约/回归 → 独立证据支持后再 commit、push；不要直接改生成副本。",
     }
 
 

@@ -276,6 +276,8 @@ table.grid tr:last-child td { border-bottom: none; }
 }
 .action-toast.on { opacity: 1; transform: translateY(0); pointer-events: auto; }
 .action-toast[data-tone="error"] { border-color: rgba(239,130,117,.66); }
+.action-toast[data-tone="pending"] { border-color: rgba(117,170,239,.72); }
+.action-toast[data-tone="success"] { border-color: rgba(112,201,157,.72); }
 .action-toast-text { flex: 1; min-width: 0; font-size: 12.5px; line-height: 1.55; }
 .action-toast-close {
   border: none; background: none; color: #d5d8d2; padding: 0 2px;

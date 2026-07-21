@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 from pathlib import Path
 
@@ -223,6 +224,59 @@ def test_case_detail_adds_model_view_but_keeps_raw_snapshot_byte_equivalent(
     assert (case_dir / "forecast_snapshot.json").read_text(encoding="utf-8") == snapshot_text
     assert detail["model_view"]["main_line"]["target_node_ids"] == ["profit"]
     assert detail["model_view"]["monitoring"]["drivers"][0]["driver_id"] == "ai_asp"
+
+
+def test_case_summary_distinguishes_published_training_and_invalid_seals(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.setattr(data, "RUNS_ROOT", tmp_path)
+
+    def case(name: str, seal: dict) -> dict:
+        directory = tmp_path / "round" / name
+        directory.mkdir(parents=True)
+        (directory / "run_manifest.json").write_text(
+            json.dumps({"entity": name, "security": name}), encoding="utf-8"
+        )
+        (directory / "forecast_seal.json").write_text(json.dumps(seal), encoding="utf-8")
+        return data.case_summary("round", directory)
+
+    live = {
+        "schema_version": "forecast-seal/v1",
+        "seal_kind": "live_publication",
+        "status": "published",
+        "forecast_id": "fcst://LIVE/v1",
+        "run_id": "run://LIVE/v1",
+        "frozen_at": "2026-07-21T12:00:00Z",
+        "registry": {"schema_version": "artifact-registry/v2", "sha256": "sha256:" + "1" * 64},
+        "bundle_hashes": {
+            "evidence_bundle": "sha256:" + "2" * 64,
+            "operating_model_bundle": "sha256:" + "3" * 64,
+            "financial_forecast_bundle": "sha256:" + "4" * 64,
+        },
+        "supersedes": None,
+        "validated_input_pack_hash": "sha256:" + "5" * 64,
+        "snapshot_hash": "sha256:" + "6" * 64,
+        "delivery_receipt_hash": "sha256:" + "7" * 64,
+        "files": [{"path": "forecast_snapshot.json"}],
+    }
+    encoded = json.dumps(live, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+    live["pack_hash"] = "sha256:" + hashlib.sha256(encoded).hexdigest()
+    live_summary = case("LIVE", live)
+    assert live_summary["sealed"] is True
+    assert live_summary["seal_status"] == "published"
+    assert live_summary["sealed_at"] == live["frozen_at"]
+
+    training_summary = case("TRAIN", {
+        "status": "sealed_before_actuals",
+        "sealed_at": "2026-07-21T10:00:00Z",
+        "pack_hash": "sha256:" + "8" * 64,
+    })
+    assert training_summary["sealed"] is True
+    assert training_summary["seal_status"] == "sealed_before_actuals"
+
+    invalid_summary = case("INVALID", {"status": "published", "pack_hash": "made-up"})
+    assert invalid_summary["sealed"] is False
+    assert invalid_summary["seal_status"] == "invalid"
 
 
 def test_db_ingest_prefers_v2_structured_valuation_and_keeps_v1_compatible(

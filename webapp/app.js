@@ -28,7 +28,7 @@ let actionToastTimer = 0;
 function safeActionErrorMessage(error) {
   const raw = String(error?.message || error || "").trim();
   const status = raw.match(/\b(400|401|403|404|409|422|429|500|502|503|504)\b/)?.[1];
-  if (status === "401") return "未获得控制权限，请使用受信任账号或重新配对。";
+  if (status === "401") return "未获得控制权限，请刷新页面后重试。";
   if (status === "403") return "当前账号没有控制权限。";
   if (status === "429") return "请求过于频繁，请稍后重试。";
   if (status === "503") return "控制服务暂时不可用，请稍后重试。";
@@ -87,9 +87,35 @@ function reportActionError(action, error) {
   return showActionToast(`${action}失败：${safeActionErrorMessage(error)}`, "error");
 }
 
+async function runPendingButton(button, pendingLabel, action) {
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.setAttribute("aria-busy", "true");
+  button.textContent = pendingLabel;
+  showActionToast("操作已提交，本地 Codex 正在处理…", "pending");
+  try {
+    const result = await action();
+    showActionToast("操作已完成，正在刷新数据…", "success");
+    return result;
+  } finally {
+    button.disabled = false;
+    button.removeAttribute("aria-busy");
+    button.textContent = originalText;
+  }
+}
+
+if (typeof globalThis.addEventListener === "function") {
+  globalThis.addEventListener("forecast-command-state", event => {
+    const status = event?.detail?.status;
+    if (status === "queued") showActionToast("命令已进入队列，本地 Codex 正在执行…", "pending");
+    if (status === "timeout") showActionToast("命令仍在队列中，完成后会自动同步；请勿重复点击。", "pending");
+  });
+}
+
 globalThis.__FORECAST_ACTION_FEEDBACK = Object.freeze({
   safeErrorMessage: safeActionErrorMessage,
   showError: reportActionError,
+  runPendingButton,
 });
 /* ACTION_FEEDBACK_END */
 
@@ -154,7 +180,9 @@ function modelItemText(item) {
   if (typeof item !== "object") return String(item);
   const identity = firstDefined(item.label, item.name, item.title, item.id, item.node_id, item.driver_id, item.metric, item.indicator, item.driver);
   const label = item.driver_id && item.series ? `${item.driver_id} / ${item.series}` : identity;
-  const value = firstDefined(item.value, item.current, item.current_value, item.model_value, item.point, item.status);
+  const currentValue = firstDefined(item.current, item.current_value);
+  const modelValue = item.model_value;
+  const value = firstDefined(item.value, item.point, item.status);
   const unit = item.unit ? ` ${item.unit}` : "";
   const trigger = firstDefined(
     item.trigger,
@@ -165,10 +193,17 @@ function modelItemText(item) {
   );
   const parts = [];
   if (label != null) parts.push(String(label));
-  if (value != null) parts.push(`${modelScalar(value)}${unit}`);
+  if (currentValue != null) parts.push(`当前: ${modelScalar(currentValue)}${unit}`);
+  if (modelValue != null) parts.push(`模型: ${modelScalar(modelValue)}${unit}`);
+  if (currentValue == null && modelValue == null && value != null) parts.push(`${modelScalar(value)}${unit}`);
+  if (item.model_cell_or_formula) parts.push(`单元格: ${item.model_cell_or_formula}`);
+  if (item.monitor_type) parts.push(`类型: ${item.monitor_type}`);
   if (item.frequency) parts.push(`频率: ${item.frequency}`);
+  if (item.next_expected_at) parts.push(`下次: ${item.next_expected_at}`);
+  if (item.milestone_date) parts.push(`里程碑: ${item.milestone_date}`);
   if (trigger != null) parts.push(`触发: ${trigger}`);
   if (item.action_if_breached) parts.push(`动作: ${item.action_if_breached}`);
+  if (item.owner) parts.push(`负责人: ${item.owner}`);
   return parts.join(" · ") || Object.keys(item).join(" / ");
 }
 
@@ -291,14 +326,22 @@ function renderForecastModelView(modelView, snapshot = {}) {
   if (valuePeriods.length || Object.keys(fade).length || valueCreation.wacc != null) {
     html += `<div class="dsec"><h3>价值创造 · ROIC、再投资与增长</h3>`;
     if (valuePeriods.length) {
-      html += `<table class="grid"><thead><tr><th>期间</th><th class="num">ROIC</th><th class="num">增量 ROIC</th><th class="num">再投资率</th><th class="num">基本面增长</th><th class="num">WACC</th></tr></thead><tbody>` +
+      html += `<table class="grid"><thead><tr><th>期间</th><th class="num">规范化 NOPAT</th><th class="num">平均投入资本</th><th class="num">ROIC</th><th class="num">增量 ROIC</th><th class="num">再投资率</th><th class="num">基本面增长</th><th class="num">WACC</th></tr></thead><tbody>` +
         valuePeriods.map(period => `<tr><td>${esc(firstDefined(period.period, period.year, "当前"))}</td>
-          <td class="num">${modelRatio(period.roic)}</td><td class="num">${modelRatio(period.incremental_roic)}</td>
+          <td class="num">${modelScalar(firstDefined(period.normalized_nopat, period.nopat))}</td>
+          <td class="num">${modelScalar(period.average_invested_capital)}</td>
+          <td class="num">${modelRatio(firstDefined(period.average_roic, period.roic))}</td><td class="num">${modelRatio(period.incremental_roic)}</td>
           <td class="num">${modelRatio(period.reinvestment_rate)}</td><td class="num">${modelRatio(period.fundamental_growth)}</td>
           <td class="num">${modelRatio(firstDefined(period.wacc, valueCreation.wacc))}</td></tr>`).join("") + `</tbody></table>`;
     }
     if (Object.keys(fade).length) {
       html += `<div class="notice"><b>竞争衰减</b> · 终局 ROIC ${modelRatio(fade.terminal_roic)}${fade.years_to_fade != null ? ` · ${esc(fade.years_to_fade)} 年衰减` : ""}${fade.competitive_response ? ` · ${esc(fade.competitive_response)}` : ""}</div>`;
+      if (Array.isArray(fade.schedule) && fade.schedule.length) {
+        html += `<table class="grid"><thead><tr><th>淡出期间</th><th class="num">平均 ROIC</th><th class="num">增量 ROIC</th><th class="num">再投资率</th><th class="num">增长</th><th>竞争 / 更新事件</th></tr></thead><tbody>${fade.schedule.filter(isObject).map(row => `<tr>
+          <td>${esc(firstDefined(row.period, "—"))}</td><td class="num">${modelRatio(row.average_roic)}</td>
+          <td class="num">${modelRatio(row.incremental_roic)}</td><td class="num">${modelRatio(row.reinvestment_rate)}</td>
+          <td class="num">${modelRatio(row.fundamental_growth)}</td><td>${esc(firstDefined(row.erosion_or_renewal_event, "—"))}</td></tr>`).join("")}</tbody></table>`;
+      }
     }
     html += `</div>`;
   }
@@ -898,12 +941,12 @@ function startSugPoll(prevGen) {
 }
 
 function bindPortfolio() {
-  const msg = document.getElementById("w-msg");
-  document.getElementById("w-add").onclick = async () => {
+  const addButton = document.getElementById("w-add");
+  addButton.onclick = async () => {
     try {
-      await post("/api/watchlist", { entity: document.getElementById("w-entity").value, security: document.getElementById("w-sec").value, note: document.getElementById("w-note").value });
+      await runPendingButton(addButton, "加入中…", () => post("/api/watchlist", { entity: document.getElementById("w-entity").value, security: document.getElementById("w-sec").value, note: document.getElementById("w-note").value }));
       viewPortfolio();
-    } catch (e) { msg.textContent = e.message; }
+    } catch (error) { reportActionError("加入关注", error); }
   };
   bindAutocomplete();
   const sugRun = document.getElementById("sug-run");
@@ -924,8 +967,8 @@ function bindPortfolio() {
   $view.querySelectorAll("[data-sugadd]").forEach(b => b.onclick = async () => {
     const it = ((sugData || {}).suggestions || [])[+b.dataset.sugadd];
     if (!it) return;
-    try { await post("/api/watchlist", { entity: it.entity, security: it.security, note: (it.note || "").slice(0, 30) }); viewPortfolio(); }
-    catch (e) { const m = document.getElementById("sug-msg"); if (m) m.textContent = e.message; }
+    try { await runPendingButton(b, "加入中…", () => post("/api/watchlist", { entity: it.entity, security: it.security, note: (it.note || "").slice(0, 30) })); viewPortfolio(); }
+    catch (error) { reportActionError(`加入 ${it.security || it.entity}`, error); }
   });
   $view.querySelectorAll("[data-sort]").forEach(b => b.onclick = () => { pfSort = b.dataset.sort; paintPortfolio(); });
   $view.querySelectorAll("[data-filter]").forEach(b => b.onclick = () => { pfFilter = b.dataset.filter; paintPortfolio(); });
@@ -950,7 +993,7 @@ function bindPortfolio() {
     ev.stopPropagation();
     if (!confirm(`把 ${b.dataset.unwatch} 移出关注列表?(不删除已有预测记录)`)) return;
     try {
-      await del(`/api/watchlist/${encodeURIComponent(b.dataset.unwatch)}`); expanded.delete(b.dataset.unwatch); viewPortfolio();
+      await runPendingButton(b, "移除中…", () => del(`/api/watchlist/${encodeURIComponent(b.dataset.unwatch)}`)); expanded.delete(b.dataset.unwatch); viewPortfolio();
     } catch (error) { reportActionError(`移除 ${b.dataset.unwatch}`, error); }
   });
   $view.querySelectorAll("[data-toggle]").forEach(el => el.onclick = () => {
@@ -1076,7 +1119,7 @@ async function viewTraining() {
     return `<option value="">默认</option>` + (spec.models || []).map(m => `<option value="${esc(m.id)}">${esc(m.id)}</option>`).join("");
   };
   const groupEditor = (key, label, items) => `
-    <div class="planbox"><b>${label}</b>(${items.length}/2)
+    <div class="planbox"><b>${label}</b>(${items.length})
       <table class="grid">${items.map((it, i) => `<tr><td>${esc(it.entity)} <span class="mono cellnote">${esc(it.security)}</span></td><td class="mono">${esc(it.as_of)}</td><td><button class="btn btn-sm" data-rmplan="${key}|${i}">去掉</button></td></tr>`).join("") || "<tr><td class='cellnote'>从课程表点「填入」或手动添加</td></tr>"}</table>
       <div class="form-row" style="margin:6px 0 0">
         <div class="field"><input placeholder="公司" id="p-${key}-e" style="min-width:110px"></div>
@@ -1097,8 +1140,8 @@ async function viewTraining() {
   </div>
 
   <div class="card">
-    <h2>轮次计划(一轮 4 只:2 训练 + 2 验证)</h2>
-    <div class="card-sub">从下方课程表按 pair 填入,或手动编辑;保存后可一键启动整轮,也可以让 agent 自动安排下一轮。</div>
+    <h2>轮次计划(case-selected 训练 + 未触碰验证)</h2>
+    <div class="card-sub">每组至少 1 个案例；数量由本轮要辨别的失败机制、经济类型与周期状态决定，不设固定配额。可从课程表填入或手动编辑。</div>
     <div class="form-row"><div class="field"><label>轮次 ID</label><input id="plan-id" value="${esc(nextRoundId(roundsData))}" style="min-width:120px"></div>
       <div class="field"><label>引擎</label><select id="plan-engine">${engineOpts}</select></div>
       <div class="field"><label>型号(可选)</label><select id="plan-model" style="min-width:150px">${modelOptsFor((availableEngines.find(e => e.available) || {}).engine || "codex")}</select></div>
@@ -1158,8 +1201,8 @@ async function viewTraining() {
   }
   html += `</div>
 
-  <div class="card"><h2>方法是否在进步</h2>
-    <div class="card-sub">按方法版本(git 提交)聚合已对照真值的案例——skill 每优化一版,这里多一行。</div>
+  <div class="card"><h2>训练诊断向量</h2>
+    <div class="card-sub">误差、覆盖与案例数用于定位失效机制，不合成为总分，也不单独决定方法发布；发布取决于独立案例上的逻辑、证据、会计闭环与泛化判断。</div>
     <div id="progressbox">加载中…</div>
   </div>
 
@@ -1171,7 +1214,7 @@ async function viewTraining() {
     const box = document.getElementById("progressbox");
     if (!box) return;
     if (!prog.length) { box.innerHTML = `<div class="cellnote">还没有已评分的案例——第一轮训练完成后,这里会出现按方法版本的误差趋势。</div>`; return; }
-    box.innerHTML = `<table class="grid"><thead><tr><th>方法版本</th><th class="num">案例数</th><th class="num">平均收入MAPE</th><th class="num">平均利润率误差(pp)</th><th class="num">区间覆盖率</th></tr></thead><tbody>` +
+    box.innerHTML = `<table class="grid"><thead><tr><th>方法版本</th><th class="num">诊断案例数</th><th class="num">收入误差(均值)</th><th class="num">利润率误差(pp,均值)</th><th class="num">区间覆盖(诊断)</th></tr></thead><tbody>` +
       prog.map(r => `<tr><td class="mono">${esc(r.method_commit)}</td><td class="num">${r.cases}</td>
         <td class="num">${pct(r.avg_revenue_mape)}</td><td class="num">${num(r.avg_margin_mae_pp, 1)}</td>
         <td class="num">${pct(r.avg_revenue_coverage, 0)}</td></tr>`).join("") + `</tbody></table>`;
@@ -1212,16 +1255,17 @@ function bindTraining(paused) {
     for (const c of JSON.parse(b.dataset.fill)) {
       const target = c.role === "development" ? plan.a : c.role === "untouched_holdout" ? plan.b : null;
       if (!target) continue;               // locked_regression etc. never enter a round plan
-      if (target.length >= 2) continue;    // 2+2 shape is fixed
-      if (!target.some(x => x.security === c.security && x.as_of === c.as_of)) target.push({ entity: c.entity, security: c.security, as_of: c.as_of });
+      const other = target === plan.a ? plan.b : plan.a;
+      if (![...target, ...other].some(x => x.security === c.security && x.as_of === c.as_of)) target.push({ entity: c.entity, security: c.security, as_of: c.as_of });
     }
     viewTraining();
   });
   $view.querySelectorAll("[data-fillone]").forEach(b => b.onclick = () => {
     const c = JSON.parse(b.dataset.fillone);
     const target = c.group === "a" ? plan.a : plan.b;
-    if (target.length >= 2) { msg.textContent = "每组固定 2 只(2+2)"; return; }
-    if (!target.some(x => x.security === c.security && x.as_of === c.as_of)) target.push({ entity: c.entity, security: c.security, as_of: c.as_of });
+    const other = target === plan.a ? plan.b : plan.a;
+    if ([...target, ...other].some(x => x.security === c.security && x.as_of === c.as_of)) { msg.textContent = "同一案例不能重复或同时进入训练组与验证组"; return; }
+    target.push({ entity: c.entity, security: c.security, as_of: c.as_of });
     viewTraining();
   });
   $view.querySelectorAll("[data-rmplan]").forEach(b => b.onclick = () => {
@@ -1233,11 +1277,12 @@ function bindTraining(paused) {
     const security = document.getElementById(`p-${key}-s`).value.trim();
     const as_of = document.getElementById(`p-${key}-d`).value.trim();
     if (!entity || !as_of) { msg.textContent = "公司和 as_of 必填"; return; }
-    if (plan[key].length >= 2) { msg.textContent = "每组固定 2 只(2+2)"; return; }
-    plan[key].push({ entity, security: security || entity, as_of }); viewTraining();
+    const normalizedSecurity = security || entity;
+    if ([...plan.a, ...plan.b].some(x => x.security === normalizedSecurity && x.as_of === as_of)) { msg.textContent = "同一案例不能重复或同时进入训练组与验证组"; return; }
+    plan[key].push({ entity, security: normalizedSecurity, as_of }); viewTraining();
   });
   document.getElementById("plan-save").onclick = async () => {
-    if (plan.a.length !== 2 || plan.b.length !== 2) { msg.textContent = `一轮固定 4 只:训练 2 + 验证 2(当前 ${plan.a.length}+${plan.b.length})`; return; }
+    if (!plan.a.length || !plan.b.length) { msg.textContent = `每组至少 1 个案例(当前 ${plan.a.length}+${plan.b.length})`; return; }
     try {
       await post("/api/rounds", { round_id: document.getElementById("plan-id").value.trim(), group_a: plan.a, group_b: plan.b, notes: "dashboard 计划" });
       msg.textContent = "计划已保存"; viewTraining();
@@ -1245,7 +1290,7 @@ function bindTraining(paused) {
   };
   document.getElementById("plan-launch").onclick = async () => {
     const rid = document.getElementById("plan-id").value.trim();
-    if (!confirm(`启动整轮训练 ${rid}?agent 会依次跑 A组训练→B组验证→按结果换组或发布,耗时数小时。`)) return;
+    if (!confirm(`启动整轮训练 ${rid}?agent 会依次跑开发组→未触碰验证组→独立判断是否可发布；必要时才做交叉诊断，耗时可能较长。`)) return;
     try {
       if (plan.a.length && plan.b.length) await post("/api/rounds", { round_id: rid, group_a: plan.a, group_b: plan.b, notes: "dashboard 计划" });
       const c = planChoice();
@@ -1372,22 +1417,22 @@ const LOOP_SVG = `
   </style>
 
   <rect class="bd" x="0" y="40" width="578" height="112" rx="10"/>
-  <text class="bdl" x="14" y="59">时间沙盒 · 只用 ≤ as_of 的信息</text>
+  <text class="bdl" x="14" y="59">历史训练沙盒 · 只用 ≤ cutoff 的信息</text>
   <rect class="bd2" x="582" y="40" width="578" height="112" rx="10"/>
   <text class="bdl" x="596" y="59">封存之后 · 揭真值、归因、复核</text>
 
   <rect class="bx" x="10" y="76" width="170" height="62" rx="7"/>
-  <text class="no" x="24" y="94">01</text><text class="bt" x="95" y="107" text-anchor="middle">选公司组</text><text class="bs" x="95" y="125" text-anchor="middle">2 只训练 + 2 只验证</text>
+  <text class="no" x="24" y="94">01</text><text class="bt" x="95" y="107" text-anchor="middle">选择辨别案例</text><text class="bs" x="95" y="125" text-anchor="middle">按失效机制与经济类型</text>
   <rect class="bx" x="204" y="76" width="170" height="62" rx="7"/>
   <text class="no" x="218" y="94">02</text><text class="bt" x="289" y="107" text-anchor="middle">沙盒研究</text><text class="bs" x="289" y="125" text-anchor="middle">模型记忆不算证据</text>
   <rect class="bx" x="398" y="76" width="170" height="62" rx="7"/>
   <text class="no" x="412" y="94">03</text><text class="bt" x="483" y="107" text-anchor="middle">封存预测</text><text class="bs" x="483" y="125" text-anchor="middle">哈希定格,不可改</text>
   <rect class="bx" x="592" y="76" width="170" height="62" rx="7"/>
-  <text class="no" x="606" y="94">04</text><text class="bt" x="677" y="107" text-anchor="middle">揭真值 · 打分</text><text class="bs" x="677" y="125" text-anchor="middle">MAPE / 误差 / 覆盖</text>
+  <text class="no" x="606" y="94">04</text><text class="bt" x="677" y="107" text-anchor="middle">揭真值 · 诊断</text><text class="bs" x="677" y="125" text-anchor="middle">误差向量 + 外部方法复核</text>
   <rect class="bx" x="786" y="76" width="170" height="62" rx="7"/>
   <text class="no" x="800" y="94">05</text><text class="bt" x="871" y="107" text-anchor="middle">机制级归因</text><text class="bs" x="871" y="125" text-anchor="middle">改规则,不调数字</text>
   <rect class="bx" x="980" y="76" width="170" height="62" rx="7"/>
-  <text class="no" x="994" y="94">06</text><text class="bt" x="1065" y="107" text-anchor="middle">验证组复核</text><text class="bs" x="1065" y="125" text-anchor="middle">2 只未触碰的股</text>
+  <text class="no" x="994" y="94">06</text><text class="bt" x="1065" y="107" text-anchor="middle">独立验证复核</text><text class="bs" x="1065" y="125" text-anchor="middle">未触碰案例逐项判断</text>
 
   <line class="e" x1="180" y1="107" x2="198" y2="107"/>
   <line class="e" x1="374" y1="107" x2="392" y2="107"/>
@@ -1396,58 +1441,21 @@ const LOOP_SVG = `
   <line class="e" x1="956" y1="107" x2="974" y2="107"/>
 
   <rect class="bx" x="700" y="226" width="260" height="60" rx="7"/>
-  <text class="bt" x="830" y="252" text-anchor="middle">换组交叉(左脚踩右脚)</text><text class="bs" x="830" y="270" text-anchor="middle">B 转训练,A 回验,比一致性</text>
+  <text class="bt" x="830" y="252" text-anchor="middle">可选交叉诊断</text><text class="bs" x="830" y="270" text-anchor="middle">仅在能区分失败解释时使用</text>
   <rect class="bx" x="270" y="226" width="250" height="60" rx="7"/>
-  <text class="bt" x="395" y="252" text-anchor="middle">git 发布 / 回退</text><text class="bs" x="395" y="270" text-anchor="middle">通过 push · 失败 revert</text>
+  <text class="bt" x="395" y="252" text-anchor="middle">限定范围发布 / 放弃</text><text class="bs" x="395" y="270" text-anchor="middle">独立证据支持才进入生产</text>
 
   <path class="eg" d="M 1030 138 V 182 Q 1030 190 1022 190 H 403 Q 395 190 395 198 V 216"/>
-  <text class="lg" x="620" y="179">没大问题 → 发布</text>
+  <text class="lg" x="620" y="179">逻辑、证据、会计闭环与泛化均成立 → 发布</text>
 
   <path class="ew" d="M 1100 138 V 248 Q 1100 256 1092 256 H 970"/>
   <text class="lw" x="1088" y="216" text-anchor="end">验证不佳</text>
 
   <line class="ew" x1="700" y1="256" x2="530" y2="256"/>
-  <text class="note" x="830" y="302" text-anchor="middle">两组一致 → 发布;仍不一致 → 放弃,换一组新公司</text>
+  <text class="note" x="830" y="302" text-anchor="middle">交叉不是必经门；不能减少关键不确定性就不做</text>
 
   <path class="eb" d="M 270 256 H 103 Q 95 256 95 248 V 148"/>
   <text class="lb" x="112" y="243">新方法版本 → 下一轮</text>
-</svg>`;
-
-const PIPE_SVG = `
-<svg viewBox="0 0 1160 306" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="生产 skill 预测流水线">
-  <defs><marker id="par" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a8c92"/></marker></defs>
-  <style>
-    .pbx{fill:#fff;stroke:#dedcd4}
-    .pno{font:500 9.5px 'IBM Plex Mono',monospace;fill:#c2c1b9;letter-spacing:.1em}
-    .pbt{font:600 12.5px 'IBM Plex Sans',system-ui,sans-serif;fill:#14161a}
-    .pbs{font:10.5px 'IBM Plex Sans',system-ui,sans-serif;fill:#8a8c92}
-    .pe{stroke:#8a8c92;stroke-width:1.5;fill:none;marker-end:url(#par)}
-  </style>
-  <rect class="pbx" x="10" y="30" width="212" height="66" rx="7"/><text class="pno" x="24" y="48">01</text>
-  <text class="pbt" x="116" y="60" text-anchor="middle">决策问题与时点边界</text><text class="pbs" x="116" y="78" text-anchor="middle">投资问题 · 公司口径 · as_of 锁定</text>
-  <rect class="pbx" x="246" y="30" width="212" height="66" rx="7"/><text class="pno" x="260" y="48">02</text>
-  <text class="pbt" x="352" y="60" text-anchor="middle">数据规范化与证据权限</text><text class="pbs" x="352" y="78" text-anchor="middle">事实/主张/假设分离 · 时点留痕</text>
-  <rect class="pbx" x="482" y="30" width="212" height="66" rx="7"/><text class="pno" x="496" y="48">03</text>
-  <text class="pbt" x="588" y="60" text-anchor="middle">行业与技术商业化</text><text class="pbs" x="588" y="78" text-anchor="middle">利润池 · 周期 · 技术到收入门槛</text>
-  <rect class="pbx" x="718" y="30" width="212" height="66" rx="7"/><text class="pno" x="732" y="48">04</text>
-  <text class="pbt" x="824" y="60" text-anchor="middle">因果主线与驱动图</text><text class="pbs" x="824" y="78" text-anchor="middle">证据 → 主线变量 → 利润 / FCF</text>
-  <rect class="pbx" x="954" y="30" width="196" height="66" rx="7"/><text class="pno" x="968" y="48">05</text>
-  <text class="pbt" x="1052" y="60" text-anchor="middle">分部经营与三表联动</text><text class="pbs" x="1052" y="78" text-anchor="middle">量价成本 · 营运资本 · 现金闭环</text>
-  <line class="pe" x1="222" y1="63" x2="242" y2="63"/><line class="pe" x1="458" y1="63" x2="478" y2="63"/>
-  <line class="pe" x1="694" y1="63" x2="714" y2="63"/><line class="pe" x1="930" y1="63" x2="950" y2="63"/>
-  <path class="pe" d="M 1052 96 V 130 Q 1052 138 1044 138 H 124 Q 116 138 116 146 V 178"/>
-  <rect class="pbx" x="10" y="182" width="212" height="66" rx="7"/><text class="pno" x="24" y="200">06</text>
-  <text class="pbt" x="116" y="212" text-anchor="middle">价值创造与竞争衰减</text><text class="pbs" x="116" y="230" text-anchor="middle">ROIC · 再投资 · 增长 · fade</text>
-  <rect class="pbx" x="246" y="182" width="212" height="66" rx="7"/><text class="pno" x="260" y="200">07</text>
-  <text class="pbt" x="352" y="212" text-anchor="middle">估值与市场隐含</text><text class="pbs" x="352" y="230" text-anchor="middle">DCF · RI · 反向隐含 · 安全边际</text>
-  <rect class="pbx" x="482" y="182" width="212" height="66" rx="7"/><text class="pno" x="496" y="200">08</text>
-  <text class="pbt" x="588" y="212" text-anchor="middle">情景、证伪与红队</text><text class="pbs" x="588" y="230" text-anchor="middle">主线首攻 · 永久损失 · 竞争响应</text>
-  <rect class="pbx" x="718" y="182" width="212" height="66" rx="7"/><text class="pno" x="732" y="200">09</text>
-  <text class="pbt" x="824" y="212" text-anchor="middle">模型图与严格校验</text><text class="pbs" x="824" y="230" text-anchor="middle">单位 · lineage · 三表 · 估值恒等式</text>
-  <rect class="pbx" x="954" y="182" width="196" height="66" rx="7"/><text class="pno" x="968" y="200">10</text>
-  <text class="pbt" x="1052" y="212" text-anchor="middle">封存、监测与学习</text><text class="pbs" x="1052" y="230" text-anchor="middle">快照哈希 · 驱动监测 · 误差归因</text>
-  <line class="pe" x1="222" y1="215" x2="242" y2="215"/><line class="pe" x1="458" y1="215" x2="478" y2="215"/>
-  <line class="pe" x1="694" y1="215" x2="714" y2="215"/><line class="pe" x1="930" y1="215" x2="950" y2="215"/>
 </svg>`;
 
 async function viewMethod() {
@@ -1473,8 +1481,7 @@ async function viewMethod() {
   let html = `
     <div class="card">
       <h2>生产 skill 完整逻辑(technology-company-profit-forecasting)</h2>
-      <div class="card-sub">一次实时预测从 01 到 10 全流程走完才允许交付;任何一道门失败都会中止并留下失败记录。</div>
-      <div class="loopwrap">${PIPE_SVG}</div>
+      <div class="card-sub">生产预测中，当前证据持续进入直到发布冻结；日期只记录快照身份，不限制证据进入。下方流程直接来自 canonical skill map，不在前端维护第二份方法。</div>
       ${howToChange}
       ${stageCards}
     </div>
@@ -1484,11 +1491,11 @@ async function viewMethod() {
         <div class="idea"><b>时间沙盒</b><span>历史训练只用截止日前公开的资料,模型记忆不算证据。</span></div>
         <div class="idea"><b>先封存,后见真值</b><span>预测在看真实结果前哈希封存,打分只对封存版本进行。</span></div>
         <div class="idea"><b>改机制,不调数字</b><span>误差归因到经济机制,修可泛化的规则,不是把 20% 改成 10%。</span></div>
-        <div class="idea"><b>2+2 换组交叉</b><span>一轮 4 只:2 只训练、2 只未触碰验证;失败则两组互换再验,仍不一致就放弃换新组。</span></div>
+        <div class="idea"><b>案例按问题选择</b><span>开发组与未触碰验证组都至少一个案例；按失败机制、经济类型与周期覆盖选择，交叉只在能区分解释时使用。</span></div>
       </div>
       <div class="loopwrap">${LOOP_SVG}</div>
     </div>
-    <div class="card"><h2>两个技能的分工</h2><table class="grid"><tbody>` +
+    <div class="card"><h2>多-skill 系统分工</h2><table class="grid"><tbody>` +
     skills.map(s => `<tr><td style="min-width:220px"><b class="mono">${esc(s.name)}</b></td><td>${esc(s.description)}</td></tr>`).join("") +
     `</tbody></table></div>
     <div class="card"><h2>方法演进脉络(每个版本优化了什么)</h2>
@@ -1501,7 +1508,7 @@ async function viewMethod() {
           <span class="evo-hash">${esc(v.short)}</span>
           <span class="evo-date">${esc((v.date || "").replace("T", " ").slice(0, 16))}</span>
           ${v.categories.map(c => `<span class="evo-cat c-${esc(c)}">${esc(c)}</span>`).join("")}
-          ${prog ? `<span class="evo-metrics">验证 ${prog.cases} 案例 · MAPE ${pct(prog.avg_revenue_mape)}</span>` : ""}
+          ${prog ? `<span class="evo-metrics">诊断 ${prog.cases} 案例 · 收入误差 ${pct(prog.avg_revenue_mape)}</span>` : ""}
         </div>
         <div class="evo-subject">${esc(v.subject)}</div>
         ${v.points.length ? `<ul class="evo-points">${v.points.map(pt => `<li>${esc(pt)}</li>`).join("")}</ul>`

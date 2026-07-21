@@ -130,6 +130,8 @@ def test_skill_map_reports_existing_missing_and_globbed_responsibility_files(liv
         "lines": 2,
         "title": "Test mechanism",
     } in mechanism_files
+    assert "build_skill_system.py" in result["how_to_change"]
+    assert "build_live_release.py" not in result["how_to_change"]
 
 
 def test_skill_file_reads_an_allowed_file_relative_to_the_live_skill(live_skill):

@@ -11,6 +11,7 @@ from __future__ import annotations
 import copy
 import csv
 import datetime as dt
+import hashlib
 import json
 import re
 import shutil
@@ -46,6 +47,70 @@ def read_csv_rows(path: Path) -> list[dict[str, str]]:
         return []
 
 
+_SHA256_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
+
+
+def _live_seal_is_self_consistent(seal: object) -> bool:
+    """Validate the self-contained live seal shape used for dashboard state.
+
+    Publication remains responsible for full file and registry verification;
+    this read-only view only prevents an arbitrary JSON file from appearing as
+    a published forecast.
+    """
+
+    if not isinstance(seal, dict):
+        return False
+    if (
+        seal.get("schema_version") != "forecast-seal/v1"
+        or seal.get("seal_kind") != "live_publication"
+        or seal.get("status") != "published"
+    ):
+        return False
+    if not all(str(seal.get(field) or "").strip() for field in ("forecast_id", "run_id", "frozen_at")):
+        return False
+    hashes = [
+        seal.get("pack_hash"),
+        seal.get("validated_input_pack_hash"),
+        seal.get("snapshot_hash"),
+        seal.get("delivery_receipt_hash"),
+    ]
+    bundles = seal.get("bundle_hashes")
+    if not isinstance(bundles, dict) or set(bundles) != {
+        "evidence_bundle",
+        "operating_model_bundle",
+        "financial_forecast_bundle",
+    }:
+        return False
+    hashes.extend(bundles.values())
+    if not all(isinstance(value, str) and _SHA256_RE.fullmatch(value) for value in hashes):
+        return False
+    if not isinstance(seal.get("files"), list) or not seal["files"]:
+        return False
+    canonical = dict(seal)
+    expected = canonical.pop("pack_hash")
+    encoded = json.dumps(
+        canonical,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    ).encode("utf-8")
+    return expected == "sha256:" + hashlib.sha256(encoded).hexdigest()
+
+
+def _seal_state(seal: object) -> tuple[str | None, str | None]:
+    if _live_seal_is_self_consistent(seal):
+        return "published", str(seal.get("frozen_at"))
+    if isinstance(seal, dict) and (
+        seal.get("status") == "sealed_before_actuals"
+        and str(seal.get("sealed_at") or "").strip()
+        and isinstance(seal.get("pack_hash"), str)
+        and _SHA256_RE.fullmatch(seal["pack_hash"])
+    ):
+        return "sealed_before_actuals", str(seal.get("sealed_at"))
+    return ("invalid", None) if seal is not None else (None, None)
+
+
 def _safe_name(name: str) -> bool:
     return bool(name) and name not in {".", ".."} and "/" not in name and "\\" not in name and not name.startswith(".")
 
@@ -68,6 +133,7 @@ def case_summary(round_id: str, case_dir: Path) -> dict:
     evaluation = read_json(case_dir / "evaluation.json") or read_json(case_dir / "evaluation" / "evaluation.json")
     validation = read_json(case_dir / "delivery_validation.json")
     state = read_json(case_dir / "training_state.json") or {}
+    seal_status, sealed_at = _seal_state(seal)
     mtimes = [p.stat().st_mtime for p in case_dir.glob("*.json") if p.is_file()]
     return {
         "round_id": round_id,
@@ -79,8 +145,9 @@ def case_summary(round_id: str, case_dir: Path) -> dict:
         "case_role": manifest.get("training_case_role") or state.get("case_role"),
         "method_commit": manifest.get("method_commit") or state.get("method_commit"),
         "phase": state.get("phase"),
-        "sealed": seal is not None,
-        "sealed_at": (seal or {}).get("sealed_at"),
+        "sealed": seal_status in {"published", "sealed_before_actuals"},
+        "seal_status": seal_status,
+        "sealed_at": sealed_at,
         "evaluated": evaluation is not None,
         "metrics": (evaluation or {}).get("metrics"),
         "delivery_passed": (validation or {}).get("passed"),
@@ -623,7 +690,7 @@ def save_round_plan(round_id: str, group_a: list, group_b: list, notes: str, bas
         "base_method_commit": existing.get("base_method_commit") or base_commit,
         "group_a": plan_a,
         "group_b": plan_b,
-        "status": existing.get("status") or "planned",
+        "status": "planned",
         "notes": notes or existing.get("notes", ""),
         "planned_at": dt.datetime.now(dt.timezone.utc).isoformat(),
     }
