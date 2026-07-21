@@ -626,8 +626,11 @@ function enrichRow(r) {
   const live = q.price != null;
   const fv = v.fair_value || {};
   const base = fv.base ?? null, bear = fv.bear ?? null, bull = fv.bull ?? null;
+  const refFv = v.reference_fair_value ?? null;
+  const refOnly = base == null && refFv != null;   // v10 参考情景方言:无三值,只有参考情景 DCF
+  const target = base ?? refFv;                     // 目标价 / 上涨空间用的值:基准优先,否则参考情景
   const buy = v.recommended_buy_price ?? null;
-  const u = price && base != null ? base / price - 1 : null;
+  const u = price && target != null ? target / price - 1 : null;
   const d = price && buy ? price / buy - 1 : null;
   let distKey = null, distLabel = "";
   if (d != null) {
@@ -635,7 +638,7 @@ function enrichRow(r) {
     else if (d <= 0.05) { distKey = "near"; distLabel = "接近买点 +" + (d * 100).toFixed(1) + "%"; }
     else { distKey = "above"; distLabel = "高于买点 +" + (d * 100).toFixed(1) + "%"; }
   }
-  return { r, v, price, live, base, bear, bull, buy, u, d, distKey, distLabel, action: String(v.action || "").toLowerCase() };
+  return { r, v, price, live, base, bear, bull, refFv, refOnly, target, buy, u, d, distKey, distLabel, action: String(v.action || "").toLowerCase() };
 }
 
 function valbarHtml(e) {
@@ -657,6 +660,32 @@ function valbarHtml(e) {
     </div>
     <div class="vb-scale"><span class="vb-lo">悲观 ${money(e.bear)}</span><span class="vb-basetxt" style="left:${L(pB).toFixed(2)}%">基准 ${money(e.base)}</span><span class="vb-hi">乐观 ${money(e.bull)}</span></div></div>`;
 }
+
+// 情景 id 转人话:下划线转空格即可,不做映射表。
+const scenarioText = id => String(id ?? "").replace(/_/g, " ").trim();
+
+// v10 参考情景方言:只估一个参考情景、其余情景刻意不估值,没有悲观/基准/乐观三值。
+// 不画三值区间条,改画一小块:参考情景公允价 vs 现价、市场隐含差距、未估情景 + 备注。
+function referenceValuationHtml(v, price) {
+  v = v || {};
+  const mi = v.market_implied || {};
+  const ref = v.reference_fair_value ?? null;
+  const refName = scenarioText(v.reference_scenario_id);
+  const u = (price && ref != null) ? ref / price - 1 : null;
+  const notValued = (v.not_valued_scenario_ids || []).map(scenarioText).filter(Boolean).join("、");
+  const note = v.valuation_note || v.current_valuation_note || "";
+  let html = `<div class="verdict-fv">参考情景公允价 <b>${money(ref)}</b>${refName ? ` <span class="cellnote">(${esc(refName)})</span>` : ""} · 现价 ${money(price)}${u != null ? ` · 上涨空间 <b style="color:${u >= 0 ? "var(--gain)" : "var(--loss)"}">${(u >= 0 ? "+" : "") + (u * 100).toFixed(1)}%</b>(参考情景)` : ""}</div>`;
+  if (mi.implied_driver_value != null && mi.model_driver_value != null) {
+    html += `<div class="verdict-fv">市场隐含 ${esc(mi.named_driver || "驱动")}:隐含 <b>${modelScalar(mi.implied_driver_value)}</b> vs 模型 <b>${modelScalar(mi.model_driver_value)}</b>${mi.unit ? " " + esc(mi.unit) : ""}</div>`;
+  }
+  if (notValued || note) {
+    html += `<div class="verdict-fv">${notValued ? `其余情景刻意未估值:${esc(notValued)}` : ""}${notValued && note ? " · " : ""}${note ? esc(note) : ""}</div>`;
+  }
+  return html;
+}
+
+// 参考情景方言在卡片里占用区间条的位置:包一层 valwrap 复用现有间距。
+const refValwrap = e => `<div class="valwrap">${referenceValuationHtml(e.v, e.price)}</div>`;
 
 function summaryHtml(es) {
   const ups = es.filter(e => e.u != null);
@@ -770,8 +799,8 @@ function paintPortfolio() {
         <div><div class="pc-price">${e.price != null ? money(e.price) : "—"}${e.live ? ` <span class="cellnote">实时</span>` : e.price != null ? ` <span class="cellnote">${esc((e.v.price_as_of || "").slice(0, 10) || "研究时点")}</span>` : ""}</div>
           ${e.distKey ? `<div class="pc-dist ${e.distKey}">${esc(e.distLabel)}</div>` : ""}</div>
         <div class="pc-rating"><span class="ratepill" style="background:${rm.bg};color:${rm.color}"><span class="dot" style="background:${rm.color}"></span>${rm.label}</span></div>
-        <div class="pc-up"><span class="v" style="color:${e.u == null ? "var(--muted)" : e.u >= 0 ? "var(--gain)" : "var(--loss)"}">${e.u == null ? "—" : (e.u >= 0 ? "+" : "") + (e.u * 100).toFixed(1) + "%"}</span><div class="l">上涨空间</div></div>
-        <div class="pc-target"><span class="v">${money(e.base)}</span><div class="l">目标价</div></div>
+        <div class="pc-up"><span class="v" style="color:${e.u == null ? "var(--muted)" : e.u >= 0 ? "var(--gain)" : "var(--loss)"}">${e.u == null ? "—" : (e.u >= 0 ? "+" : "") + (e.u * 100).toFixed(1) + "%"}</span><div class="l">${e.refOnly ? "上涨空间·参考" : "上涨空间"}</div></div>
+        <div class="pc-target"><span class="v">${money(e.refOnly ? e.refFv : e.base)}</span><div class="l">${e.refOnly ? "目标价·参考情景" : "目标价"}</div></div>
         <div class="pc-act">${r.job_running
           ? `<button class="btn btn-sm" data-viewlog="${esc(r.job_id || "")}">日志</button> <button class="btn btn-sm btn-danger" data-canceljob="${esc(r.job_id || "")}" data-sec="${esc(r.security)}">取消</button>`
           : r.job_queued
@@ -781,7 +810,7 @@ function paintPortfolio() {
           <button class="btn btn-sm btn-danger" data-unwatch="${esc(r.security)}" title="移出关注列表(历史版本保留在数据库)">移除</button></div>
         <div class="chev ${isOpen ? "open" : ""}">›</div>
       </div>
-      ${valbarHtml(e)}
+      ${e.refOnly ? refValwrap(e) : valbarHtml(e)}
       ${isOpen ? `<div class="pcbody"><div class="dwrap" id="d-${esc(r.security)}">加载中…</div></div>` : ""}
     </div>`;
   }
@@ -913,7 +942,7 @@ function openVersionDrawer(sec, entity) {
         return `<div class="vercard ${h.deleted ? "ver-del" : ""} ${isEff ? "ver-eff" : ""}">
           <div class="ver-pick">${h.deleted || !h.has_valuation ? "" : `<input type="radio" name="verpick" ${isEff ? "checked" : ""} data-actrun="${h.id}" title="设为看板显示版本">`}</div>
           <div class="ver-main">
-            <div><b class="mono" style="font-size:14px">${money(fv.base)}</b> ${h.has_valuation ? actionChip(val.action) : statusChip("muted", "无估值")}
+            <div><b class="mono" style="font-size:14px">${money(fv.base ?? val.reference_fair_value)}</b>${val.reference_fair_value != null && fv.base == null ? ` <span class="cellnote">参考情景</span>` : ""} ${h.has_valuation ? actionChip(val.action) : statusChip("muted", "无估值")}
               ${isEff ? statusChip("good", pinned ? "当前显示 · 手动固定" : "当前显示 · 自动") : ""} ${h.deleted ? statusChip("critical", "已删除") : ""}</div>
             <div class="cellnote">买入 ≤ ${money(val.recommended_buy_price)} · 方法 <span class="mono">${esc((h.method_commit || "—").slice(0, 7))}</span> · ${esc(h.engine || "—")}${h.model ? " · " + esc(h.model) : ""}${h.effort ? " · " + esc(h.effort) : ""}</div>
             <div class="cellnote mono">${fmtTime(h.captured_at)} · as_of ${esc((h.as_of || "").slice(0, 10))} · ${esc(h.case_id || "")}</div>
@@ -1089,11 +1118,15 @@ async function renderDetail(sec, rows) {
   const primary = row.latest_live || row.latest;
   let html = "";
   const v = row.valuation;
-  if (v && (v.one_line_thesis || v.fair_value)) {
+  const refOnly = !!(v && v.reference_fair_value != null && !(v.fair_value && v.fair_value.base != null));
+  const price = (quotesCache[sec] || {}).price ?? (v && v.current_price) ?? null;
+  if (v && (v.one_line_thesis || v.fair_value || v.reference_fair_value)) {
     html += `<div class="verdict" style="border-left-color:${rateMeta(v.action).color}">
       <div class="verdict-main">${actionChip(v.action)} <b>${esc(v.one_line_thesis || "")}</b></div>
-      <div class="verdict-fv">情景公允价:悲观 ${money(v.fair_value?.bear)} · 基准 <b>${money(v.fair_value?.base)}</b> · 乐观 ${money(v.fair_value?.bull)} · 建议买入 ≤ ${money(v.recommended_buy_price)}</div>
-      ${v.current_valuation_note ? `<div class="verdict-fv" style="margin-top:4px">当前估值:${esc(v.current_valuation_note)}</div>` : ""}
+      ${refOnly
+        ? referenceValuationHtml(v, price)
+        : `<div class="verdict-fv">情景公允价:悲观 ${money(v.fair_value?.bear)} · 基准 <b>${money(v.fair_value?.base)}</b> · 乐观 ${money(v.fair_value?.bull)} · 建议买入 ≤ ${money(v.recommended_buy_price)}</div>
+      ${v.current_valuation_note ? `<div class="verdict-fv" style="margin-top:4px">当前估值:${esc(v.current_valuation_note)}</div>` : ""}`}
     </div>`;
   }
   if (!primary) {
@@ -1644,7 +1677,7 @@ async function route() {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { isV2ModelView, renderForecastModelView };
+  module.exports = { isV2ModelView, renderForecastModelView, referenceValuationHtml };
 }
 
 if (typeof window !== "undefined" && typeof document !== "undefined") {

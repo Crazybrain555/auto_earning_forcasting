@@ -45,3 +45,7 @@ sites/
 # YouTube transcript MCP install/build output (bootstrap rebuilds them)
 scripts/mcp/youtube-transcript-mcp/node_modules/
 scripts/mcp/youtube-transcript-mcp/dist/
+
+# Evidence store blobs: content-addressed originals live on disk, only
+# paths+hashes go in PostgreSQL - never committed.
+backend/state/evidence/

@@ -118,17 +118,85 @@ def _scenario_values(payload) -> dict:
     return {role: payload.get(role) for role in ("bear", "base", "bull")}
 
 
+def _extract_valuation_reference(snapshot: dict, summary: dict) -> dict:
+    """Portfolio view for the reference-scenario valuation dialect.
+
+    This dialect values only a named reference scenario by DCF and leaves the
+    other scenarios deliberately unvalued, so there is no bear/base/bull triple
+    to report.  The reference fair value is surfaced on its own key while the
+    bear/base/bull slots stay empty, so nothing downstream mistakes the single
+    reference number for a symmetric scenario range.
+    """
+    valuation = snapshot.get("valuation")
+    valuation = valuation if isinstance(valuation, dict) else {}
+    market = snapshot.get("market_implied_expectations")
+    market = market if isinstance(market, dict) else {}
+    investment = snapshot.get("investment_case")
+    investment = investment if isinstance(investment, dict) else {}
+
+    by_scenario = summary.get("fair_value_by_scenario_id")
+    by_scenario = dict(by_scenario) if isinstance(by_scenario, dict) else {}
+    reference_scenario_id = summary.get("reference_scenario_id")
+    reference_fair_value = (
+        by_scenario.get(reference_scenario_id) if _present(reference_scenario_id) else None
+    )
+    if not _present(reference_fair_value):
+        valued = [value for value in by_scenario.values() if _present(value)]
+        reference_fair_value = valued[0] if len(valued) == 1 else None
+    not_valued = summary.get("not_valued_scenario_ids")
+    not_valued = list(not_valued) if isinstance(not_valued, (list, tuple)) else []
+
+    note = summary.get("current_valuation_note", "")
+    return {
+        "current_price": _first_present(
+            market.get("observed_price"), summary.get("current_price")
+        ),
+        "price_currency": _first_present(
+            valuation.get("currency"), summary.get("price_currency")
+        ),
+        "price_as_of": _first_present(
+            market.get("price_as_of"), summary.get("price_as_of")
+        ),
+        "current_valuation_note": note,
+        "valuation_note": note,
+        # No symmetric scenario range exists in this dialect; keep the triple
+        # empty instead of promoting the reference DCF into a fake base.
+        "fair_value": {"bear": None, "base": None, "bull": None},
+        "reference_scenario_id": reference_scenario_id,
+        "reference_fair_value": reference_fair_value,
+        "fair_value_by_scenario_id": by_scenario,
+        "not_valued_scenario_ids": not_valued,
+        "market_implied": {
+            "observed_price": market.get("observed_price"),
+            "named_driver": market.get("named_driver"),
+            "implied_driver_value": market.get("implied_driver_value"),
+            "model_driver_value": market.get("model_driver_value"),
+            "unit": market.get("unit"),
+        },
+        "recommended_buy_price": summary.get("recommended_buy_price"),
+        "action": summary.get("action", "watch"),
+        "one_line_thesis": _first_present(
+            investment.get("one_line_thesis"), summary.get("one_line_thesis")
+        )
+        or "",
+    }
+
+
 def extract_valuation(snapshot: dict | None) -> dict:
     """Return the stable portfolio valuation view for either snapshot contract.
 
     Legacy snapshots already publish ``valuation_summary`` and are returned
     unchanged.  For v2, structured valuation and market-implied fields are the
     source of truth; the summary remains a fallback for optional presentation
-    fields and scenario values that the detailed model does not publish.
+    fields and scenario values that the detailed model does not publish.  The
+    reference-scenario dialect (scenario-keyed fair values with the rest left
+    unvalued) is surfaced through its own view without a synthesized triple.
     """
     snapshot = snapshot if isinstance(snapshot, dict) else {}
     summary = snapshot.get("valuation_summary")
     summary = dict(summary) if isinstance(summary, dict) else {}
+    if "fair_value_by_scenario_id" in summary or "reference_scenario_id" in summary:
+        return _extract_valuation_reference(snapshot, summary)
     if _contract_major(snapshot) != "2":
         return summary
 
@@ -233,7 +301,10 @@ def ingest_case(case: dict, snapshot: dict | None, outputs_normalized: dict | No
     canonical = json.dumps(snapshot, sort_keys=True, ensure_ascii=False)
     content_hash = "sha256:" + hashlib.sha256(canonical.encode()).hexdigest()
     valuation = extract_valuation(snapshot)
-    has_val = bool((valuation.get("fair_value") or {}).get("base") is not None)
+    has_val = bool(
+        (valuation.get("fair_value") or {}).get("base") is not None
+        or _present(valuation.get("reference_fair_value"))
+    )
     job = (jobs_by_workspace or {}).get(str(case.get("workspace") or "")) or \
           (jobs_by_workspace or {}).get(str(Path(CONFIG["runs_root"]) / case["round_id"] / case["case_id"])) or {}
     own = conn is None
@@ -308,7 +379,10 @@ def history(security: str) -> list[dict]:
 
 
 def effective_valuation(security: str) -> dict | None:
-    """The version the dashboard should show: pinned first, else newest good one."""
+    """The version the dashboard should show: pinned first, else the newest
+    delivered one. In-progress workspaces are ingested for history, but a
+    half-built snapshot must never surface as the board's conclusion, so the
+    fallback only considers sealed or delivery-validated versions."""
     sec = _sec_key(security)
     with _connect() as conn:
         row = conn.execute(
@@ -319,6 +393,7 @@ def effective_valuation(security: str) -> dict | None:
             row = conn.execute(
                 """SELECT valuation_json FROM runs
                    WHERE security = ? AND deleted_at IS NULL AND has_valuation = 1
+                     AND (sealed = 1 OR delivery_passed = 1)
                    ORDER BY captured_at DESC, id DESC LIMIT 1""", (sec,)).fetchone()
     if row is None:
         return None

@@ -75,6 +75,50 @@ def _v2_snapshot() -> dict:
     }
 
 
+def _v10_snapshot() -> dict:
+    """Reference-scenario dialect: one scenario valued by DCF, the rest are
+    deliberately unvalued. Shape mirrors the live MRVL v10 snapshot."""
+    return {
+        "forecast_contract_version": "2.0",
+        "schema_version": "2.0",
+        "model_version": "10.0.0+git:ce917c69226f-dirty",
+        "investment_case": {
+            "one_line_thesis": "Operating upside is substantial, but the observed price requires scale far above the reference causal path.",
+            "margin_of_safety_pct": -0.5596906391069124,
+        },
+        "valuation": {
+            "currency": "USD",
+            "dcf": {"enterprise_value": 80084.89426749862},
+            "per_share": {"value_per_share": 85.8339068124985, "diluted_shares": 920.0},
+        },
+        "market_implied_expectations": {
+            "price_as_of": "2026-07-20",
+            "observed_price": 194.94,
+            "named_driver": "FY2031 revenue at reference FCF margin",
+            "implied_driver_value": 71233.23251373842,
+            "model_driver_value": 27000.0,
+            "unit": "USD_millions",
+            "falsification_trigger": "Sustained evidence that revenue materially exceeds the reference path.",
+        },
+        "valuation_summary": {
+            "current_price": 194.94,
+            "price_currency": "USD",
+            "price_as_of": "2026-07-20",
+            "current_valuation_note": "Reference DCF only; alternatives are explicit but intentionally unvalued because the decision is already dominated by the market-implied gap.",
+            "reference_scenario_id": "reference_ai_ramp",
+            "fair_value_by_scenario_id": {"reference_ai_ramp": 85.8339068124985},
+            "not_valued_scenario_ids": [
+                "qualification_and_competitive_delay",
+                "broader_program_acceleration",
+            ],
+            "valuation_completeness": "reference_only_executable",
+            "recommended_buy_price": None,
+            "action": "watch",
+            "one_line_thesis": "Operating upside is substantial, but the observed price requires scale far above the reference causal path.",
+        },
+    }
+
+
 def _model_graph() -> dict:
     return {
         "schema_version": "2.0",
@@ -314,3 +358,86 @@ def test_db_ingest_prefers_v2_structured_valuation_and_keeps_v1_compatible(
     }
     extracted = db.extract_valuation(legacy)
     assert extracted == legacy["valuation_summary"]
+
+
+def test_effective_valuation_ignores_undelivered_drafts(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "forecast.db")
+    db.init()
+    delivered = {
+        "round_id": "live", "case_id": "TEST@2026-07-20",
+        "security": "TEST", "entity": "Test Co",
+        "sealed": True, "delivery_passed": True,
+    }
+    db.ingest_case(delivered, _v2_snapshot(), {})
+
+    draft_snapshot = _v2_snapshot()
+    draft_snapshot["valuation"]["per_share"]["value_per_share"] = 5.55
+    draft = {
+        "round_id": "live", "case_id": "TEST@2026-07-21",
+        "security": "TEST", "entity": "Test Co",
+        "sealed": False, "delivery_passed": None,
+    }
+    db.ingest_case(draft, draft_snapshot, {})
+
+    effective = db.effective_valuation("TEST")
+    assert effective is not None
+    assert effective["fair_value"]["base"] == 9.10
+
+    only_draft = {
+        "round_id": "live", "case_id": "NEW@2026-07-21",
+        "security": "NEW", "entity": "New Co",
+        "sealed": False, "delivery_passed": None,
+    }
+    db.ingest_case(only_draft, _v2_snapshot(), {})
+    assert db.effective_valuation("NEW") is None
+
+    assert len(db.history("TEST")) == 2
+
+
+def test_db_reference_dialect_surfaces_reference_value_without_faking_a_base(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "forecast.db")
+    db.init()
+    snapshot = _v10_snapshot()
+
+    extracted = db.extract_valuation(snapshot)
+    # New reference-dialect keys are surfaced for the portfolio view.
+    assert extracted["reference_scenario_id"] == "reference_ai_ramp"
+    assert extracted["reference_fair_value"] == 85.8339068124985
+    assert extracted["fair_value_by_scenario_id"] == {"reference_ai_ramp": 85.8339068124985}
+    assert extracted["not_valued_scenario_ids"] == [
+        "qualification_and_competitive_delay",
+        "broader_program_acceleration",
+    ]
+    assert extracted["valuation_note"].startswith("Reference DCF only")
+    assert extracted["market_implied"] == {
+        "observed_price": 194.94,
+        "named_driver": "FY2031 revenue at reference FCF margin",
+        "implied_driver_value": 71233.23251373842,
+        "model_driver_value": 27000.0,
+        "unit": "USD_millions",
+    }
+    assert extracted["current_price"] == 194.94
+    assert extracted["price_currency"] == "USD"
+    assert extracted["one_line_thesis"].startswith("Operating upside")
+    # The single reference DCF must never be promoted into a fake bear/base/bull triple.
+    assert extracted["fair_value"] == {"bear": None, "base": None, "bull": None}
+
+    # has_valuation is driven by the reference value, not by a base triple.
+    case = {
+        "round_id": "live", "case_id": "MRVL@2026-07-21",
+        "security": "MRVL", "entity": "Marvell",
+        "sealed": True, "delivery_passed": True,
+    }
+    db.ingest_case(case, snapshot, {})
+    stored = db.history("MRVL")[0]
+    assert stored["has_valuation"] == 1
+    assert stored["valuation"]["reference_fair_value"] == 85.8339068124985
+    assert stored["valuation"]["fair_value"]["base"] is None
+
+    # A sealed, delivered reference-only forecast still floats up as the effective view.
+    effective = db.effective_valuation("MRVL")
+    assert effective is not None
+    assert effective["reference_fair_value"] == 85.8339068124985
+    assert effective["fair_value"]["base"] is None

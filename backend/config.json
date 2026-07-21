@@ -174,5 +174,9 @@
     "proxy": null,
     "ttl_seconds": 300,
     "note": "Set proxy to e.g. http://127.0.0.1:10808 if Yahoo is unreachable directly."
+  },
+  "evidence": {
+    "dsn": "postgresql:///forecast_evidence",
+    "blobs_dir": "backend/state/evidence/blobs"
   }
 }

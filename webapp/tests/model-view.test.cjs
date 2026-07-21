@@ -233,6 +233,50 @@ test("model-view text is escaped", () => {
 });
 
 
+test("v10 reference-scenario valuation renders the reference value, not a bear/base/bull range", () => {
+  const { referenceValuationHtml } = require(APP);
+  const v = {
+    current_price: 194.94,
+    price_currency: "USD",
+    valuation_note: "Reference DCF only; alternatives are explicit but intentionally unvalued.",
+    fair_value: { bear: null, base: null, bull: null },
+    reference_scenario_id: "reference_ai_ramp",
+    reference_fair_value: 85.8339068124985,
+    fair_value_by_scenario_id: { reference_ai_ramp: 85.8339068124985 },
+    not_valued_scenario_ids: [
+      "qualification_and_competitive_delay",
+      "broader_program_acceleration",
+    ],
+    market_implied: {
+      observed_price: 194.94,
+      named_driver: "FY2031 revenue at reference FCF margin",
+      implied_driver_value: 71233.23251373842,
+      model_driver_value: 27000,
+      unit: "USD_millions",
+    },
+    action: "watch",
+    one_line_thesis: "Operating upside is substantial.",
+  };
+  const html = referenceValuationHtml(v, 194.94);
+
+  // No synthesized scenario range: the bear ("悲观") framing must be absent.
+  assert.doesNotMatch(html, /悲观/);
+  // Reference framing and the deliberately-unvalued line are present.
+  assert.match(html, /参考情景/);
+  assert.match(html, /刻意未估值/);
+  // Reference fair value and the humanized scenario id (underscores -> spaces).
+  assert.match(html, /\$85\.83/);
+  assert.match(html, /reference ai ramp/);
+  // Market-implied gap: named driver, implied vs model value, unit.
+  assert.match(html, /FY2031 revenue at reference FCF margin/);
+  assert.match(html, /71,233/);
+  assert.match(html, /27,000/);
+  assert.match(html, /USD_millions/);
+  // The unvalued scenarios are listed in human-readable form.
+  assert.match(html, /qualification and competitive delay/);
+});
+
+
 test("method pipeline is rendered from the canonical skill map", () => {
   const source = fs.readFileSync(APP, "utf8");
   for (const oldText of ["9+1 机制模块", "8 行业透镜", "机制权重"]) {
