@@ -5,7 +5,9 @@
       "mcp__arxiv__reindex",
       "mcp__arxiv__citation_graph",
       "mcp__arxiv__watch_topic",
-      "mcp__arxiv__check_alerts"
+      "mcp__arxiv__check_alerts",
+      "mcp__youtube-transcript__youtube_download_video",
+      "mcp__youtube-transcript__youtube_download_audio"
     ]
   }
 }

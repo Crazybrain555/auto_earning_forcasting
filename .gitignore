@@ -25,6 +25,7 @@ backend/jobs/
 backend/state/*.db
 backend/state/*.db-*
 backend/state/watch_suggestions.json
+replica/
 
 # Local junk
 pkcs11.txt
@@ -32,3 +33,14 @@ validator_stderr.txt
 
 # Office temp lock files
 .~lock.*#
+
+# Nested git repositories with their own remotes — never commit as gitlinks
+forecasting-skills/
+sites/
+
+# Browser/session tool artifacts
+.playwright-mcp/
+
+# YouTube transcript MCP install/build output (bootstrap rebuilds them)
+scripts/mcp/youtube-transcript-mcp/node_modules/
+scripts/mcp/youtube-transcript-mcp/dist/
