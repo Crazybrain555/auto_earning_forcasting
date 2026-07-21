@@ -1,6 +1,6 @@
-# <Company> point-in-time forecast and valuation
+# <Company> current-evidence forecast and valuation
 
-## 1. Information cutoff and model status
+## 1. Snapshot timestamp, price timestamp and model status
 ## 2. Conclusion
 ## 3. Historical and current-year bridge
 ## 4. Forward evidence and research synthesis
@@ -20,7 +20,7 @@
 ## 9. Supply, delivery, capacity, or content constraints
 ## 10. Contracts, stages, and enterprise perimeter
 ## 11. GAAP, cash flow, capital intensity, and shares
-## 12. Bear / Base / Bull and regime tails
+## 12. Reference path, material rival states and regime tails
 ## 13. Near-term / cycle value
 ## 14. Long-term normalized value
 ## 15. Market-implied reverse model

@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -13,9 +14,9 @@ def test_generic_event_schema_and_dta_submodule_are_separate():
 
 def test_interval_widening_is_local_and_properly_scored():
     output=(ROOT/'references/core-output-and-valuation.md').read_text().lower()
-    workflow=(ROOT/'references/core-forecast-workflow.md').read_text().lower()
     loop=(ROOT/'references/historical-training-loop.md').read_text().lower()
-    assert 'global range widening is not a valid calibration method' in workflow
-    assert 'proper interval score' in output
+    assert 'do not widen every row by a common percentage' in output
+    assert 'wider is better only when it represents a supported uncertainty state' in output
+    assert re.search(r'proper interval\s+score', output)
     assert 'intervals were not silently widened' in loop
     assert 'width must still be attributed' in loop

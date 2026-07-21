@@ -1,65 +1,78 @@
-# Mechanism router
+# Equation-Primitive Router
 
-Modules are DECOMPOSITION TEMPLATES: each one tells you how to split a
-specific business line into drivers (volume × price, capacity ramp,
-subscribers × ARPU, orders → recognition...). They are selected per branch of
-the driver tree - never scored, weighted, or blended. Read
-`driver-tree-modeling.md` first: it defines the tree these templates plug
-into, the explicit main line (主线), and the historical-base-first rule.
+Read references/analysis-kernel.md and references/equation-primitives.md first.
+This router selects implementation modules for individual causal branches. It
+does not classify the whole company, score mechanisms or require an industry
+lens.
+
+The operating capability routes unit/price/cost, capacity, orders, usage,
+recurring, subscriber and program/contract modules and stops at operating
+profit. `module-perimeter-and-accounting.md` and
+`module-discrete-accounting-events.md` are financial-continuation modules; the
+operating capability may name a downstream mapping or evidence gap but does not
+execute those modules.
 
 ## Selection questions
 
-1. What is the revenue-recognizing economic unit: bit, chip, wafer, system, project, usage, subscriber, content license, or transaction?
-2. What constrains revenue: demand, capacity, yield, backlog, acceptance, infrastructure, content, customer budget, or stage conversion?
-3. What makes margin nonlinear: price cycle, mix, utilization, pass-through BOM, amortization, content cash, churn, or customer concentration?
-4. What changes enterprise perimeter or accounting basis?
-5. Which mechanism has historical validation, and which remains provisional?
+For each material branch ask:
+
+1. What physical, contractual, installed-base, subscriber or usage unit causes
+   revenue?
+2. What limits that unit: end demand, share, capacity, yield, qualification,
+   orders, delivery, acceptance, churn, infrastructure or contract rights?
+3. What determines realized price and mix?
+4. What determines unit, cohort or service cost?
+5. What lag separates demand, production, recognition and cash?
+6. What changes enterprise perimeter or accounting basis?
+7. Which disclosures support the equation, and which inputs remain assumptions?
+
+Choose the smallest set of modules that answers those questions.
 
 ## Module matrix
 
-| Module | Read when | Do not use when |
+| Module | Economic equation or state | Required distinction |
 |---|---|---|
-| `module-unit-volume-price-cost.md` | Revenue is units/bits/content × price and cost | Usage/subscriber economics dominate |
-| `module-capacity-utilization-yield.md` | Manufacturing capacity/yield/utilization bind | Pure software or content capacity dominates |
-| `module-orders-backlog-recognition.md` | Orders, backlog, delivery, installation or acceptance matter | Instant self-serve usage revenue |
-| `module-platform-usage-adoption.md` | Usage, workloads, effective price, product mix, customer state and infrastructure drive revenue | Physical units are the only driver |
-| `module-recurring-contract-revenue.md` | Subscriptions, term licenses, maintenance, committed usage, deferred revenue, RPO or mixed recurring/upfront contracts are material | One-time physical-unit revenue dominates and contracts do not affect timing |
-| `module-subscriber-content-economics.md` | Subscribers, ARPU, churn and content cash/amortization dominate | Hardware unit economics dominate |
-| `module-program-stage-conversion.md` | Design wins, custom silicon, optical or long programs | Mature commodity products without project gates |
-| `module-contracts-jv-capital.md` | RPO, long-term agreements, JVs or off-balance capital matter | No material contracts/JVs |
-| `module-perimeter-and-accounting.md` | M&A, carve-outs, segment changes or non-GAAP bridges matter | Stable organic perimeter and simple accounting |
-| `module-discrete-accounting-events.md` | A bounded discrete GAAP event can materially affect profit, balance sheet or cash | Only recurring operating variance is material |
+| module-unit-volume-price-cost.md | units or content × net price; unit-cost bridge | volume, price, mix and cost |
+| module-capacity-utilization-yield.md | capacity × utilization × yield, capped by demand | nameplate, qualified and saleable capacity |
+| module-orders-backlog-recognition.md | order cohorts → delivery → installation or acceptance → revenue | orders, backlog, shipment and recognition |
+| module-platform-usage-adoption.md | workloads × usage × effective price × monetized share | demand, optimization, price and infrastructure |
+| module-recurring-contract-revenue.md | recurring-contract state and recognition | beginning base, renewal, expansion, new stock and recognition |
+| module-subscriber-content-economics.md | average subscribers × ARPU with churn and content economics | subscriber state, revenue and content cash |
+| module-program-stage-conversion.md | addressable deployments × share × stage survival × timing | design, qualification, award, ramp and recognition |
+| module-contracts-jv-capital.md | contract quantity/price/rights plus execution and capital obligations | commercial protection, recognition and funding |
+| module-perimeter-and-accounting.md | organic + acquired − disposed + FX/recast and GAAP bridges | economics, perimeter and accounting |
+| module-discrete-accounting-events.md | eligible amount × bounded event state × recognition fraction | recurring operations, reported effect, normalized effect and cash |
 
-## Recurring-contract routing checks
+Installed-base service and inventory/cycle equations are defined in
+references/equation-primitives.md and may combine with several modules.
 
-For enterprise recurring or hybrid software, read `module-recurring-contract-revenue.md` and `lens-enterprise-recurring-software.md`. Require a beginning-base / renewal / expansion-new-logo / contract-stock / recognition bridge. Route usage, upfront IP/hardware and services through their own mechanisms. Add an accounting-transition ledger when the revenue standard, contract model or acquisition perimeter changes. For material discrete accounting events, route through `module-discrete-accounting-events.md`; use `submodule-dta-valuation-allowance.md` only for DTA/valuation-allowance cases.
+## Routing rules
 
-## Universal modules
+- Route per branch, never by sector label.
+- Use several modules only when they represent different linked states; never
+  blend their outputs with analyst-assigned weights.
+- Preserve one accounting-recognition path for each revenue line.
+- Map every module input to a causal node, source or explicit assumption.
+- Export canonical revenue, cost and operating-profit nodes once after branch
+  roll-up; the financial capability calculates consolidated statements.
+- If disclosure prevents a causal equation, use labeled ratio_carry with a
+  sensitivity range and readiness cap.
+- If no module captures a material equation, mark human-required and specify
+  the missing variable, evidence and validation plan.
 
-Evidence, historical normalization, customer analysis, financial statements, scenarios, valuation, backtesting, governance, and monitoring always apply.
+## Recurring contracts
 
-## Platform-specific routing checks
+When subscriptions, term licenses, maintenance, committed usage, deferred
+revenue or RPO are material, read module-recurring-contract-revenue.md. Build a
+beginning-base, renewal, expansion/new-logo, contract-stock and cohort
+recognition bridge. Usage, upfront hardware or IP, services and discrete
+accounting transitions retain their own equations. Never add ARR, billings,
+backlog, deferred revenue, RPO and recognized revenue as though they were
+independent revenue streams.
 
-For cloud or usage platforms, separately route:
+## Optional industry calibration
 
-- usage/workloads;
-- effective price and committed-use discounts;
-- customer cost optimization / rightsizing;
-- infrastructure capacity and utilization;
-- reported versus normalized depreciation and operating margin;
-- RPO recognition;
-- standalone FCF/ROIC allocation gaps.
-
-Do not claim standalone FCF or ROIC when the segment lacks working-capital, lease, tax, cash, or capital-structure disclosures; use `human-required`.
-
-## Subscription/content routing checks
-
-For subscription/content platforms, separately route paid members, average members, ARPU/FX/plan mix, price-churn response, regional maturity, contribution margin, content amortization, cash content additions, obligations, release timing and debt. Exogenous pull-forward must use distribution-only evaluation.
-
-## Compute-platform routing checks
-
-For compute platforms, separately route sell-in/sell-through/channel inventory, market-platform revenue, chip/system/network/software boundaries, foundry/packaging/HBM supply, purchase obligations, acquisitions, GAAP provisions and regime tails.
-
-## Unknown domains
-
-If no validated module combination captures the economic equation, do not choose the nearest industry. Mark `human-required` and propose the missing module and validation plan.
+Files matching references/lens-*.md may suggest variables, lags and sources.
+They are optional calibration examples. The module choice must be justified by
+the active branch's economics and evidence, and the Live method must remain
+complete without any lens.

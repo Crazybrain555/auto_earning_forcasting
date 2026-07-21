@@ -12,7 +12,11 @@ Reported revenue
 + FX and recast effects
 ```
 
-Only transactions public by `as_of` may enter historical Base. Unannounced future events belong in anonymous tails and may require `human-required`.
+Use transactions evidenced by the current bundle in the reference path and
+preserve their announcement, closing and consolidation dates. New evidence may
+enter until bundle freeze; after publication it creates a new forecast version.
+Unannounced possible transactions remain anonymous tail states and may require
+`human-required`.
 
 ## GAAP operating bridge
 
@@ -29,6 +33,14 @@ GAAP operating profit
 ```
 
 Also model financing, tax, dilution, working capital and cash integration costs.
+For every material non-GAAP measure preserve the closest GAAP measure,
+definition version, individual adjustment, tax effect, cash/non-cash character
+and recurrence evidence.  A changed definition opens a comparability bridge;
+it is not spliced into the old series.  The [SEC non-GAAP
+interpretations](https://www.sec.gov/rules-regulations/staff-guidance/corporation-finance-interpretations/non-gaap-financial-measures)
+are a disclosure-quality anchor, not a mechanical rule that every exclusion is
+wrong.  If forward GAAP reconciliation is unavailable, cap the GAAP conclusion
+instead of inventing the missing adjustments.
 
 ## Discrete accounting events
 

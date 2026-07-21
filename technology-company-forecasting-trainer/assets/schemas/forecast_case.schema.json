@@ -1,46 +1,19 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "ForecastCase",
+  "title": "Historical forecast case v2",
   "type": "object",
   "additionalProperties": true,
-  "required": ["case_id", "entity", "as_of", "currency", "fiscal_calendar", "horizons", "source_ids", "assumptions", "forecast"],
-  "anyOf": [
-    {"required": ["mechanisms"]},
-    {"required": ["archetypes"]}
-  ],
+  "required": ["contract_version", "case_id", "entity", "as_of", "currency", "fiscal_calendar", "analysis_primitives", "main_line", "horizons", "source_ids", "assumptions", "forecast"],
   "properties": {
+    "contract_version": {"const": "2.0"},
     "case_id": {"type": "string", "minLength": 1},
     "entity": {"type": "string", "minLength": 1},
     "as_of": {"type": "string", "format": "date-time"},
     "currency": {"type": "string"},
     "fiscal_calendar": {"type": "string"},
-    "mechanisms": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "object",
-        "required": ["name", "weight"],
-        "properties": {
-          "name": {"type": "string"},
-          "weight": {"type": "number", "minimum": 0, "maximum": 1},
-          "validation_status": {"type": "string"}
-        }
-      }
-    },
-    "archetypes": {
-      "description": "Deprecated compatibility field for historical benchmark cases.",
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "object",
-        "required": ["name", "weight"],
-        "properties": {
-          "name": {"type": "string"},
-          "weight": {"type": "number", "minimum": 0, "maximum": 1}
-        }
-      }
-    },
-    "company_lenses": {"type": "array", "items": {"type": "string"}},
+    "analysis_primitives": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["name", "validation_status"]}},
+    "main_line": {"type": "object", "required": ["thesis", "carrier_node_ids", "falsification_ids"]},
+    "optional_calibration_packs": {"type": "array", "items": {"type": "string"}},
     "human_required": {"type": "array", "items": {"type": "object"}},
     "horizons": {"type": "array", "minItems": 1, "items": {"type": "string"}},
     "source_ids": {"type": "array", "items": {"type": "string"}},

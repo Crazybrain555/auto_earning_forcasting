@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "graph_id": "graph://technology/EXAMPLE/20260720/v2",
+  "as_of": "2026-07-20T00:00:00Z",
+  "financial_role_contract": [
+    "revenue",
+    "operating_profit",
+    "pretax_profit",
+    "tax_expense",
+    "noncontrolling_interest_net_income",
+    "gaap_net_income_attributable"
+  ],
+  "nodes": [],
+  "equations": [],
+  "main_line": {
+    "carrier_node_ids": [],
+    "target_node_ids": [],
+    "falsification_ids": [],
+    "competitor_response_node_ids": []
+  }
+}

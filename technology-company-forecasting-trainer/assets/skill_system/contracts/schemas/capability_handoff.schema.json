@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forecast-capability-handoff/v2",
+  "title": "Forecast capability handoff",
+  "type": "object",
+  "required": [
+    "protocol_version",
+    "bundle_id",
+    "bundle_kind",
+    "case_id",
+    "snapshot_at",
+    "method_version",
+    "producer",
+    "orchestrator_acceptance_ref",
+    "input_refs",
+    "artifact_refs",
+    "status",
+    "blockers"
+  ],
+  "properties": {
+    "protocol_version": {
+      "const": "forecast-capability-handoff/v2"
+    },
+    "bundle_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "bundle_kind": {
+      "enum": [
+        "decision_bundle",
+        "evidence_request_bundle",
+        "evidence_bundle",
+        "operating_model_bundle",
+        "financial_forecast_bundle"
+      ]
+    },
+    "case_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "snapshot_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Audit timestamp identifying this accepted bundle snapshot; no source access or evidence permission is inferred from it."
+    },
+    "method_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "producer": {
+      "type": "object",
+      "required": [
+        "skill_name",
+        "capability_id",
+        "action_id"
+      ],
+      "properties": {
+        "skill_name": {"type": "string", "minLength": 1},
+        "capability_id": {"type": "string", "minLength": 1},
+        "action_id": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "orchestrator_acceptance_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Direct action-log reference proving the orchestrator validated and accepted this handoff before specialist consumption."
+    },
+    "input_refs": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "artifact_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["record_id", "kind", "schema_version", "location", "sha256"],
+        "properties": {
+          "record_id": {"type": "string", "minLength": 1},
+          "kind": {"type": "string", "minLength": 1},
+          "schema_version": {"type": "string", "minLength": 1},
+          "location": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "status": {
+      "enum": ["complete", "blocked", "human_required"]
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["code", "reason", "affected_output", "next_evidence"],
+        "properties": {
+          "blocker_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Stable ID for the capability that first authors this blocker; downstream bundles reference it through input_refs instead of copying the blocker."
+          },
+          "code": {"type": "string", "minLength": 1},
+          "reason": {"type": "string", "minLength": 1},
+          "affected_output": {"type": "string", "minLength": 1},
+          "next_evidence": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

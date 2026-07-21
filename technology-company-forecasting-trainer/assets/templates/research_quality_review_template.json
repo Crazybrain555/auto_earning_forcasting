@@ -1,0 +1,66 @@
+{
+  "schema_version": "research-quality-review/v1",
+  "review_id": "REPLACE",
+  "reviewed_at": "REPLACE",
+  "builder_id": "REPLACE_BUILDER_ID",
+  "reviewer_id": "REPLACE_INDEPENDENT_REVIEWER_ID",
+  "independent_of_builder": false,
+  "orchestration_receipt": {
+    "assurance_boundary": "orchestration_receipt_only_not_cryptographic_identity",
+    "receipt_id": "REPLACE_ORCHESTRATION_RECEIPT_ID",
+    "orchestrator": "REPLACE_ORCHESTRATOR",
+    "reviewer_session_id": "REPLACE_REVIEWER_SESSION_ID",
+    "reviewer_task_id": "REPLACE_REVIEWER_TASK_ID",
+    "builder_session_id": "REPLACE_BUILDER_SESSION_ID",
+    "frozen_inputs_delivered_at": "REPLACE_TIMEZONE_AWARE_TIMESTAMP",
+    "review_started_at": "REPLACE_TIMEZONE_AWARE_TIMESTAMP",
+    "initial_conclusion_at": "REPLACE_TIMEZONE_AWARE_TIMESTAMP",
+    "review_completed_at": "REPLACE_TIMEZONE_AWARE_TIMESTAMP",
+    "receipt_issued_at": "REPLACE_TIMEZONE_AWARE_TIMESTAMP",
+    "builder_rebuttal": {
+      "status": "not_provided",
+      "provided_at": null
+    }
+  },
+  "frozen_artifacts": {
+    "source_manifest.json": "sha256:REPLACE",
+    "source_independence_map.csv": "sha256:REPLACE",
+    "forward_signal_cards.csv": "sha256:REPLACE",
+    "model_graph.json": "sha256:REPLACE",
+    "scenario_set.json": "sha256:REPLACE",
+    "data_series_register.csv": "sha256:REPLACE",
+    "material_assumption_support.csv": "sha256:REPLACE",
+    "claim_ledger.jsonl": "sha256:REPLACE"
+  },
+  "principal_contradiction": {
+    "carrier_node_ids": [],
+    "falsification_node_ids": [],
+    "rival_hypothesis": "REPLACE",
+    "judgment": "inadequate",
+    "reasoning": "REPLACE",
+    "source_ids": []
+  },
+  "claim_authority_judgment_contract": {
+    "required_fields": [
+      "claim_id",
+      "authority_sufficiency",
+      "permitted_use",
+      "reviewed_source_ids",
+      "reviewed_source_epistemic_classes",
+      "reviewed_source_origin_record_kinds",
+      "reviewed_observation_bindings",
+      "rationale"
+    ],
+    "reviewed_source_epistemic_classes": "Object keyed exactly by reviewed_source_ids and bound to each frozen SourceRecord.epistemic_class.",
+    "reviewed_source_origin_record_kinds": "Object keyed exactly by reviewed_source_ids and bound to each frozen SourceRecord.origin_record_kind.",
+    "reviewed_observation_bindings": "Object keyed by every observation_id used for an independent direct/causal/external measurement. Each value repeats the computed source-and-observation fingerprint and adds a substantive independent classification_rationale."
+  },
+  "claim_authority_judgments": [],
+  "material_judgments": [],
+  "overall": {
+    "research_sufficiency": "inadequate",
+    "readiness_cap": "not-model-ready",
+    "rationale": "REPLACE",
+    "unresolved_material_disagreements": []
+  }
+}

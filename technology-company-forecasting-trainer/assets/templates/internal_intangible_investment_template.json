@@ -1,0 +1,24 @@
+{
+  "schema_version": "internal-intangible-investment/v1",
+  "materiality_threshold_pct_revenue": 1.0,
+  "categories": [
+    {
+      "category_id": "research_and_development",
+      "status": "human_required",
+      "reason": "Replace with a sourced materiality assessment; if material, build vintage cohorts without overwriting reported accounting.",
+      "source_ids": []
+    },
+    {
+      "category_id": "internal_use_software",
+      "status": "human_required",
+      "reason": "Replace with the issuer policy, materiality assessment and product attribution.",
+      "source_ids": []
+    },
+    {
+      "category_id": "content_or_customer_acquisition",
+      "status": "human_required",
+      "reason": "Replace with a company-specific assessment or a numeric not-material exception.",
+      "source_ids": []
+    }
+  ]
+}

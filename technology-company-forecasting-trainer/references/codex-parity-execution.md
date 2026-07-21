@@ -4,7 +4,8 @@
 
 Reduce quality variance between an interactive GPTPro research run and a Codex run. The Skill cannot force identical reasoning, tools, or market-data access, but it can force the same evidence, artifact, model, red-team, and validation contract.
 
-Use this protocol whenever the user asks for a full company model, five-year forecast, valuation, historical backtest, or durable investment-research package.
+Use this protocol whenever the user asks for a current full-company model,
+five-year forecast, valuation, audit or durable investment-research package.
 
 ## Non-negotiable rule
 
@@ -17,7 +18,6 @@ Do **not** deliver a final investment conclusion from chat-only reasoning. Creat
 python3 scripts/scaffold_delivery.py \
   --workspace ./forecast-runs/SNDK-20260718 \
   --entity SNDK \
-  --as-of 2026-07-18 \
   --purpose "five-year operating model and valuation"
 ```
 
@@ -27,7 +27,6 @@ This creates:
 run_manifest.json
 source_manifest.json
 forward_signal_cards.csv
-historical_query_log.csv
 source_independence_map.csv
 assumption_register.csv
 red_team.md
@@ -42,11 +41,20 @@ Keep these files current during the run. They are not optional administrative fi
 
 ### Phase 0 — Contract
 
-Freeze entity, security, `as_of`, fiscal calendar, currency, accounting basis, horizons, intended decision, artifact list, selected mechanisms, and readiness target. Do not start modeling with an ambiguous perimeter.
+Define entity, security, fiscal calendar, currency, accounting basis, horizons,
+intended decision, artifact list, selected mechanisms and readiness target. The
+runtime records the snapshot timestamp automatically and keeps accepting current
+evidence until publication freeze. Do not start modeling with an ambiguous
+consolidation perimeter.
 
 ### Phase 1 — Source Pack
 
-Collect and record the latest relevant filing, recent earnings releases/calls, product/customer/contract disclosures, historical filings needed for comparability, current market price with timestamp, and any E2/E3 evidence. A full-company forecast normally requires at least six official E0/E1 sources, including at least one filing and one current earnings source.
+Collect the root evidence needed to reconstruct comparable history, current
+operating state and each thesis-carrying driver. Use filings, current results,
+product/customer/contract evidence, market price and E2/E3 sources according to
+the causal question. Source type and count are diagnostics; the gate is whether
+the required financial facts and driver measurements are dated, definition-fit
+and linked to the model.
 
 ### Phase 2 — Fact and perimeter normalization
 
@@ -62,7 +70,10 @@ Build the one-year quarterly model first, then two-year scenarios, three-year di
 
 ### Phase 5 — Independent red team
 
-The red team must identify at least five substantive issues across evidence, double counting, customer/order inference, supply/capacity, accounting/cash, valuation, leakage, and overfitting. It must not merely restate risks from management.
+The red team attacks the main line and its largest failure modes. It must cover
+every material finding it discovers, but there is no minimum finding count and
+no reward for splitting one defect into several rows. It must not merely restate
+risks from management.
 
 ### Phase 6 — Validation
 
@@ -72,8 +83,6 @@ Run:
 python3 scripts/validate_delivery.py \
   --workspace ./forecast-runs/SNDK-20260718 --strict
 ```
-
-Also run relevant historical and non-target regression scripts when changing the method.
 
 ### Phase 7 — Delivery
 
@@ -111,7 +120,6 @@ Use low freedom for fragile tasks:
 - filing extraction and period/unit mapping;
 - formula construction and statement tie-outs;
 - scenario probability sums;
-- source-date cutoff checks;
 - regression and package validation.
 
 Use higher freedom only for:
@@ -129,7 +137,12 @@ Any high-freedom conclusion must point to facts, assumptions, and a model cell o
 
 
 ## Forward-evidence execution
-After official sources, execute a dated forward-evidence review. Require at least three material SignalCards across two independent source clusters unless the run documents that all candidates were rejected. The strict validator checks dates, source diversity, paper/E4 permissions, query contamination, independence mapping, report synthesis and red-team source-chain review.
+Execute a dated forward-evidence review for the uncertain thesis nodes and rival
+hypotheses. Retain any signal that can change a named driver and record rejected
+or unsuccessful searches. Signal and cluster counts do not establish
+sufficiency; strict validation checks dates, root independence, permissions,
+query contamination and model linkage, while the frozen independent research
+review judges whether the remaining evidence gap is acceptable.
 
 
 ## Research-parity role decomposition

@@ -1,61 +1,38 @@
 {
-  "version": "1.0",
-  "minimum_official_sources": 6,
-  "required_source_types": [
-    "filing",
-    "earnings"
+  "version": "3.0",
+  "objective": "Improve the generalizable quality of future revenue, operating-profit and GAAP-attributable-net-income reasoning; never optimize a validator score.",
+  "non_compensatory_invariants": [
+    "model identity, current-evidence provenance, source-date and vintage integrity, and publication-snapshot binding",
+    "fact and observation provenance",
+    "definition, period, unit, currency and accounting-basis compatibility",
+    "formula execution and accounting conservation",
+    "material evidence-to-assumption-to-output lineage"
   ],
-  "required_report_sections": [
-    "Information cutoff",
-    "Conclusion",
-    "Base forecast",
-    "Drivers",
-    "Cash",
-    "Scenarios",
-    "Valuation",
-    "Reverse-implied",
-    "Monitoring",
-    "Limitations"
+  "hard_research_invariants": [
+    "source provenance, availability and vintage",
+    "definition-compatible main-line measurements",
+    "main-line assumption and falsifier lineage",
+    "frozen independent research judgment",
+    "declared readiness no higher than independent review cap"
   ],
-  "required_workbook_concepts": [
-    "summary",
-    "sources",
-    "history",
-    "quarterly",
-    "drivers",
-    "financials",
-    "cash",
-    "scenarios",
-    "valuation",
-    "monitoring",
-    "manifest"
+  "independent_judgments": [
+    "industry and company boundary",
+    "principal contradiction and serious rival",
+    "authority scope and unresolved source conflict",
+    "management, expert and analyst incentive or common-origin bias",
+    "cycle, competition, moat and mean-reversion duration",
+    "paper, patent and commercialization transfer",
+    "clarity, parsimony and generalization"
   ],
-  "minimum_red_team_findings": 5,
-  "formula_error_tolerance": 0,
-  "scenario_probability_tolerance": 0.0001,
+  "diagnostics_not_targets": [
+    "formula count",
+    "source count",
+    "word count",
+    "artifact count",
+    "test count",
+    "single aggregate forecast metric"
+  ],
   "unresolved_p0_policy": "readiness-cap-and-disclose",
-  "minimum_accepted_research_words": 12000,
-  "minimum_substantial_sources": 8,
-  "minimum_historical_filing_periods": 3,
-  "maximum_unsupported_materiality_ratio": 0.35,
-  "required_research_artifacts": [
-    "research_coverage_matrix.csv",
-    "company_quality_moat_register.csv",
-    "technology_commercialization_register.csv",
-    "product_customer_driver_schedule.csv",
-    "material_assumption_support.csv",
-    "research_completeness.json"
-  ],
-  "research_parity_dimensions": [
-    "source depth and original anchors",
-    "products and revenue units",
-    "customers/channels/demand",
-    "competition and market structure",
-    "supply/capacity/cost",
-    "technology/IP/papers/patents/standards",
-    "management/governance/capital allocation",
-    "company quality and moat",
-    "accounting/cash/economic capital",
-    "material assumption evidence support"
-  ]
+  "materiality_policy": "case-specific effect on causal thesis, profit or decision; never an assigned weight or universal percentage",
+  "scenario_probability_tolerance": 0.0001
 }

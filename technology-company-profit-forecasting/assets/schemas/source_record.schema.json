@@ -1,18 +1,32 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "SourceRecord",
+  "$id": "source_record.schema.json",
+  "title": "Orthogonal evidence source record v3",
   "type": "object",
   "additionalProperties": true,
   "required": [
     "source_id",
     "source_type",
+    "origin_record_kind",
+    "epistemic_class",
     "publisher",
+    "authors",
+    "root_original_source_id",
+    "derived_from_source_id",
+    "common_origin",
+    "independence_cluster",
+    "measurement_method_id",
     "published_at",
+    "available_at",
     "retrieved_at",
     "period_scope",
-    "evidence_tier",
     "content_hash",
-    "location"
+    "location",
+    "authority",
+    "independence",
+    "directness",
+    "role",
+    "scope_match"
   ],
   "properties": {
     "source_id": {
@@ -20,9 +34,63 @@
       "minLength": 1
     },
     "source_type": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1,
+      "description": "Free-form retrieval and document-format metadata only; never grants claim authority."
+    },
+    "origin_record_kind": {
+      "description": "Controlled affirmative origin form and permission ceiling. Free-form source_type is retrieval metadata and cannot broaden it.",
+      "enum": [
+        "entity_primary_disclosure",
+        "public_authority_primary_record",
+        "original_measurement_observation",
+        "scholarly_or_engineering_record",
+        "expert_or_analyst_interpretation",
+        "secondary_discovery_material"
+      ]
+    },
+    "epistemic_class": {
+      "description": "Controlled observation/claim authority class. Role and source_type may route work but cannot broaden this class.",
+      "enum": [
+        "official_reported_fact",
+        "independent_external_observation",
+        "management_statement_or_plan",
+        "expert_or_analyst_opinion",
+        "technical_evidence",
+        "discovery_only"
+      ]
     },
     "publisher": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authors": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "root_original_source_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "derived_from_source_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "common_origin": {
+      "type": "boolean"
+    },
+    "independence_cluster": {
+      "type": "string",
+      "minLength": 1
+    },
+    "measurement_method_id": {
       "type": "string",
       "minLength": 1
     },
@@ -37,7 +105,62 @@
     "period_scope": {
       "type": "string"
     },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^(sha256:[0-9a-f]{64}|unhashed:.+|sha256:REPLACE)$"
+    },
+    "location": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authority": {
+      "enum": [
+        "audited_filing",
+        "regulator",
+        "standard",
+        "peer_reviewed",
+        "company",
+        "third_party"
+      ]
+    },
+    "independence": {
+      "enum": [
+        "independent",
+        "first_party"
+      ]
+    },
+    "directness": {
+      "enum": [
+        "direct",
+        "inferred",
+        "proxy"
+      ]
+    },
+    "role": {
+      "enum": [
+        "historical_fact",
+        "technical_boundary",
+        "management_claim",
+        "leading_indicator",
+        "assumption_support",
+        "discovery_only"
+      ]
+    },
+    "scope_match": {
+      "type": "object",
+      "required": [
+        "entity",
+        "product",
+        "geography",
+        "period",
+        "unit"
+      ],
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
     "evidence_tier": {
+      "description": "Legacy permission label; retained for historical readers, never summed or scored.",
       "enum": [
         "E0",
         "E1",
@@ -46,19 +169,244 @@
         "E4"
       ]
     },
-    "content_hash": {
-      "type": "string",
-      "pattern": "^sha256:"
-    },
-    "location": {
-      "type": "string",
-      "minLength": 1
-    },
     "limitations": {
-      "type": "array",
+      "type": [
+        "array",
+        "string"
+      ],
       "items": {
         "type": "string"
       }
+    },
+    "available_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Earliest verified availability to the research process for provenance and vintage audit."
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "origin_record_kind": {
+            "const": "entity_primary_disclosure"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "epistemic_class": {
+            "enum": [
+              "official_reported_fact",
+              "management_statement_or_plan",
+              "discovery_only"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "origin_record_kind": {
+            "const": "public_authority_primary_record"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "epistemic_class": {
+            "enum": [
+              "official_reported_fact",
+              "discovery_only"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "origin_record_kind": {
+            "const": "original_measurement_observation"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "epistemic_class": {
+            "enum": [
+              "independent_external_observation",
+              "discovery_only"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "origin_record_kind": {
+            "const": "scholarly_or_engineering_record"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "epistemic_class": {
+            "enum": [
+              "technical_evidence",
+              "expert_or_analyst_opinion",
+              "discovery_only"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "origin_record_kind": {
+            "const": "expert_or_analyst_interpretation"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "epistemic_class": {
+            "enum": [
+              "expert_or_analyst_opinion",
+              "discovery_only"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "origin_record_kind": {
+            "const": "secondary_discovery_material"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "epistemic_class": {
+            "const": "discovery_only"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "epistemic_class": {
+            "const": "official_reported_fact"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "authority": {
+            "enum": [
+              "audited_filing",
+              "regulator"
+            ]
+          },
+          "directness": {
+            "const": "direct"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "epistemic_class": {
+            "const": "independent_external_observation"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "authority": {
+            "enum": [
+              "third_party",
+              "regulator"
+            ]
+          },
+          "independence": {
+            "const": "independent"
+          },
+          "directness": {
+            "const": "direct"
+          },
+          "derived_from_source_id": {
+            "type": "null"
+          },
+          "common_origin": {
+            "const": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "epistemic_class": {
+            "const": "management_statement_or_plan"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "authority": {
+            "const": "company"
+          },
+          "independence": {
+            "const": "first_party"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "epistemic_class": {
+            "const": "expert_or_analyst_opinion"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "authority": {
+            "const": "third_party"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "epistemic_class": {
+            "const": "technical_evidence"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "authority": {
+            "enum": [
+              "standard",
+              "peer_reviewed",
+              "regulator",
+              "company",
+              "third_party"
+            ]
+          }
+        }
+      }
+    }
+  ]
 }

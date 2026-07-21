@@ -1,1 +1,1 @@
-﻿signal_id,case_id,source_id,publisher,published_at,source_family,evidence_tier,evidence_role,independence_cluster,method_transparency,specificity,causal_proximity,falsifiability,incentive_bias,direction,strength,horizon,allowed_use,model_driver,model_impact,source_url,limitations
+﻿signal_id,case_id,source_id,claim_ids,publisher,published_at,source_family,evidence_tier,evidence_role,independence_cluster,method_transparency,specificity,causal_proximity,falsifiability,incentive_bias,direction,strength,horizon,allowed_use,model_driver,model_impact,source_url,limitations

@@ -3,6 +3,8 @@ from __future__ import annotations
 import argparse,csv,json
 from datetime import datetime,timezone
 from pathlib import Path
+
+from legacy_backtest_diagnostics import write_legacy_backtest_diagnostics
 V70_REV=[.10,.18,.25];V70_PB=[.04,.07,.10]
 def sign(x):return 1 if x>0 else (-1 if x<0 else 0)
 def mean(v):
@@ -52,14 +54,13 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--benchmark',type=Path,required=True);p.add_argument('--cases',type=Path,required=True);p.add_argument('--output-dir',type=Path,required=True);a=p.parse_args();a.output_dir.mkdir(parents=True,exist_ok=True)
     rows,cases=load(a.benchmark,a.cases);d=calc(rows,cases);metrics={'calibration':{v:agg(d,'calibration',v) for v in ('v70','v71')},'holdout':{v:agg(d,'holdout',v) for v in ('v70','v71')}}
     old,new=metrics['holdout']['v70'],metrics['holdout']['v71']
-    gates={'revenue_mape_le_8pct':new['revenue_mape']<=.08,'profit_margin_mae_le_4pp':new['profit_margin_mae_pp']<=4,'revenue_direction_ge_85pct':new['revenue_direction_accuracy']>=.85,'profit_sign_ge_90pct':new['profit_sign_accuracy']>=.90,'revenue_coverage_ge_80pct':new['revenue_coverage']>=.80,'profit_coverage_ge_80pct':new['profit_coverage']>=.80,'revenue_interval_score_improves_30pct':1-new['revenue_interval_score']/old['revenue_interval_score']>=.30,'profit_interval_score_improves_30pct':1-new['profit_interval_score']/old['profit_interval_score']>=.30,'standalone_fcf_roic_human_required':all(c.get('human_required') for c in cases.values() if c['split']=='holdout')}
-    result={'model_version':'technology-company-forecasting-v7.1','generated_at':datetime.now(timezone.utc).isoformat(),'metrics':metrics,'gate_results':gates,'limitations':['Retrospective point-in-time simulation, not pre-registered live performance.','Small AWS-only sample.','Standalone AWS FCF and ROIC remain human-required because segment working capital, leases, cash taxes and capital structure are incomplete.']}
-    (a.output_dir/'metrics.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    threshold_observations={'revenue_mape_le_8pct':new['revenue_mape']<=.08,'profit_margin_mae_le_4pp':new['profit_margin_mae_pp']<=4,'revenue_direction_ge_85pct':new['revenue_direction_accuracy']>=.85,'profit_sign_ge_90pct':new['profit_sign_accuracy']>=.90,'revenue_coverage_ge_80pct':new['revenue_coverage']>=.80,'profit_coverage_ge_80pct':new['profit_coverage']>=.80,'revenue_interval_score_improves_30pct':1-new['revenue_interval_score']/old['revenue_interval_score']>=.30,'profit_interval_score_improves_30pct':1-new['profit_interval_score']/old['profit_interval_score']>=.30,'standalone_fcf_roic_human_required':all(c.get('human_required') for c in cases.values() if c['split']=='holdout')}
+    result={'model_version':'technology-company-forecasting-v7.1','generated_at':datetime.now(timezone.utc).isoformat(),'metrics':metrics,'limitations':['Retrospective point-in-time simulation, not pre-registered live performance.','Small AWS-only sample.','Standalone AWS FCF and ROIC remain human-required because segment working capital, leases, cash taxes and capital structure are incomplete.']}
+    write_legacy_backtest_diagnostics(a.output_dir, result, threshold_observations)
     fields=[]
     for x in d:
         for k in x:
             if k not in fields:fields.append(k)
     with (a.output_dir/'detail.csv').open('w',encoding='utf-8-sig',newline='') as f:w=csv.DictWriter(f,fieldnames=fields);w.writeheader();w.writerows(d)
     print(json.dumps(result,ensure_ascii=False,indent=2))
-    if not all(gates.values()):raise SystemExit(2)
 if __name__=='__main__':main()

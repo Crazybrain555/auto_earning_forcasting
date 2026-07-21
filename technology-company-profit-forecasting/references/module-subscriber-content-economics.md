@@ -1,6 +1,9 @@
 # Module: subscriber, pricing, churn, acquisition, and content economics
 
-**Validation status:** retrospectively validated for company revenue and operating income using Netflix multi-cutoff calibration, stable holdout, and exogenous-shock distribution tests. Precise churn/gross-add cohorts, title-level content ROI, and full cash-content valuation remain `screen-grade` and `human-required` when not disclosed.
+**Validation scope:** calibrated for subscriber revenue and operating income.
+This operating module stops at operating profit. It exports content-asset,
+liability and cash-timing mappings; the financial capability owns cash flow,
+debt, shares, FCF, ROIC and valuation.
 
 ## Applies to
 
@@ -32,9 +35,10 @@ Where precise gross adds and churn are not disclosed, do not reverse-engineer ex
 3. Acquisition and churn: gross adds, voluntary churn, failed-payment churn, reactivations, and release-seasonality.
 4. Contribution economics: delivery, payment processing, support, partner payments, marketing/customer acquisition, and regional contribution margin.
 5. Content economics: licensed versus produced content, release slate, cash additions, amortization, liabilities, off-balance obligations, residuals, and write-offs.
-6. Financing: debt, interest, equity issuance, and content-related working capital.
+6. Downstream timing mappings: content assets/liabilities, cash payment timing
+   and working-capital effects, without executing financing or cash flow here.
 
-## Content accounting and cash bridge
+## Content expense and downstream cash mapping
 
 ```text
 Reported content expense
@@ -50,16 +54,11 @@ Cash content investment
 
 Cash-content gap
 = Cash content investment - Content amortization
-
-FCF
-= Net income
-+ Non-cash items
-- Cash-content gap
-- Other working-capital investment
-- PP&E / acquisitions
 ```
 
-Never treat content amortization as cash content spending. Preserve reported profit and cash-content economics side by side.
+Never treat content amortization as cash content spending. Preserve reported
+operating expense and the cash-content timing mapping side by side, then hand
+the mapping to the financial capability rather than calculating FCF here.
 
 ## Content cohort logic
 
@@ -97,7 +96,9 @@ Do not apply price increases without a churn or plan-mix response.
 - Maturity: slower net adds, ARPU and engagement become more important.
 - Content-slate disruption: release timing or production interruption changes acquisition, churn, amortization, and cash payments.
 - Price reset: ARPU rises but churn/plan migration must be tested.
-- Exogenous pull-forward: demand shock moves future adoption into the current period; use a distribution-only contract if not observable at `as_of`.
+- Exogenous pull-forward: demand shock moves future adoption into the current
+  period; return it as a named rival input when it remains unobserved at bundle
+  freeze. The coordinator decides whether to author a distribution.
 - Model transition: advertising, paid sharing, games, live events, or bundles require separate stage gates.
 
 ## Forecast permissions
@@ -106,16 +107,18 @@ Do not apply price increases without a churn or plan-mix response.
 - Deferred monthly membership fees are near-term timing items, not multi-year backlog.
 - Content obligations are commitments, not future revenue.
 - A new plan or monetization model enters Base only after launch plus observable adoption or revenue.
-- Exogenous shocks that were not observable at cutoff are evaluated through interval coverage, not point accuracy.
+- Exogenous shocks unobserved at bundle freeze remain rival or tail inputs, not
+  point facts. Current observations continue to enter until that freeze.
 
 ## Required outputs
 
 - paid membership and ARPU bridge by region/plan where disclosed;
 - reported operating profit and regional contribution economics;
-- content amortization, cash content additions, obligations, and FCF bridge;
+- content amortization, cash content additions and obligations as downstream
+  timing mappings;
 - price/churn sensitivity;
 - mature versus scaling-region mix;
-- exogenous-shock or model-transition tail;
+- a material exogenous-shock or model-transition rival input when applicable;
 - human-required TODOs for undisclosed churn, title economics, and content allocation.
 
 ## Failure modes
@@ -125,6 +128,8 @@ Do not apply price increases without a churn or plan-mix response.
 - blending mature and new regions;
 - price increases without churn response;
 - treating amortization as cash spending;
-- ignoring content obligations and debt;
+- ignoring content obligations or claiming downstream FCF/valuation inside the
+  operating module;
 - treating pandemic or other exogenous pull-forward as a normal Base forecast;
-- using later advertising or paid-sharing success to backfill an earlier cutoff.
+- using later advertising or paid-sharing success to rewrite an earlier
+  published forecast.

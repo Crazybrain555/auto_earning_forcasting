@@ -1,0 +1,2 @@
+boundary_id,row_type,value_chain_node,period,geography,product_scope,currency,revenue_pool,profit_measure,profit_pool,invested_capital,company_revenue_share,company_profit_share,capacity_or_supply,pricing_mechanism,entry_exit_barrier,competitor_response,response_lead_time_days,cycle_state,source_ids,driver_node_ids,as_of,data_vintage_at,status,notes
+TBD,total,total,TBD,TBD,TBD,TBD,,,TBD,,,,,,,,,,,,,TBD,pending,Replace the placeholder with one total and reconciling component or residual rows for each boundary-period

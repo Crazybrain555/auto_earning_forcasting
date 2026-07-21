@@ -1,119 +1,303 @@
 {
-  "forecast_id": "fcst://technology/EXAMPLE/20260718/v1",
-  "as_of": "2026-07-18T00:00:00Z",
-  "model_version": "method-commit:UNSET",
+  "forecast_contract_version": "2.0",
+  "schema_version": "2.0",
+  "forecast_id": "fcst://technology/EXAMPLE/20260720/v2",
+  "as_of": "2026-07-20T00:00:00Z",
+  "model_version": "10.0.0+git:UNSET",
+  "accounting_basis_id": "REPLACE",
   "source_pack_hash": "sha256:REPLACE",
-  "mechanism_weights": {
-    "unit-volume-price-cost": 1.0
-  },
-  "company_lenses": [],
-  "scenario_probabilities": {
-    "bear": 0.2,
-    "base": 0.55,
-    "bull": 0.2,
-    "regime_break": 0.05
-  },
+  "publication": null,
+  "analysis_primitives": [],
+  "scenario_probabilities": {},
   "outputs": {
     "year_1": {
       "period": null,
+      "low_scenario_id": null,
+      "high_scenario_id": null,
       "revenue_point": null,
       "revenue_low": null,
       "revenue_high": null,
+      "operating_profit_point": null,
+      "operating_profit_low": null,
+      "operating_profit_high": null,
+      "pretax_profit_point": null,
+      "pretax_profit_low": null,
+      "pretax_profit_high": null,
+      "tax_expense_point": null,
+      "tax_expense_low": null,
+      "tax_expense_high": null,
+      "noncontrolling_interest_net_income_point": null,
+      "noncontrolling_interest_net_income_low": null,
+      "noncontrolling_interest_net_income_high": null,
+      "net_income_point": null,
+      "net_income_low": null,
+      "net_income_high": null,
       "profit_point": null,
       "profit_low": null,
       "profit_high": null,
-      "point_evaluable": true,
+      "interval_alpha": null,
       "eps_point": null,
       "eps_low": null,
-      "eps_high": null
+      "eps_high": null,
+      "point_evaluable": true
     },
     "year_2": {
       "period": null,
+      "low_scenario_id": null,
+      "high_scenario_id": null,
       "revenue_point": null,
       "revenue_low": null,
       "revenue_high": null,
+      "operating_profit_point": null,
+      "operating_profit_low": null,
+      "operating_profit_high": null,
+      "pretax_profit_point": null,
+      "pretax_profit_low": null,
+      "pretax_profit_high": null,
+      "tax_expense_point": null,
+      "tax_expense_low": null,
+      "tax_expense_high": null,
+      "noncontrolling_interest_net_income_point": null,
+      "noncontrolling_interest_net_income_low": null,
+      "noncontrolling_interest_net_income_high": null,
+      "net_income_point": null,
+      "net_income_low": null,
+      "net_income_high": null,
       "profit_point": null,
       "profit_low": null,
       "profit_high": null,
-      "point_evaluable": true,
+      "interval_alpha": null,
       "eps_point": null,
       "eps_low": null,
-      "eps_high": null
+      "eps_high": null,
+      "point_evaluable": true
     },
     "year_3_distribution": {
       "period": null,
+      "low_scenario_id": null,
+      "high_scenario_id": null,
       "revenue_point": null,
       "revenue_low": null,
       "revenue_high": null,
+      "operating_profit_point": null,
+      "operating_profit_low": null,
+      "operating_profit_high": null,
+      "pretax_profit_point": null,
+      "pretax_profit_low": null,
+      "pretax_profit_high": null,
+      "tax_expense_point": null,
+      "tax_expense_low": null,
+      "tax_expense_high": null,
+      "noncontrolling_interest_net_income_point": null,
+      "noncontrolling_interest_net_income_low": null,
+      "noncontrolling_interest_net_income_high": null,
+      "net_income_point": null,
+      "net_income_low": null,
+      "net_income_high": null,
       "profit_point": null,
       "profit_low": null,
       "profit_high": null,
-      "point_evaluable": false,
+      "interval_alpha": null,
       "eps_point": null,
       "eps_low": null,
-      "eps_high": null
+      "eps_high": null,
+      "point_evaluable": false
     },
     "long_term_normalized": {},
     "market_implied": {}
   },
-  "breakpoints": [],
-  "human_required": [],
-  "confidence_and_limits": [
-    "screen-grade until delivery validation and forward evidence"
-  ],
-  "horizon_contracts": {
-    "FY+1": "point-and-interval",
-    "FY+2": "scenario-or-distribution",
-    "FY+3": "distribution-only"
+  "investment_case": {
+    "decision_question": null,
+    "variant_view": null,
+    "one_line_thesis": null,
+    "margin_of_safety_pct": null,
+    "main_line_node_ids": [],
+    "falsification_ids": [],
+    "permanent_loss_paths": []
   },
-  "process_integrity": "pending",
-  "research_sufficiency": "pending",
-  "run_mode": "live_forecast",
-  "forecast_sealed_before_actuals": false,
-  "training_iteration_id": null,
-  "training_case_role": null,
+  "driver_tree": {
+    "main_line_id": null,
+    "thesis_carriers": [],
+    "segments": [],
+    "partition": {
+      "partition_id": null,
+      "dimension": null,
+      "exhaustive": null,
+      "mutually_exclusive": null,
+      "declared_residual": null
+    },
+    "cross_check_views": []
+  },
+  "integrated_model": {"periods": []},
+  "value_creation": {
+    "wacc": null,
+    "periods": [
+      {
+        "period": null,
+        "reported_nopat": null,
+        "after_tax_normalization_adjustments": null,
+        "normalized_nopat": null,
+        "beginning_invested_capital": null,
+        "ending_invested_capital": null,
+        "average_invested_capital": null,
+        "average_roic": null,
+        "reinvestment": null,
+        "invested_capital_bridge_adjustment": null,
+        "reinvestment_rate": null,
+        "prior_normalized_nopat": null,
+        "incremental_nopat": null,
+        "incremental_invested_capital": null,
+        "incremental_roic": null,
+        "incremental_return_lag_periods": null,
+        "fundamental_growth": null
+      }
+    ],
+    "fade": {
+      "terminal_roic": null,
+      "years_to_fade": null,
+      "competitive_response": null,
+      "schedule": [
+        {
+          "period": null,
+          "average_roic": null,
+          "incremental_roic": null,
+          "reinvestment_rate": null,
+          "fundamental_growth": null,
+          "competitive_or_obsolescence_driver_node_ids": [],
+          "erosion_or_renewal_event": null
+        }
+      ]
+    },
+    "reported_vs_analytical_roic": null
+  },
+  "recurring_model": {
+    "applicable": false,
+    "cohort_periods": [
+      {
+        "cohort_id": null,
+        "customer_group": null,
+        "contract_type": null,
+        "period": null,
+        "beginning_arr": null,
+        "churned_arr": null,
+        "retained_arr": null,
+        "price_expansion_arr": null,
+        "seat_expansion_arr": null,
+        "usage_or_cross_sell_expansion_arr": null,
+        "new_logo_arr": null,
+        "ending_arr": null,
+        "reported_nrr_cross_check": null,
+        "calculated_nrr": null,
+        "average_arr": null,
+        "recognition_factor": null,
+        "subscription_revenue": null
+      }
+    ],
+    "cost_periods": [
+      {
+        "period": null,
+        "usage_units": null,
+        "inference_unit_cost": null,
+        "inference_cost": null,
+        "hosting_capacity_units": null,
+        "hosting_unit_cost": null,
+        "hosting_cost": null,
+        "support_load_units": null,
+        "support_unit_cost": null,
+        "support_cost": null,
+        "other_subscription_cogs": null,
+        "subscription_cogs": null,
+        "service_delivery_units": null,
+        "service_unit_cost": null,
+        "service_cogs": null
+      }
+    ]
+  },
+  "valuation": {
+    "currency": "USD",
+    "dcf": {},
+    "residual_income": {},
+    "earnings_power": {},
+    "reconciliation": {},
+    "enterprise_to_equity": {},
+    "per_share": {},
+    "terminal": {}
+  },
+  "market_implied_expectations": {
+    "price_as_of": null,
+    "observed_price": null,
+    "named_driver": null,
+    "implied_driver_value": null,
+    "model_driver_value": null,
+    "unit": null,
+    "falsification_trigger": null
+  },
   "valuation_summary": {
     "current_price": null,
     "price_currency": "USD",
     "price_as_of": null,
     "current_valuation_note": "",
-    "fair_value": {
-      "bear": null,
-      "base": null,
-      "bull": null
-    },
+    "reference_scenario_id": null,
+    "fair_value_by_scenario_id": {},
+    "not_valued_scenario_ids": [],
+    "valuation_completeness": "none_executable",
     "recommended_buy_price": null,
     "action": "watch",
     "one_line_thesis": ""
   },
-  "driver_tree": {
-    "main_line": null,
-    "segments": []
-  },
-  "historical_base": {
-    "trailing_organic_growth_pct": null,
-    "base_period": null,
-    "note": null
-  },
+  "monitoring": {"driver_ids": [], "last_updated_at": null},
+  "breakpoints": [],
+  "human_required": [],
+  "confidence_and_limits": ["not-decision-ready until every v2 validator passes"],
+  "horizon_contracts": {"FY+1": "point-and-interval", "FY+2": "scenario-or-distribution", "FY+3": "distribution-only"},
+  "process_integrity": "pending",
+  "research_sufficiency": "pending",
+  "run_mode": "live_forecast",
+  "forecast_sealed_before_actuals": false,
+  "historical_base": {"trailing_organic_growth_pct": null, "base_period": null, "note": null},
   "error_budget": {
-    "year_1": {
-      "expected_revenue_error_pct": null,
-      "expected_margin_error_pp": null,
-      "dominant_risk": null,
-      "why": null
-    },
-    "year_2": {
-      "expected_revenue_error_pct": null,
-      "expected_margin_error_pp": null,
-      "dominant_risk": null,
-      "why": null
-    },
-    "year_3_distribution": {
-      "expected_revenue_error_pct": null,
-      "expected_margin_error_pp": null,
-      "dominant_risk": null,
-      "why": null
-    }
+    "year_1": {"expected_revenue_error_pct": null, "expected_margin_error_pp": null, "dominant_risk": null, "why": null},
+    "year_2": {"expected_revenue_error_pct": null, "expected_margin_error_pp": null, "dominant_risk": null, "why": null},
+    "year_3_distribution": {"expected_revenue_error_pct": null, "expected_margin_error_pp": null, "dominant_risk": null, "why": null}
   },
-  "deceleration_reason": null
+  "persistence_analysis": {
+    "mean_reversion": {
+      "status": "pending",
+      "object": null,
+      "unit": null,
+      "reference_class": null,
+      "reference_class_source_ids": [],
+      "target_median": null,
+      "target_low": null,
+      "target_high": null,
+      "sample_selection_limits": null,
+      "company_departure": null,
+      "speed_driver_node_ids": [],
+      "fade_horizon_periods": null,
+      "falsification_node_ids": [],
+      "scenario_ids": [],
+      "limitations": null
+    },
+    "cost_behavior": [
+      {
+        "cost_line": null,
+        "status": "pending",
+        "materiality": "critical",
+        "activity_driver_node_id": null,
+        "activity_unit": null,
+        "elasticity_up": null,
+        "elasticity_down": null,
+        "adjustment_lag_periods": null,
+        "committed_resource_floor": null,
+        "floor_unit": null,
+        "exit_or_adjustment_cost": null,
+        "estimation_method": null,
+        "source_ids": [],
+        "scenario_ids": [],
+        "notes": null,
+        "limitations": null
+      }
+    ]
+  },
+  "growth_challenger_review": []
 }

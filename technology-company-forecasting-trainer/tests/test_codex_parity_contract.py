@@ -1,3 +1,4 @@
+import json
 import unittest
 from pathlib import Path
 
@@ -16,25 +17,28 @@ class CodexParityContractTest(unittest.TestCase):
             SKILL/'assets/templates/run_manifest_template.json',
             SKILL/'assets/templates/delivery_quality_rubric.json',
             SKILL/'assets/templates/red_team_template.md',
-            SKILL/'assets/examples/sandisk_v73/Sandisk_SNDK_v7.3_五年财务模型.xlsx',
-            SKILL/'assets/examples/sandisk_v73/Sandisk_SNDK_v7.3_模型报告.md',
         ]
         for path in required:
             self.assertTrue(path.exists(), str(path))
             self.assertGreater(path.stat().st_size, 0, str(path))
 
     def test_mandatory_language(self):
-        text=(SKILL/'SKILL.md').read_text(encoding='utf-8').lower()
-        for phrase in ['mandatory full-model execution contract','validate_delivery.py --strict','validate_research_completeness.py','formula-driven','red team','run_manifest.json','company quality','patents'] :
-            self.assertIn(phrase.lower(),text)
-        prompt=(SKILL/'agents/openai.yaml').read_text(encoding='utf-8').lower()
-        for phrase in ['initialize the run workspace','formula-driven xlsx','strict delivery validator','immutable snapshot']:
-            self.assertIn(phrase,prompt)
-
-    def test_memory_channel_and_effective_cost(self):
-        text=(SKILL/'references/lens-memory-storage.md').read_text(encoding='utf-8').lower()
-        for phrase in ['sell-in','sell-through','effective cost per bit','technical cost per bit']:
-            self.assertIn(phrase,text)
+        # Parity is a shared executable contract, not a phrase-presence score.
+        text=(SKILL/'SKILL.md').read_text(encoding='utf-8')
+        self.assertIn('assets/method_system.json', text)
+        self.assertIn('references/research-sop.md', text)
+        method=json.loads((SKILL/'assets/method_system.json').read_text(encoding='utf-8'))
+        overlay=json.loads((SKILL/'assets/training_method_overlay.json').read_text(encoding='utf-8'))
+        self.assertNotIn('improvement_objective', method)
+        self.assertTrue(overlay['improvement_objective']['not_a_scalar_optimization'])
+        self.assertEqual(
+            method['construction_philosophy']['canonical_sop'],
+            'references/research-sop.md',
+        )
+        self.assertEqual(
+            method['assurance_philosophy']['tests_are'],
+            'orthogonal_views_not_a_completeness_score',
+        )
 
 if __name__=='__main__':
     unittest.main()

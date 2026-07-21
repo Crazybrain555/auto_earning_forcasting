@@ -8,11 +8,16 @@ Use only for jurisdiction-specific deferred-tax assets, NOLs, credits and valuat
 - `S1`: improving evidence, but realization remains insufficient; tail probability only.
 - `S2`: sustained jurisdiction-specific profitability and realizability evidence; release probability may rise.
 - `S3`: explicit management/auditor evidence or accounting conclusion that release is probable; a bounded GAAP branch is permitted.
-- `S4`: recognized in an official filing; Actual only after forecast seal in historical training.
+- `S4`: recognized in an official filing and available as a reported fact.
 
 ## Eligible amount and scheduling
 
-Cap the benefit by the eligible jurisdiction-specific DTA or valuation allowance, adjusted for expiration, uncertain tax positions, forecast taxable income, reversal schedules and legal realization limits. E0/E1 tax notes are required for Base permission.
+Cap the benefit by the eligible jurisdiction-specific DTA or valuation
+allowance, adjusted for expiration, uncertain tax positions, forecast taxable
+income, reversal schedules and legal realization limits. Base permission
+requires tax-note facts for the reported balance and proposition-appropriate
+evidence for jurisdictional realizability and timing; an evidence label alone
+does not establish release.
 
 ```text
 Recurring tax provision_t

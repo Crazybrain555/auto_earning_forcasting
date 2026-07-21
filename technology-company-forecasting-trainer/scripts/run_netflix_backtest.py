@@ -3,6 +3,8 @@ from __future__ import annotations
 import argparse,csv,json
 from datetime import datetime,timezone
 from pathlib import Path
+
+from legacy_backtest_diagnostics import write_legacy_backtest_diagnostics
 OLD_REV=[.10,.18,.25];OLD_PB=[.04,.07,.10]
 def sign(x):return 1 if x>0 else (-1 if x<0 else 0)
 def mean(v):
@@ -63,14 +65,13 @@ def main():
     rows,cases=load(a.benchmark,a.cases);d=calc(rows,cases,a.old,a.new)
     metrics={"calibration":{v:agg(d,"calibration",v) for v in (a.old,a.new)},"holdout":{v:agg(d,"holdout",v) for v in (a.old,a.new)},"distribution":{v:distribution(d,v) for v in (a.old,a.new)}}
     old,new=metrics["holdout"][a.old],metrics["holdout"][a.new];dist=metrics["distribution"][a.new]
-    gates={"revenue_mape_le_8pct":new["revenue_mape"]<=.08,"profit_margin_mae_le_5pp":new["profit_margin_mae_pp"]<=5,"revenue_direction_ge_80pct":new["revenue_direction_accuracy"]>=.80,"profit_sign_ge_90pct":new["profit_sign_accuracy"]>=.90,"revenue_coverage_ge_80pct":new["revenue_coverage"]>=.80,"profit_coverage_ge_80pct":new["profit_coverage"]>=.80,"revenue_interval_score_improves_30pct":1-new["revenue_interval_score"]/old["revenue_interval_score"]>=.30,"profit_interval_score_improves_30pct":1-new["profit_interval_score"]/old["profit_interval_score"]>=.30,"distribution_revenue_coverage_ge_80pct":dist["revenue_coverage"]>=.80,"distribution_profit_coverage_ge_80pct":dist["profit_coverage"]>=.80,"human_required_present":any(c.get("human_required") for c in cases.values())}
-    result={"model_version":"technology-company-forecasting-v7.2","benchmark":a.name,"generated_at":datetime.now(timezone.utc).isoformat(),"metrics":metrics,"gate_results":gates,"limitations":["Retrospective point-in-time simulation, not pre-registered live performance.","Small company-specific sample.","Point metrics exclude horizons classified as exogenous, perimeter-break, or regime-tail distribution contracts."]}
-    (a.output_dir/"metrics.json").write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    threshold_observations={"revenue_mape_le_8pct":new["revenue_mape"]<=.08,"profit_margin_mae_le_5pp":new["profit_margin_mae_pp"]<=5,"revenue_direction_ge_80pct":new["revenue_direction_accuracy"]>=.80,"profit_sign_ge_90pct":new["profit_sign_accuracy"]>=.90,"revenue_coverage_ge_80pct":new["revenue_coverage"]>=.80,"profit_coverage_ge_80pct":new["profit_coverage"]>=.80,"revenue_interval_score_improves_30pct":1-new["revenue_interval_score"]/old["revenue_interval_score"]>=.30,"profit_interval_score_improves_30pct":1-new["profit_interval_score"]/old["profit_interval_score"]>=.30,"distribution_revenue_coverage_ge_80pct":dist["revenue_coverage"]>=.80,"distribution_profit_coverage_ge_80pct":dist["profit_coverage"]>=.80,"human_required_present":any(c.get("human_required") for c in cases.values())}
+    result={"model_version":"technology-company-forecasting-v7.2","benchmark":a.name,"generated_at":datetime.now(timezone.utc).isoformat(),"metrics":metrics,"limitations":["Retrospective point-in-time simulation, not pre-registered live performance.","Small company-specific sample.","Point metrics exclude horizons classified as exogenous, perimeter-break, or regime-tail distribution contracts."]}
+    write_legacy_backtest_diagnostics(a.output_dir, result, threshold_observations)
     fields=[]
     for x in d:
         for k in x:
             if k not in fields:fields.append(k)
     with (a.output_dir/"detail.csv").open("w",encoding="utf-8-sig",newline="") as f:w=csv.DictWriter(f,fieldnames=fields);w.writeheader();w.writerows(d)
     print(json.dumps(result,ensure_ascii=False,indent=2))
-    if not all(gates.values()):raise SystemExit(2)
 if __name__=="__main__":main()

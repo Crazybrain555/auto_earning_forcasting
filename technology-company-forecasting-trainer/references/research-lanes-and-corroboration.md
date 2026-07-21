@@ -1,112 +1,115 @@
-# Research lanes and corroboration
+# Research Lanes and Corroboration
 
-An audit of three live runs found the research was filings-only: management
-forward commentary, sell-side and industry research, expert/channel work, and
-technical literature were all absent from the query logs. Filings are audited
-history; they cannot answer what happens next. This file makes lane coverage
-and cross-validation enforceable.
+Research breadth is a defense against shared blind spots. Lane count is a
+coverage diagnostic, not a truth score. Claims enter the model only through
+source lineage, causal permission and sensitivity.
 
-Two principles:
+## Eight search lanes
 
-1. **Breadth is required.** A forecast built from one lane is one lane's
-   blind spots wearing a model.
-2. **Credibility is asymmetric.** Low-tier lanes are valuable *and*
-   dangerous. They may generate hypotheses freely; they may only set Base
-   numbers under corroboration.
-
-## The eight lanes
-
-| # | Lane | Examples | Default tier | Base permission |
+| ID | Lane | Typical evidence | Principal strength | Principal risk |
 |---|---|---|---|---|
-| L1 | Official filings | 10-K/10-Q/8-K, prospectus, annual report | E0 | Base anchor |
-| L2 | Management voice | earnings call, investor/analyst day, conference keynote, CEO/CFO interview, fireside chat, 业绩说明会, 投资者关系问答 | E1 | Base driver, guidance-bias adjusted |
-| L3 | Cross-company official | customers/suppliers/competitors describing this company or the shared value chain | E1 | Base driver |
-| L4 | Industry data | TrendForce, IDC, Counterpoint, Yole, TechInsights, Omdia, SEMI | E3 | Base driver only if method disclosed |
-| L5 | Sell-side / broker research | broker models, initiation notes, industry primers | E3 | Never Base alone - corroboration required |
-| L6 | Expert & channel work | expert-network calls, supply-chain checks, distributor/dealer checks, 产业链调研 | E4 (E3 if named expert + disclosed method) | Monitor/trigger only unless corroborated |
-| L7 | Technical literature | papers, standards, patents, roadmaps (see `technology-trend-evidence.md`) | E2 | Timing/feasibility/scenario only, never Base point |
-| L8 | Trade press & articles | reputable trade media, quality long-form analysis | E3/E4 | Never Base alone - corroboration required |
+| L1 | Official filings | annual/interim reports, regulatory filings, prospectus | reported history and accounting | backward-looking, aggregated |
+| L2 | Management voice | calls, Q&A, investor days, letters, formal interviews | intent, guide and operating context | incentives, selective disclosure |
+| L3 | Cross-company official | customer, supplier and competitor filings or calls | orthogonal value-chain read-through | scope and timing mismatch |
+| L4 | Measured industry data | shipments, utilization, price, inventory, capex | external state variables | opaque samples and revisions |
+| L5 | Sell-side research | models, primers and field work | synthesis and estimate structure | access, banking and consensus incentives |
+| L6 | Expert and channel | named experts, distributors, customer or supply-chain checks | close causal proximity | stale, partial or unverifiable samples |
+| L7 | Technical and IP | papers, standards, patent families, readiness evidence | mechanism and technical bounds | weak commercialization permission |
+| L8 | Trade and event research | specialist press and rigorous long-form work | discovery and chronology | repetition and source laundering |
 
-Lane ≠ truth ranking. An expert channel check can be more informative than a
-10-K; it is simply less verifiable, so it carries a different permission.
+The evidence tier remains attached to the individual source, not automatically
+to the lane. A measured industry series with disclosed method may be more useful
+than a vague filing sentence; its permission is still bounded to what it
+measures.
 
-## Coverage requirement
+## Search routing
 
-Every delivery's `historical_query_log.csv` must show searches spanning at
-least **5 of the 8 lanes**, and **L2 (management voice) is mandatory** - a
-technology forecast that never read the earnings call, investor day, or a
-management interview has not done the work. L7 is mandatory for FY+2+
-horizons (see `technology-trend-evidence.md`).
+Do not optimize lane count. Route searches from the uncertain node and rival
+hypothesis. A customer-share thesis usually calls for customer or cross-company
+evidence; a cycle thesis calls for measured demand, inventory, supply and price;
+a technology-commercialization thesis calls for technical conditions,
+replication, manufacturing readiness, qualification and commercial evidence.
+Those are causal needs, not a universal requirement that every company touch a
+fixed number of lanes.
 
-Log every search whether or not it found anything: an empty lane with a
-recorded query is a documented negative; an empty lane with no query is a
-gap. Record the queries that failed - they show where evidence does not exist.
+Log successful and unsuccessful searches. An unsuccessful well-specified query
+is a documented evidence gap. No query is an unexamined gap.
 
-## The corroboration rule
+A filings-only package should normally trigger an independent-review challenge,
+but it fails deterministically only when a material main-line measurement lacks
+the required lineage, construct fit, causal permission or a truthfully declared
+cross-check. Several lanes repeating one root observation remain one origin.
 
-**Materiality is computed, never assigned.** An assumption does not become
-important because someone typed 0.15 next to it - that is factor scoring in
-disguise. It is important if perturbing it moves the answer. Every row of
-`material_assumption_support.csv` therefore states:
+## Independence is about origin and method
 
-- `test_delta` - the perturbation actually tested ("-5pp ASP", "ramp slips
-  two quarters", "share holds flat instead of +3pp"), and
-- `revenue_impact_pct` / `profit_impact_pct` - what the model does under it,
-  and
-- `changes_conclusion` - whether the rating or buy price flips.
+Collapse sources into one independence cluster when they share the same
+originating dataset, interview, press release, analyst note, expert or
+measurement method. Syndication and citation chains do not create
+corroboration.
 
-An assumption is **material** when the tested perturbation moves FY+1 revenue
-≥2%, profit ≥5%, or flips the conclusion. Those thresholds are on measured
-output, so a reviewer can re-run the test and disagree with a number rather
-than with a weight.
+Two sources are useful corroboration when failure modes are meaningfully
+different. Record:
 
-A material assumption requires:
+- original producer and funding or incentive;
+- collection and estimation method;
+- sample, geography, population and period;
+- unit and definition;
+- transformations and revisions;
+- dependence on other accepted sources.
 
-- support from **≥2 independent source clusters** spanning **≥2 different
-  lanes**, and
-- at least one of those from an **anchoring lane** (L1, L2, L3, or a direct
-  measurement), unless the assumption is explicitly labeled `scenario_only`.
+## Claim-level corroboration
 
-An assumption that flips the conclusion must additionally state its
-falsification trigger - if the whole call turns on it, the reader is owed the
-observation that would kill it.
+Each conclusion-critical claim requires:
 
-`support_status` values in `material_assumption_support.csv`:
+1. a bounded sentence;
+2. causal edge or parameter it may change;
+3. at least one source close enough to measure that claim;
+4. a genuinely independent cross-check where available;
+5. conflicting evidence and rival explanation;
+6. falsification condition and monitor.
 
-| Status | Meaning | Allowed use |
-|---|---|---|
-| `hard_anchor` | L1/L2 direct disclosure of this exact quantity | Base point |
-| `corroborated` | ≥2 lanes agree, ≥1 anchoring | Base driver |
-| `single_lane` | only one lane supports it | Scenario/monitor only - may not carry Base |
-| `contested` | lanes disagree | Both readings recorded; Base states which and why |
-| `scenario_only` | speculative by construction | Tail/scenario weight only |
+A reference-path thesis carrier needs evidence appropriate to its failure risk. When a
+row is labeled `corroborated`, the referenced sources must include a genuinely
+independent root, originating team and measurement method. A single direct hard
+anchor can remain labeled as such; the independent reviewer decides whether its
+failure risk requires another method or a readiness cap. Do not manufacture
+confidence by adding distant sources or relabeling a single-origin chain.
 
-A single-lane claim that carries a Base number is the specific failure this
-rule exists to prevent.
+The machine does not infer a corroboration claim merely because a series is
+`accepted` or `conclusion_critical`. Empty cross-check fields preserve the
+single-anchor state for review. Populating a cross-check series, result or basis
+bridge is an explicit corroboration claim; the validator then verifies that the
+claim is complete, independent and definition-compatible. Whether another
+method should have been sought remains reviewer judgment.
 
-## Handling low-credibility lanes well
+Technical feasibility, manufacturing readiness, qualification, commercial
+commitment and revenue recognition require different evidence. Sources that
+support one gate do not corroborate another.
 
-- **Record the incentive.** Sell-side has banking and access incentives;
-  experts are paid and often former employees with stale or partial views;
-  trade press amplifies whoever briefed them. Note the incentive per source.
-- **Prefer disclosed method.** An industry-data point with a stated
-  methodology outranks a bigger name without one.
-- **Trace to the original.** Three articles repeating one analyst note is one
-  source; `source_independence_map.csv` must collapse them into one cluster.
-- **Date everything.** Expert views decay fast; a channel check older than one
-  quarter is a historical observation, not a current read.
-- **Contradiction is signal.** When management voice and channel work
-  disagree, that gap is often the most valuable thing in the pack. Record it
-  and let it widen the scenario spread rather than averaging it away.
+## Sensitivity determines importance
 
-## Management-voice specifics (L2)
+Materiality is computed from the model. For each assumption record a named
+`test_delta` and its effect on revenue, operating profit or NOPAT, attributable
+net income, FCF, value per share and the investment posture. Prioritize the
+assumptions that explain most of the model's change, can flip the decision, or
+interact with leverage, solvency, covenants, dilution or a binary qualification
+gate. Do not encode one universal percentage cutoff: the economically relevant
+scale depends on the company, horizon and decision.
 
-Prioritise, in order: (1) the most recent earnings call Q&A - the analyst
-questions reveal what the market doubts; (2) investor/analyst day materials -
-where multi-year targets and segment detail live; (3) conference keynotes and
-fireside chats - often the first place a strategy shift is voiced;
-(4) executive interviews in trade or business media; (5) IR follow-up Q&A.
+Allowed support states include hard_anchor, corroborated, single_lane,
+contested, analyst_only, scenario_only and human_required. The state describes
+evidence; it is not a numerical weight.
 
-Treat guidance as a management-adjusted quantity, not a fact: record the
-company's historical guidance-versus-actual bias where computable, and state
-whether the Base uses guidance as given, haircut, or raised, with the reason.
+## Handling conflict
+
+Do not average conflicting claims. Reconcile scope, period, units, recognition,
+incentives and data lineage. If the conflict survives, preserve only the rival
+propositions actually anchored by their sources and return their permitted uses
+to the coordinator. The coordinator decides whether they are material causal
+hypotheses and authors any named scenarios; an evidence researcher does not
+complete missing sides of a conflict or assign probabilities. The disagreement
+itself may become a monitor.
+
+Management guidance requires a historical bias check where possible. Sell-side,
+expert and trade sources must name incentives and trace back to origin.
+Technical sources follow references/technology-commercialization-and-ip.md.

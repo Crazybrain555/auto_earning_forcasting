@@ -1,0 +1,17 @@
+{
+  "skill_name": "company-evidence-research",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "截至2025-03-31，为一家存储芯片公司整理可用于两年盈利预测的证据包。财报说库存正常化，CEO说HBM需求很强，两个专家访谈给出互相冲突的价格判断。不要建预测模型。",
+      "expected_output": "A point-in-time evidence bundle that separates official facts, management propositions, independent observations and expert interpretation; preserves that a conflict exists without inventing either expert's unstated direction, magnitude, period or scope; authors no scenario; and opens bounded requests for the original price views and inventory measurements.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "我们去年已经抓过一份IDC终端出货数据和一篇券商拆机报告。现在给另一家公司做预测，判断哪些资料可以复用，哪些许可和口径必须重新裁决，并输出证据交接包。",
+      "expected_output": "Reuse source assets and observations without copying case-specific permissions; re-evaluate as-of, scope, definitions and evidence use; return direct lineage and explicit limitations.",
+      "files": []
+    }
+  ]
+}

@@ -23,5 +23,5 @@ class SkillShapeTest(unittest.TestCase):
         self.assertRegex(f,r'(?m)^name: technology-company-profit-forecasting$')
         m=re.search(r'(?m)^description: (.+)$',f);self.assertIsNotNone(m)
         self.assertLessEqual(len(m.group(1)),1024)
-        self.assertIn(NAME,m.group(1))
+        self.assertNotIn(NAME,m.group(1))
 if __name__=='__main__':unittest.main()

@@ -1,0 +1,19 @@
+{
+  "schema_version": "forecast-capability-profile/v2",
+  "skill_name": "company-financial-forecasting",
+  "capability_id": "financial_forecast",
+  "input_bundle_kinds": ["decision_bundle", "evidence_bundle", "operating_model_bundle"],
+  "output_bundle_kind": "financial_forecast_bundle",
+  "owned_stage_ids": ["integrated_statements", "value_creation", "valuation"],
+  "reasoning_invariant_refs": [
+    "share_basis_separation",
+    "conditional_analysis_routing",
+    "minimum_sufficient_presentation"
+  ],
+  "forbidden_inputs": [
+    "unaccepted_orchestrator_bundle",
+    "unrestricted_source_access",
+    "raw_actuals_channel"
+  ],
+  "storage_access": "read_only_bundle_and_candidate_artifact_output"
+}

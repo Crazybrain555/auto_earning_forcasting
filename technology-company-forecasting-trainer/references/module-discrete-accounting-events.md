@@ -29,7 +29,10 @@ Expected discrete GAAP effect_t
   × sign_e]
 ```
 
-This expected value is a distribution component, not automatically a recurring point forecast. Include it in Base only when event-family accounting criteria and E0/E1 evidence support probable recognition. Otherwise retain it as a named scenario or tail.
+This expected value is one distribution diagnostic, not automatically a
+recurring point forecast. Base treatment follows the event-specific accounting
+recognition criteria and proposition-appropriate evidence available at bundle
+freeze. Otherwise retain the event as a named scenario or tail.
 
 ## Cash and valuation integrity
 
@@ -46,29 +49,28 @@ This expected value is a distribution component, not automatically a recurring p
 - Acquisition accounting: separate purchase-price allocation, inventory step-up, amortization, integration and contingent consideration.
 - Litigation: separate legal probability threshold, range of loss, insurance/indemnity and payment timing.
 
-## Distribution-width floor for identified events
+## Event-local distribution construction
 
-When a discrete accounting event is identified as a named possibility at `as_of` with a quantifiable eligible amount, the forecast distribution must reflect the event's expected value even when the event is excluded from the Base point estimate. Omitting an identified event from both the point estimate and the distribution width systematically under-forecasts profit variance and produces intervals that cannot cover the actual.
+When a named event is material, build its possible outcomes from the eligible
+amount, event-specific states, timing and accounting recognition rules. Keep
+three questions separate:
 
-**Applicability.** All three conditions must hold:
+1. Is the economic event possible, and over what bounded amount?
+2. Would the applicable accounting basis recognize it in this period and at
+   what amount?
+3. When, if ever, would cash move?
 
-1. The event is named and its family identified (DTA release, impairment, restructuring, litigation, etc.) — not a generic "accounting risk" placeholder.
-2. The eligible amount is quantifiable from E0/E1 sources at `as_of` (e.g., gross DTA on the balance sheet, asset carrying value, announced restructuring charge range, disclosed litigation exposure).
-3. At least one enabling condition for recognition is observable at `as_of` (e.g., cumulative profitability trend for DTA release, declining asset returns for impairment, announced plan for restructuring).
+Record the observable enabling conditions, rival explanation, probability or
+range rationale, and the evidence that would change treatment. Expected value
+may summarize a distribution, but it neither defines interval width nor forces
+the Base point. A modal Base, an expected-value decision model and a
+standard-compliant reported forecast can legitimately differ; reconcile them
+instead of applying a universal probability cutoff.
 
-**Rule.** When the event is not included in the Base point estimate:
-
-- The Bull case (or upside tail for beneficial events) or Bear case (for adverse events) must include the probability-weighted expected value of the event: `eligible_amount × probability × recognition_fraction`.
-- The minimum distribution width attributable to the event equals the expected value. This is additive to operating uncertainty — do not offset it by narrowing operating intervals.
-- Record the event in the assumption register with its eligible amount, estimated probability, and the specific enabling conditions observed at `as_of`. State why it is excluded from Base (e.g., "probable" threshold not met under ASC 740) and what evidence would move it into Base.
-
-When the event has probability above 50% based on observable enabling conditions at `as_of` and the accounting standard's recognition criteria are substantially met, include its expected value in the Base point estimate, not only in the distribution tail.
-
-**Failure conditions — do not apply when:**
-
-- the event is purely speculative with no observable enabling conditions;
-- the eligible amount cannot be bounded from disclosed data;
-- the event family has no defined recognition trigger (use monitoring-only treatment).
+Do not model a purely generic risk with no event family or trigger as if it had
+a measurable probability. If the eligible amount is unavailable, mark the
+affected conclusion `human-required` or monitoring-only rather than inventing
+a bound.
 
 ## Failure conditions
 

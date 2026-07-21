@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Scaffold one historical training/validation case workspace.
 
-Wraps scaffold_delivery.py in historical_train mode and stamps round/case
+Wraps scaffold_historical_delivery.py and stamps round/case
 bookkeeping. Roles: development (training group), validation (untouched
 until its validation pass), regression (re-run of a previously used case).
 """
@@ -23,7 +23,7 @@ def main():
     a = p.parse_args()
     scripts = Path(__file__).resolve().parent
     w = Path(a.workspace).resolve()
-    cmd = [sys.executable, str(scripts / 'scaffold_delivery.py'), '--workspace', str(w), '--entity', a.entity,
+    cmd = [sys.executable, str(scripts / 'scaffold_historical_delivery.py'), '--workspace', str(w), '--entity', a.entity,
            '--security', a.security, '--as-of', a.as_of, '--mode', 'historical_train',
            '--purpose', 'historical training forecast']
     r = subprocess.run(cmd, capture_output=True, text=True)

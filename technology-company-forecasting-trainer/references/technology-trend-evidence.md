@@ -1,80 +1,71 @@
-# Technology-trend evidence (papers, standards, patents)
+# Technology-Trend Evidence
 
-Filings are backward-looking. Sell-side research lags. For a technology
-company, the 2-5 year question - *which technology transition lands, when,
-and who is positioned for it* - is answered in the technical literature
-**before** it appears in revenue. A forecast that skips this layer is a
-financial-mechanics exercise with a blind spot where the thesis lives.
+This is the research-routing companion to
+references/technology-commercialization-and-ip.md. Use it whenever a technical
+transition materially affects FY+2 or later demand, share, price, cost, capital
+or persistence.
 
-This is where an AI analyst should exceed a human sell-side model, which
-typically has no technology-literature layer at all.
+## Required technology lane
 
-## What counts as technology-trend evidence
+Search official product and process disclosures, papers, standards, patent
+families, customer qualification evidence, manufacturing evidence and
+commercial commitments. Preserve dated documents and negative results.
 
-| Lane | Examples | Typical lead time |
-|---|---|---|
-| Peer-reviewed / preprint | arXiv, IEEE Xplore, Nature Electronics | 1-4 years |
-| Conference disclosure | ISSCC, IEDM, VLSI, Hot Chips, OFC, ECTC, SC | 0.5-3 years |
-| Standards bodies | JEDEC (HBM/DDR), OIF, IEEE 802.3, PCI-SIG, CXL | 1-3 years |
-| Patents | USPTO/EPO grants and applications by the company and its rivals | 2-5 years |
-| Technical roadmaps | IRDS, SEMI, foundry PDK notes, OEM design guides | 1-5 years |
+For each accepted claim record:
 
-All are family `technical-paper-standard` in the signal taxonomy, except
-vendor technical announcements which stay `official-product`.
+- claim and competing technology;
+- evidence design; measured parameter, unit and conditions when applicable;
+- explicit sample and benchmark applicability; positive sample and conditions
+  for an empirical model use, otherwise typed `not_applicable|unknown` with a
+  reason and no fabricated zero;
+- source ID, evidence class, root original, originating team, measurement
+  method and independence cluster;
+- causal node and financial parameter it may change;
+- readiness, manufacturing, qualification and commercial gate;
+- lag, scenario permission and falsification condition.
 
-## The three questions this layer must answer
+Filings can document delivered history and commitments, but cannot alone
+determine when an emerging technology reaches technical, manufacturing or
+commercial readiness. Papers, patents and roadmaps can inform mechanism and
+bounds, but cannot alone enter material Base revenue.
 
-1. **Which transition is assumed?** Name it concretely: HBM4 stacking,
-   1.6T optics / 200G-per-lane SerDes, GAA transistors, glass core substrate,
-   400-layer NAND, CXL memory pooling, liquid cooling at >100kW racks.
-2. **Is it feasible, and when?** Cite the physical/engineering evidence:
-   demonstrated parameters, yield/power/thermal limits, standard ratification
-   dates, qualification cycles. State the timing distribution, not a point.
-3. **What would falsify it?** The technical failure boundary: a parameter
-   that must be achieved, a standard that must ratify, a qualification that
-   must pass. This becomes a `failure_boundary` SignalCard and feeds the
-   scenario tail.
+Resolve all technical, replication and production observations through the
+shared source-provenance graph.  An independent replication differs in root,
+experimental team and measurement method; an orthogonal engineering result must
+also come from an independent engineering or qualification path.  Experimental
+to production differences use the structured numeric production-transfer
+bridge, whose adjustments and residual are recomputed.
 
-## Permission rules (unchanged and enforced)
+## Distinct permissions
 
-- Technical evidence **cannot** set a Base point value. Physics does not
-  price a quarter. Allowed uses: `timing_signal`, `feasibility_bound`,
-  `scenario_probability`, `failure_boundary`, `monitor_trigger`.
-- What it *can* do: bound a driver parameter (e.g. "200G/lane demonstrated at
-  X pJ/bit implies 1.6T optics cannot ramp before 20XX"), set transition
-  timing distributions, and justify scenario weights.
-- Every technical signal must name the **driver parameter it touches** in
-  `model_driver`. A paper that does not attach to a number in the driver tree
-  is decoration - reject it from the pack.
+Keep these conclusions independent:
 
-## Transmission into the driver tree
+- scientifically plausible;
+- technically demonstrated in a relevant environment;
+- manufacturable repeatedly at target quality, rate and cost;
+- protected or constrained by IP;
+- compatible with standards and complements;
+- qualified by a named customer or class;
+- commercially committed;
+- shipped, accepted, recognized and collected.
 
-```
-Paper/standard evidence  →  driver parameter  →  driver-tree leaf  →  revenue
-  "HBM4 JEDEC ratified,      "HBM ASP uplift      "HBM segment:        segment
-   1.4x bandwidth,            +25-40% vs HBM3E,    volume x ASP"        revenue
-   qualification 2H26"        ramp from 2H26"
-```
+Do not convert a count of papers, patents or citations into a score or adoption
+probability. Use evidence to update a specific edge or parameter.
 
-Record the transmission explicitly. If the chain cannot be written, the
-technical claim is not usable in the model.
+## Model translation
 
-## Competitive-position reading
+Every conclusion-critical technology claim must enter the operating model
+through a named driver: addressable units, content, share, price, useful life,
+yield, throughput, energy, materials, warranty, qualification time, capex or
+working capital. Link the change through the statements and valuation.
 
-Papers and patents also answer *who wins*: read the author affiliations and
-assignees. Sustained first-author presence at ISSCC/IEDM/OFC on the relevant
-node, or a dense patent family around the enabling process step, is direct
-evidence of technical position - and it is observable years before market
-share moves. Where a company's rivals dominate the literature on the assumed
-transition, that is a Base-case risk, not a footnote.
+If no financial parameter changes, the item remains context. If a gate is
+missing, route the effect to a named scenario or option tail and define the
+monitor that would permit promotion to Base.
 
-## Depth expectations
+## Minimum output
 
-- Horizon FY+2 and beyond: at least **2** technical-lane signals, each with a
-  named driver parameter and a stated falsification condition.
-- A thesis whose main line IS a technology inflection (capacity_ramp or
-  program_conversion basis): at least **3**, including one that examines the
-  competitive literature position.
-- If the technology lane genuinely does not apply (mature commodity, no
-  pending transition), state that explicitly in the report with the reason -
-  an empty lane must be an argued choice, never an omission.
+The technology-commercialization register must show the full stage chain,
+status, evidence, next milestone, model permission, earliest revenue period and
+kill condition. A narrative technology section without that linkage is not a
+completed research lane.

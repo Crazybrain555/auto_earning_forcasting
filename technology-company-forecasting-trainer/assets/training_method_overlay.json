@@ -1,0 +1,70 @@
+{
+  "schema_version": "forecast-training-overlay/v1",
+  "applies_to_profile": "trainer",
+  "base_method": "assets/method_system.json",
+  "historical_sop": "references/historical-training-loop.md",
+  "exclusive_ownership": [
+    "freeze_historical_cutoff_and_source_eligibility",
+    "construct_and_audit_specialist_projection_views",
+    "seal_forecast_before_answer_access",
+    "retrieve_and_validate_post_seal_actuals",
+    "evaluate_realized_outcomes_and_attribute_errors",
+    "judge_generalization_and_release_or_revert"
+  ],
+  "specialist_projection_view": {
+    "included": [
+      "decision_contract",
+      "eligible_source_and_evidence_content",
+      "accounting_basis",
+      "forecast_horizons",
+      "normal_capability_handoff_metadata"
+    ],
+    "excluded": [
+      "cutoff_controller",
+      "seal_receipts",
+      "post_seal_actuals",
+      "outcome_evaluations",
+      "error_attribution",
+      "candidate_challenger_judgments"
+    ],
+    "rule": "specialists_execute_their_normal_contract_and_never_own_a_second_cutoff_seal_or_outcome_evaluation_workflow"
+  },
+  "improvement_objective": {
+    "primary": "generalized_quality_of_future_revenue_operating_profit_and_gaap_attributable_net_income_reasoning",
+    "not_a_scalar_optimization": true,
+    "metrics_are": "diagnostic_evidence_not_the_objective",
+    "decision_criteria": [
+      "financial_and_industry_validity",
+      "causal_explanatory_quality",
+      "generalization_across_issuers_and_regimes",
+      "sealed_predictive_evidence_against_a_simpler_challenger",
+      "parsimony_and_operational_usability",
+      "honest_uncertainty_without_leakage_or_interval_gaming"
+    ],
+    "non_compensatory_failures": [
+      "time_leakage",
+      "broken_accounting_conservation",
+      "outcome_fitted_company_specific_rule",
+      "material_failure_to_generalize",
+      "unsupported_conclusion_permission"
+    ],
+    "aggregation_rule": "do_not_collapse_the_criteria_into_manual_weights_or_one_promotion_score"
+  },
+  "assurance_additions": {
+    "orthogonal_angles": [
+      "predictive_discipline"
+    ],
+    "predictive_question": "Does the change add sealed out-of-sample forecast value for revenue, operating profit and attributable net income versus a simpler challenger without gaming interval width?"
+  },
+  "historical_controls": [
+    "freeze_historical_cutoff",
+    "project_eligible_inputs_to_specialists",
+    "seal_before_actuals",
+    "retrieve_and_validate_actuals",
+    "evaluate_realized_outcomes_and_attribute_error",
+    "external_method_reflection",
+    "validate_generalization",
+    "independent_blind_review",
+    "release_or_revert"
+  ]
+}

@@ -8,7 +8,7 @@ assets/examples/sandisk_v73/
 
 It demonstrates:
 
-- explicit information cutoff and price timestamp;
+- automatic snapshot identity and an explicit market-price timestamp;
 - Source Pack with evidence permissions;
 - current-year quarterly bridge;
 - quarterly one-year model before annual forecasts;

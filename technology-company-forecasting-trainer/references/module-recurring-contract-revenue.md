@@ -2,30 +2,74 @@
 
 Use when a material portion of revenue is created by subscriptions, term licenses, maintenance/support, committed usage, multi-year agreements, deferred revenue, backlog or RPO. This is a stock-flow and state-transition module, not a rule to raise growth for every software company.
 
+This operating module closes recurring revenue, service cost and operating
+profit. It exports recognition and timing states to the financial capability;
+it does not roll shares, cash, tax or the three statements, assign scenario
+probabilities, model fade or value the company.
+
 ## 1. Contract-type decomposition
 
 Classify material revenue into ratable subscription/term license, maintenance/support, usage/consumption, upfront license/IP/hardware/royalty, professional services, and acquired/migrated/accounting-transition cohorts.
 
 Contract value, billings, backlog, deferred revenue, RPO, bookings, ACV, ARR, usage and recognized revenue are different states or flows. Never add them.
 
-## 2. Required stock-flow equations
+## 2. Cohort ARR/NRR identity and stock-flow equations
+
+Build product × customer group × contract type × original-start cohort ×
+quarter rows. An existing-customer expansion remains in its original cohort;
+`new_logo_ARR` contains only customers absent from the eligible opening base.
+This boundary is mandatory even when management reports only aggregate ARR.
+
+For every opening cohort `c`:
+
+```text
+Ending existing-cohort ARR_c,t
+= beginning eligible ARR_c,t
+- churn ARR_c,t
+- contraction ARR_c,t
++ price ARR_c,t
++ seat / volume / usage expansion ARR_c,t
++ explicit price×volume cross-effect_c,t
+
+GRR_t
+= sum(beginning eligible ARR - churn ARR - contraction ARR)
+÷ sum(beginning eligible ARR)
+
+NRR_t
+= sum(ending existing-cohort ARR at constant FX and perimeter)
+÷ sum(beginning eligible ARR at constant FX and perimeter)
+
+Ending ARR_t
+= sum(ending existing-cohort ARR_c,t)
++ sum(new-logo ARR_c,t)
+± separately disclosed FX / acquisition / disposal / migration effects_t
+```
+
+NRR excludes new-logo ARR. Price effect is calculated holding retained
+quantity/usage constant; seat/usage expansion is calculated at the base price;
+the price×volume cross-effect is shown once. Alternatively, calculate ending
+ARR directly from ending units × ending price and use the bridge only as an
+exact reconciliation. Never put the same existing-customer expansion in both
+the retained cohort and an expansion/new-logo row. Require zero checks for the
+cohort sum, NRR numerator and reported-ARR reconciliation.
+
+### Recognition and contract-stock equations
 
 For each material contract type and, where disclosed, customer cohort:
 
 ```text
-Retained recurring value_t
-= beginning eligible recurring base_t
-× renewal probability_t
-× price / seat / usage expansion_t
+Recognized ratable revenue_c,t
+= average in-force annualized recurring value_c,t
+× period fraction_t
+× recognition factor_c,t
 
-New recognized recurring revenue_t
-= new-logo or expansion contract value_t
-× stage / close probability_t
-× period recognition fraction_t
+New-logo ARR_c,t
+= qualified new-logo contract value_c,t
+× stage / close probability_c,t
+× activation probability_c,t
 
 Recognized recurring revenue_t
-= retained recurring value recognized in period
-+ new recognized recurring revenue_t
+= sum(recognized ratable revenue_c,t)
 + permitted catch-up / variable-consideration adjustments_t
 
 Ending unrecognized contract stock_t
@@ -37,12 +81,42 @@ Ending unrecognized contract stock_t
 Reported revenue_t
 = recognized recurring revenue_t
 + upfront product / IP / hardware revenue_t
-+ usage revenue_t
++ billable usage units_t × effective price per usage unit_t
 + services revenue_t
 + permitted accounting-transition adjustments_t
 ```
 
 Customer demand, contract stock, billings/deferred and reported revenue are cross-checks, not additive models.
+
+### Usage, hosting and support unit economics
+
+For consumption or AI service, the cost schedule is mandatory:
+
+```text
+Serve / inference cost_t
+= usage units_t × unit serve / inference cost_t
+
+Required hosting capacity_t
+= usage units_t × resource intensity per usage unit_t
+÷ utilization_t
+
+Hosting capacity cost_t
+= average deployed hosting capacity_t × unit hosting cost_t
+
+Support load_t
+= active customers, tickets, hours or cases_t
+× support intensity per active unit_t
+
+Support cost_t
+= support load_t × unit support cost_t
+```
+
+Define the cost pools inside each unit rate. If serve cost includes hosting,
+set the separate hosting row to zero and label the rate `all-in`; otherwise
+exclude depreciation/leases, fixed energy/network, facilities and idle
+capacity from serve cost. Reconcile the cost pools so no hosting or support
+dollar appears twice. A carried gross-margin ratio or unexplained
+`support/other` percentage is non-compliant.
 
 ## 3. State transitions
 
@@ -57,32 +131,47 @@ A new accounting standard, pricing model, contract migration or acquisition inte
 
 ## 4. Evidence permission
 
-- E0/E1 filings, contract notes, official KPI definitions, audited deferred revenue/RPO and official guidance may anchor the bridge.
+- Filings and audited facts anchor what was reported on their stated accounting
+  basis; contract notes anchor disclosed terms; official KPI definitions anchor
+  the issuer's own construct. None of them independently proves future demand,
+  retention, realized price or margin.
 - Official customer/partner evidence may change stage probability after perimeter and independence checks.
-- Measured independent research may change a driver only after corroboration.
+- Independently generated measurements may change a driver when their construct,
+  population, period and causal link fit that proposition; corroboration means
+  independent roots, not report count.
 - Sales anecdotes, unnamed pipeline claims, search snippets and duplicated commentary are monitoring signals only.
 - Missing cohort, duration, cancellation or recognition data require an explicit residual and lower readiness; do not invent customer names or shares.
 
-## 5. Technology-inflection expansion floor
+## 5. Technology-inflection challenger and causal bridge
 
-When observable evidence at `as_of` shows a technology inflection driving structural demand acceleration for the recurring product set, the Base expansion rate for FY+2 and FY+3 must not fall below the inflection-driven floor. This rule prevents anchoring on pre-inflection historical averages when the demand driver has demonstrably shifted.
+A technology transition is a rival hypothesis to historical persistence, not a
+mechanical growth floor. When material, decompose it into observable adoption
+states and the recurring economics it could change:
 
-**Applicability.** All three conditions must hold:
+```text
+eligible customers or workloads
+× qualification / migration rate
+× incremental seats, usage or attach per adoption
+× effective price
+× recognition timing
+= transition-linked recurring revenue
+```
 
-1. A named technology transition is in progress (e.g., major semiconductor node shift, new design-methodology requirement, platform migration) with E0/E1 evidence of customer adoption at `as_of`.
-2. The transition creates incremental, measurable demand for the recurring product (more seats, higher complexity per design, new tool attach) — not merely a general narrative of "growth."
-3. At least two independent forward signals (design starts, customer disclosures, order patterns, official guidance citing the transition) corroborate accelerating adoption as of the cutoff.
+Model the opposing mechanisms in the same graph: saturation, delayed programs,
+customer concentration, churn or cannibalization, capacity/support constraints,
+discounting and competitive response. Historical organic expansion, management
+guidance and an adoption build are separate challengers. A gap between them is
+a research question; it is not proof that guidance is conservative or that the
+historical rate is a lower bound.
 
-**Rule.** When applicable, set the FY+2 and FY+3 Base expansion rate at or above the higher of (a) the trailing four-quarter organic expansion rate and (b) the inflection-driven floor implied by the measured adoption signals. The floor is not a point estimate — it sets the lower bound of the Base case; upside scenarios may exceed it.
-
-**Floor inputs — provenance requirements.** Input (a) must be computed from reported recurring/subscription revenue for the four quarters preceding `as_of`, and the derivation must appear where the floor is set (report and workbook): the four quarterly figures, the computed trailing rate, the inflection-implied floor, and the selected maximum. Management guidance is never admissible as input (a) — guided growth is an output constraint (§6), not a measured trailing rate, and labeling a guided rate as "trailing" is the exact anchoring failure this rule exists to prevent. When guided growth sits materially below the computed trailing rate without a quantified mechanism-level cause (capacity limit, churn event, quantified law-of-large-numbers drag), treat the gap as probable guidance conservatism: the floor stays at the computed trailing rate, and the gap itself becomes a monitor signal. A forecast that claims this rule applies but omits the derivation line is non-compliant with the rule.
-
-**Failure conditions — do not apply when:**
-
-- the transition evidence is analyst commentary or model memory only (no E0/E1 anchor);
-- the product's share of the inflection is unquantified or speculative;
-- the customer base is concentrated enough that one delayed program would remove the floor;
-- the inflection is a one-time migration (e.g., ASC 606 transition) rather than a sustained demand expansion.
+Move the transition into the reference operating path only when
+proposition-appropriate observations
+support the named adoption states and economics and the serious rivals have
+been investigated. Technical feasibility, TAM, commentary or a fixed count of
+signals cannot grant that permission. If company attribution, timing or
+economics remain unresolved, keep the transition as a bounded rival input and
+monitor the discriminating observations. The coordinator decides whether that
+input warrants an authored joint scenario.
 
 ## 6. Permission and uncertainty
 
@@ -94,9 +183,33 @@ When observable evidence at `as_of` shows a technology inflection driving struct
 - FY+1 point precision requires a bridge that explains a substantial, decision-relevant share of revenue and reconciles to official guidance/run rate.
 - FY+2 shows renewal/expansion and recognition breakpoints; FY+3 is distribution-first when cohort/duration evidence is weak.
 
-## 7. Workbook and registers
+## 7. Operating bundle and downstream mappings
 
-Include product × customer group × contract type × quarter, beginning recurring base, unrecognized contract stock, renewal/expansion/new logos, price/usage, stage conversion, billings/deferred/RPO reconciliation where disclosed, recognition by revenue type, cancellations/FX/scope, margin/cash differences, source permission, materiality, sensitivity and falsification trigger.
+Include only the schedules needed to close the operating path: product ×
+customer group × contract type × quarter; beginning recurring base;
+renewal/expansion/new logos; price/usage; stage conversion; unrecognized
+contract stock and recognition by revenue type; cancellations/FX/scope; the
+selected service-cost construction; operating profit; evidence permission;
+material sensitivity and falsification.
+
+When an all-in observed service/hosting cost and a decomposed serve/capacity/
+support build are both available, compile both to one canonical service-cost
+node, select exactly one for execution and let that node enter operating profit
+once. The unselected path remains a reconciliation check.
+
+Export deferred-revenue, receivable, contract-asset, payable,
+capitalized-development, billing and collection timing as named downstream
+mappings when observed; the financial capability owns their accounting rolls,
+cash-flow links, share denominators, tax, FCF and valuation. If a material rival
+changes retention, price, usage, cost or recognition timing, return the changed
+node, unit, effective period, lag, evidence and falsifier. The coordinator, not
+this module, decides whether to create a joint scenario and probability.
+
+If a required cohort, price, usage, cost or recognition input is missing,
+author one `human-required` blocker with the affected operating output and next
+evidence. Keep the machine formula symbolic and reference that blocker; do not
+repeat a placeholder table for every period or pull in downstream schedules to
+make the operating bundle look complete.
 
 ## 8. Coverage and residual diagnostics
 
@@ -110,7 +223,10 @@ sensitivity_weighted_residual
 = unexplained revenue share × sensitivity of the conclusion to that residual
 ```
 
-An 80% explained share and 10% unexplained residual are useful default warning thresholds for a reasonably disclosed business, not universal hard gates. Tighten or relax them only with a documented reason based on disclosure quality, concentration, business mix and decision sensitivity.
+These are diagnostics, not target ratios. The independent reviewer decides
+whether the residual can change the revenue, profit or investment conclusion,
+using disclosure quality, concentration, business mix and sensitivity. Do not
+manufacture rows to improve an explained-share percentage.
 
 Cap readiness or fail the mechanism when:
 
@@ -118,5 +234,9 @@ Cap readiness or fail the mechanism when:
 - a material residual is unnamed or unsensitized;
 - contract value is treated as recognized revenue;
 - ARR, billings, RPO and revenue are added;
+- new-logo ARR is included in NRR or expansion is counted in two cohorts;
+- serve, hosting-capacity and support costs are blended into one margin plug;
+- a proposed rival input omits its model node, unit, effective period or lag;
+- a missing schedule is deleted instead of retained as `human-required`;
 - one renewal/growth rate is applied to heterogeneous cohorts without evidence;
 - an accounting transition is called organic demand.

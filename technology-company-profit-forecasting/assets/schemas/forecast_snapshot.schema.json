@@ -1,21 +1,846 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "ForecastSnapshot",
+  "$id": "forecast_snapshot.schema.json",
+  "title": "Value-investing forecast snapshot v2",
   "type": "object",
   "additionalProperties": true,
-  "required": ["forecast_id", "as_of", "model_version", "source_pack_hash", "mechanism_weights", "scenario_probabilities", "outputs", "breakpoints", "confidence_and_limits"],
+  "required": [
+    "forecast_contract_version",
+    "forecast_id",
+    "as_of",
+    "model_version",
+    "accounting_basis_id",
+    "source_pack_hash",
+    "analysis_primitives",
+    "scenario_probabilities",
+    "outputs",
+    "investment_case",
+    "driver_tree",
+    "integrated_model",
+    "value_creation",
+    "recurring_model",
+    "valuation",
+    "market_implied_expectations",
+    "valuation_summary",
+    "breakpoints",
+    "confidence_and_limits",
+    "persistence_analysis",
+    "growth_challenger_review"
+  ],
+  "not": {
+    "anyOf": [
+      {
+        "required": [
+          "mechanism_weights"
+        ]
+      },
+      {
+        "required": [
+          "archetype_weights"
+        ]
+      },
+      {
+        "required": [
+          "company_lenses"
+        ]
+      }
+    ]
+  },
+  "$defs": {
+    "canonicalOutput": {
+      "type": "object",
+      "required": [
+        "period",
+        "low_scenario_id",
+        "high_scenario_id",
+        "revenue_point",
+        "revenue_low",
+        "revenue_high",
+        "operating_profit_point",
+        "operating_profit_low",
+        "operating_profit_high",
+        "pretax_profit_point",
+        "pretax_profit_low",
+        "pretax_profit_high",
+        "tax_expense_point",
+        "tax_expense_low",
+        "tax_expense_high",
+        "noncontrolling_interest_net_income_point",
+        "noncontrolling_interest_net_income_low",
+        "noncontrolling_interest_net_income_high",
+        "net_income_point",
+        "net_income_low",
+        "net_income_high",
+        "profit_point",
+        "profit_low",
+        "profit_high",
+        "point_evaluable"
+      ],
+      "properties": {
+        "period": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "low_scenario_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "high_scenario_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "revenue_point": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "revenue_low": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "revenue_high": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "operating_profit_point": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "operating_profit_low": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "operating_profit_high": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "pretax_profit_point": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "pretax_profit_low": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "pretax_profit_high": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "tax_expense_point": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "tax_expense_low": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "tax_expense_high": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "noncontrolling_interest_net_income_point": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "noncontrolling_interest_net_income_low": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "noncontrolling_interest_net_income_high": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "net_income_point": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "net_income_low": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "net_income_high": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "profit_point": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "profit_low": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "profit_high": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "interval_alpha": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 1
+        },
+        "point_evaluable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "integratedPeriod": {
+      "type": "object",
+      "required": [
+        "period",
+        "income_statement",
+        "balance_sheet",
+        "cash_flow_statement",
+        "roll_forwards"
+      ],
+      "properties": {
+        "period": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "income_statement": {
+          "type": "object",
+          "required": [
+            "revenue",
+            "operating_costs_and_expenses",
+            "operating_profit",
+            "nonoperating_income_expense_net",
+            "pretax_profit",
+            "tax_expense",
+            "net_income",
+            "net_income_attributable_to_noncontrolling_interests",
+            "net_income_attributable"
+          ],
+          "properties": {
+            "revenue": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "operating_costs_and_expenses": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "operating_profit": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "nonoperating_income_expense_net": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "pretax_profit": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "tax_expense": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "net_income": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "net_income_attributable_to_noncontrolling_interests": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "net_income_attributable": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          }
+        },
+        "balance_sheet": {
+          "type": "object"
+        },
+        "cash_flow_statement": {
+          "type": "object"
+        },
+        "roll_forwards": {
+          "type": "object"
+        }
+      }
+    }
+  },
   "properties": {
-    "forecast_id": {"type": "string"},
-    "as_of": {"type": "string", "format": "date-time"},
-    "model_version": {"type": "string"},
-    "source_pack_hash": {"type": "string", "pattern": "^sha256:"},
-    "mechanism_weights": {"type": "object"},
-    "archetype_weights": {"description": "Deprecated compatibility field.", "type": "object"},
-    "company_lenses": {"type": "array", "items": {"type": "string"}},
-    "scenario_probabilities": {"type": "object"},
-    "outputs": {"type": "object"},
-    "breakpoints": {"type": "array"},
-    "human_required": {"type": "array"},
-    "confidence_and_limits": {"type": "array", "items": {"type": "string"}}
+    "forecast_contract_version": {
+      "const": "2.0"
+    },
+    "schema_version": {
+      "const": "2.0"
+    },
+    "forecast_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "model_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "accounting_basis_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_pack_hash": {
+      "type": "string",
+      "pattern": "^(sha256:[0-9a-f]{64}|unhashed:.+|sha256:REPLACE)$"
+    },
+    "publication": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "required": [
+        "contract_version",
+        "frozen_at",
+        "bundle_hashes",
+        "supersedes"
+      ],
+      "properties": {
+        "contract_version": {
+          "const": "forecast-live-publication/v1"
+        },
+        "frozen_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "bundle_hashes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "evidence_bundle",
+            "operating_model_bundle",
+            "financial_forecast_bundle"
+          ],
+          "properties": {
+            "evidence_bundle": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "operating_model_bundle": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "financial_forecast_bundle": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          }
+        },
+        "supersedes": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      }
+    },
+    "analysis_primitives": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "scenario_probabilities": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "required": [
+        "year_1",
+        "year_2",
+        "year_3_distribution"
+      ],
+      "properties": {
+        "year_1": {
+          "$ref": "#/$defs/canonicalOutput"
+        },
+        "year_2": {
+          "$ref": "#/$defs/canonicalOutput"
+        },
+        "year_3_distribution": {
+          "$ref": "#/$defs/canonicalOutput"
+        }
+      }
+    },
+    "investment_case": {
+      "type": "object",
+      "required": [
+        "decision_question",
+        "variant_view",
+        "falsification_ids"
+      ],
+      "properties": {
+        "decision_question": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "variant_view": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "margin_of_safety_pct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "falsification_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "driver_tree": {
+      "type": "object",
+      "properties": {
+        "partition": {
+          "type": "object",
+          "properties": {
+            "partition_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "dimension": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "exhaustive": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "mutually_exclusive": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "declared_residual": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          }
+        },
+        "segments": {
+          "type": "array"
+        },
+        "cross_check_views": {
+          "type": "array"
+        }
+      }
+    },
+    "integrated_model": {
+      "type": "object",
+      "required": [
+        "periods"
+      ],
+      "properties": {
+        "periods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/integratedPeriod"
+          }
+        }
+      }
+    },
+    "value_creation": {
+      "type": "object",
+      "required": [
+        "wacc",
+        "periods",
+        "fade",
+        "reported_vs_analytical_roic"
+      ],
+      "properties": {
+        "wacc": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "periods": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "period",
+              "reported_nopat",
+              "after_tax_normalization_adjustments",
+              "normalized_nopat",
+              "beginning_invested_capital",
+              "ending_invested_capital",
+              "average_invested_capital",
+              "average_roic",
+              "reinvestment",
+              "invested_capital_bridge_adjustment",
+              "reinvestment_rate",
+              "prior_normalized_nopat",
+              "incremental_nopat",
+              "incremental_invested_capital",
+              "incremental_roic",
+              "incremental_return_lag_periods",
+              "fundamental_growth"
+            ]
+          }
+        },
+        "fade": {
+          "type": "object",
+          "required": [
+            "terminal_roic",
+            "years_to_fade",
+            "competitive_response",
+            "schedule"
+          ]
+        },
+        "reported_vs_analytical_roic": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "recurring_model": {
+      "type": "object",
+      "required": [
+        "applicable",
+        "cohort_periods",
+        "cost_periods"
+      ],
+      "properties": {
+        "applicable": {
+          "type": "boolean"
+        },
+        "cohort_periods": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "cost_periods": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "valuation": {
+      "type": "object"
+    },
+    "market_implied_expectations": {
+      "type": "object"
+    },
+    "valuation_summary": {
+      "description": "Stable dashboard projection of executable valuation results; never the calculation source.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "current_price",
+        "price_currency",
+        "price_as_of",
+        "current_valuation_note",
+        "reference_scenario_id",
+        "fair_value_by_scenario_id",
+        "not_valued_scenario_ids",
+        "valuation_completeness",
+        "recommended_buy_price",
+        "action",
+        "one_line_thesis"
+      ],
+      "properties": {
+        "current_price": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "price_currency": {
+          "type": "string"
+        },
+        "price_as_of": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "current_valuation_note": {
+          "type": "string"
+        },
+        "reference_scenario_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "fair_value_by_scenario_id": {
+          "type": "object",
+          "propertyNames": {
+            "minLength": 1
+          },
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "not_valued_scenario_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "valuation_completeness": {
+          "enum": [
+            "none_executable",
+            "reference_only_executable",
+            "all_authored_scenarios_executable"
+          ]
+        },
+        "recommended_buy_price": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "action": {
+          "type": "string"
+        },
+        "one_line_thesis": {
+          "type": "string"
+        }
+      }
+    },
+    "monitoring": {
+      "type": "object"
+    },
+    "breakpoints": {
+      "type": "array"
+    },
+    "human_required": {
+      "type": "array"
+    },
+    "confidence_and_limits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "horizon_contracts": {
+      "type": "object"
+    },
+    "process_integrity": {
+      "type": "string"
+    },
+    "research_sufficiency": {
+      "type": "string"
+    },
+    "historical_base": {
+      "type": "object"
+    },
+    "error_budget": {
+      "type": "object"
+    },
+    "persistence_analysis": {
+      "type": "object",
+      "required": [
+        "mean_reversion",
+        "cost_behavior"
+      ],
+      "properties": {
+        "mean_reversion": {
+          "type": "object"
+        },
+        "cost_behavior": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "growth_challenger_review": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "challenger",
+          "horizon",
+          "status",
+          "notes"
+        ],
+        "properties": {
+          "challenger": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Case-selected relevant outside view; no universal taxonomy is imposed."
+          },
+          "horizon": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "accepted",
+              "not_available_with_reason",
+              "human_required"
+            ]
+          },
+          "challenger_growth_pct": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "driver_tree_growth_pct": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "difference_direction": {
+            "enum": [
+              null,
+              "acceleration",
+              "deceleration",
+              "no_difference"
+            ]
+          },
+          "material_difference": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "materiality_basis": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "transition_driver_node_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "named_state_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bridge": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    }
   }
 }

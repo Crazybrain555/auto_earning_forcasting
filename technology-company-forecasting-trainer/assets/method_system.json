@@ -1,0 +1,364 @@
+{
+  "schema_version": "forecast-method-system/v1",
+  "method_id": "technology-company-causal-value-system",
+  "method_version": "10.0.0",
+  "title": "Evidence-to-Value Technology Company Forecasting System",
+  "title_zh": "从证据到价值的科技公司预测系统",
+  "canonical_flow": [
+    "dated_evidence",
+    "causal_dag",
+    "operating_equations",
+    "integrated_three_statements",
+    "conditional_earnings_persistence_bridge",
+    "roic_reinvestment_fade",
+    "valuation_reverse_implied_expectations",
+    "red_team",
+    "monitoring"
+  ],
+  "judgment_boundary": {
+    "allowed": [
+      "main_line_and_rival_hypothesis_selection",
+      "named_scenario_design_and_probabilities",
+      "required_return",
+      "margin_of_safety_and_posture"
+    ],
+    "prohibited": [
+      "manual_importance_weights",
+      "unexplained_cagr_or_margin_plugs",
+      "balancing_plugs",
+      "evidence_scores_presented_as_truth"
+    ]
+  },
+  "construction_philosophy": {
+    "primary_control": "stage_order_and_correct_by_construction_sop",
+    "canonical_sop": "references/research-sop.md",
+    "authored_once": [
+      "decision_and_hypothesis_contract",
+      "source_claim_observation_and_financial_fact_ledgers",
+      "typed_causal_equation_graph",
+      "named_scenario_overrides",
+      "explicit_judgment_inputs"
+    ],
+    "generated_or_reconciled_views": [
+      "historical_and_operating_schedules",
+      "scenario_profit_paths",
+      "integrated_statements",
+      "earnings_power_and_valuation",
+      "workbook_snapshot_report_and_monitors"
+    ],
+    "complexity_rule": "add detail only when it changes a material revenue operating-profit or attributable-net-income distribution, distinguishes a rival hypothesis, or prevents a demonstrated data/accounting failure",
+    "equation_count_target": null,
+    "artifact_count_target": null,
+    "test_count_target": null
+  },
+  "assurance_philosophy": {
+    "tests_are": "orthogonal_views_not_a_completeness_score",
+    "deterministic_scope": [
+      "source_dates_vintages_and_scope",
+      "provenance_and_types",
+      "equation_execution",
+      "accounting_conservation",
+      "evidence_to_conclusion_referential_integrity"
+    ],
+    "independent_agent_scope": [
+      "economic_causality_and_principal_contradiction",
+      "evidence_interpretation_and_noise",
+      "rival_hypotheses_and_disconfirmation",
+      "technology_to_production_transfer",
+      "persistence_moat_and_mean_reversion",
+      "investment_relevance_and_clarity"
+    ],
+    "orthogonal_angles": [
+      "economic_causality",
+      "evidence_and_data",
+      "accounting_and_execution",
+      "disconfirmation_and_investment_relevance",
+      "clarity_and_reproducibility"
+    ],
+    "duplicate_rule": "consolidate tests that respond to the same underlying defect",
+    "independence_rule": "freeze evidence and model before an isolated reviewer records findings; role labels or duplicated prompts do not establish independence",
+    "complexity_change_contract": [
+      "distinct_failure_addressed",
+      "primary_assurance_angle",
+      "overlapping_rule_retired_or_reason_none_exists",
+      "ablation_or_retirement_condition"
+    ]
+  },
+  "mandatory_decision_schedules": {
+    "applies_to_read_only_memos": true,
+    "human_required_preserves_rows_and_blocks_conclusions": true,
+    "integrated_three_statement_minimum": {
+      "trigger": "full_company_or_three_year_or_longer_forecast_or_valuation",
+      "narrow_review_rule": "materiality_bounded",
+      "required_roll_forwards": [
+        "ppe_and_depreciation",
+        "operating_working_capital",
+        "debt_and_cash",
+        "financing_dilution_and_basic_diluted_shares"
+      ],
+      "required_checks": [
+        "cfs_to_balance_sheet_cash",
+        "assets_equal_liabilities_plus_equity",
+        "revenue_to_operating_profit",
+        "operating_profit_to_pretax_profit",
+        "pretax_tax_nci_to_gaap_attributable_net_income",
+        "forecast_period_coverage_across_integrated_snapshot_and_earnings_bridge"
+      ]
+    },
+    "every_full_company_model": [
+      "document_observation_and_financial_fact_lineage",
+      "material_series_cross_check_strategy_and_honest_corroboration_status",
+      "reported_normalized_cash_accrual_investment_cycle_profit_bridge"
+    ],
+    "three_year_or_valuation": [
+      "normalized_nopat_average_and_incremental_roic_reinvestment_growth",
+      "conditional_earnings_persistence_and_mean_reversion",
+      "causal_competition_and_obsolescence_fade",
+      "cell_date_threshold_action_monitoring"
+    ],
+    "material_technology_or_ip": [
+      "patent_claim_ownership_encumbrance_family_citation_fto",
+      "claim_to_driver_node_to_economic_permission"
+    ],
+    "recurring_or_usage": [
+      "cohort_arr_nrr_without_double_counting",
+      "usage_hosting_support_unit_costs",
+      "deferred_ar_ap_capitalized_development_diluted_share_rolls",
+      "case_selected_material_driver_scenarios_reexecuted_through_one_model"
+    ]
+  },
+  "profiles": {
+    "live": {
+      "purpose": "Continuously incorporate current evidence through bundle freeze, then publish a versioned forecast, valuation and monitoring state",
+      "extra_stages": []
+    }
+  },
+  "optional_calibration": {
+    "glob": "references/lens-*.md",
+    "core_dependency": false,
+    "authority": "calibration_example_only"
+  },
+  "stages": [
+    {
+      "no": 1,
+      "id": "decision_contract",
+      "name": "Decision and model identity",
+      "name_zh": "决策与模型身份",
+      "purpose": "Define entity, security, consolidation perimeter, fiscal/accounting basis, currency, horizon, user decision and readiness target; the runtime records source, price, bundle-freeze and publication timestamps as audit identity while research continues to accept current evidence until bundle freeze.",
+      "gates": [
+        "unambiguous_perimeter",
+        "model_identity_and_snapshot_audit_semantics",
+        "declared_output_contract",
+        "typed_accounting_framework_version_and_policy_contract"
+      ],
+      "files": [
+        "references/analysis-kernel.md"
+      ]
+    },
+    {
+      "no": 2,
+      "id": "evidence_system",
+      "name": "Evidence, claims and research coverage",
+      "name_zh": "证据、主张与研究覆盖",
+      "purpose": "Build dated source lineage, bounded claims, independence clusters, conflicts, missing evidence and permitted uses.",
+      "gates": [
+        "dated_source_lineage",
+        "observation_value_definition_scope_availability_and_vintage_chain",
+        "financial_fact_restatement_lineage",
+        "historical_to_forecast_accounting_basis_reconciliation",
+        "three_year_complete_comparable_historical_base",
+        "latest_interim_or_typed_unavailability",
+        "historical_profit_chain_and_segment_reconciliation",
+        "latest_actual_to_first_forecast_numeric_bridge",
+        "claimed_corroboration_has_independent_root_method_and_definition_bridge",
+        "controlled_source_origin_ceiling_and_epistemic_class",
+        "model_changing_external_evidence_binds_observation_record_and_frozen_fingerprint",
+        "claim_to_source_trace",
+        "conclusion_critical_coverage",
+        "conflicts_preserved"
+      ],
+      "files": [
+        "references/core-source-and-evidence.md",
+        "references/data-quality-and-triangulation.md",
+        "references/research-lanes-and-corroboration.md",
+        "references/research-completeness-and-company-quality.md"
+      ]
+    },
+    {
+      "no": 3,
+      "id": "causal_graph",
+      "name": "Causal DAG and thesis carriers",
+      "name_zh": "因果图与投资主线",
+      "purpose": "Convert accepted claims into typed, falsifiable causal edges and name the smallest causally sufficient set of paths carrying the investment thesis; common counts are not validator caps.",
+      "gates": [
+        "typed_nodes_and_edges",
+        "units_periods_signs_and_lags",
+        "main_line_declared",
+        "rival_hypothesis",
+        "falsification_conditions"
+      ],
+      "files": [
+        "references/analysis-kernel.md",
+        "references/driver-tree-modeling.md"
+      ]
+    },
+    {
+      "no": 4,
+      "id": "operating_model",
+      "name": "Operating equations, industry state and commercialization",
+      "name_zh": "经营方程、行业状态与商业化",
+      "purpose": "Build segment equations for demand, volume, price, mix, cost, supply, cycle and technology-to-commercial conversion.",
+      "gates": [
+        "segment_sum_reconciles",
+        "dimensionally_valid_equations",
+        "demand_supply_price_cost_separated",
+        "cycle_state_explicit",
+        "stock_flow_cycle_chain_reconciled",
+        "stock_flow_cycle_equations_machine_recomputed",
+        "industry_profit_pool_boundary_reconciled",
+        "technology_commercialization_gates",
+        "paper_version_status_replication_transfer_and_permission_validated"
+      ],
+      "files": [
+        "references/equation-primitives.md",
+        "references/mechanism-router.md",
+        "references/industry-economics-and-cycle.md",
+        "references/technology-commercialization-and-ip.md",
+        "references/module-unit-volume-price-cost.md",
+        "references/module-capacity-utilization-yield.md",
+        "references/module-orders-backlog-recognition.md",
+        "references/module-platform-usage-adoption.md",
+        "references/module-recurring-contract-revenue.md",
+        "references/module-subscriber-content-economics.md",
+        "references/module-program-stage-conversion.md",
+        "references/module-contracts-jv-capital.md"
+      ]
+    },
+    {
+      "no": 5,
+      "id": "integrated_statements",
+      "name": "Integrated statements and roll-forwards",
+      "name_zh": "三表联动与滚动勾稽",
+      "purpose": "Translate operating equations into reported and analytical P&L, balance sheet, cash flow, working capital and capital schedules.",
+      "gates": [
+        "three_statements_close",
+        "cash_reconciles",
+        "working_capital_rolls",
+        "ppe_and_debt_roll",
+        "period_by_period_reported_profit_chain_reconciliation",
+        "nopat_operating_cash_flow_and_change_in_noa_identity",
+        "reported_to_normalized_bridge"
+        ,"material_internal_intangible_cohorts_or_numeric_exception"
+      ],
+      "files": [
+        "references/model-mechanical-integrity.md",
+        "references/internal-intangible-investment.md",
+        "references/equation-primitives.md",
+        "references/module-perimeter-and-accounting.md",
+        "references/module-discrete-accounting-events.md",
+        "references/submodule-dta-valuation-allowance.md"
+      ]
+    },
+    {
+      "no": 6,
+      "id": "value_creation",
+      "name": "ROIC, reinvestment, growth and fade",
+      "name_zh": "资本回报、再投资、增长与衰减",
+      "purpose": "Explain whether growth creates value and how competitive response changes incremental economics over time.",
+      "gates": [
+        "normalized_nopat_identity",
+        "average_invested_capital_and_roic_identity",
+        "invested_capital_continuity",
+        "incremental_roic_identity",
+        "reinvestment_bridge",
+        "fundamental_growth_reconciliation",
+        "causal_fade_schedule_to_terminal_roic",
+        "conditional_earnings_persistence_and_fade",
+        "mean_reversion_reference_distribution_company_departure_speed_and_falsifier",
+        "state_dependent_cost_elasticity_lag_floor_and_exit_cost",
+        "moat_claims_bind_evidence_nodes_fade_value_and_monitors"
+      ],
+      "files": [
+        "references/business-quality-and-moat.md",
+        "references/earnings-power-and-mean-reversion.md",
+        "references/valuation-and-market-expectations.md"
+      ]
+    },
+    {
+      "no": 7,
+      "id": "valuation",
+      "name": "Valuation and market-implied expectations",
+      "name_zh": "估值与市场隐含预期",
+      "purpose": "Reconcile intrinsic-value methods, enterprise-to-equity and per-share value, then solve the market price into named operating drivers.",
+      "gates": [
+        "dcf_identity",
+        "residual_income_identity",
+        "method_reconciliation",
+        "terminal_economic_constraints",
+        "enterprise_to_equity_and_per_share_bridge",
+        "named_reverse_implied_driver"
+      ],
+      "files": [
+        "references/valuation-and-market-expectations.md",
+        "references/core-output-and-valuation.md"
+      ]
+    },
+    {
+      "no": 8,
+      "id": "scenarios_and_red_team",
+      "name": "Named scenarios and independent red team",
+      "name_zh": "命名情景与独立红队",
+      "purpose": "Express uncertainty through causal states and attack the thesis carriers, accounting, valuation and evidence lineage.",
+      "gates": [
+        "scenario_changes_named_drivers",
+        "all_scenario_shocks_bind_unit_cell_effective_period_and_lag",
+        "scenario_dimensions_are_case_selected_material_and_causally_executed",
+        "probabilities_sum_to_one",
+        "red_team_attacks_main_line_first",
+        "downside_and_first_failure_point"
+      ],
+      "files": [
+        "references/analysis-kernel.md",
+        "references/core-output-and-valuation.md"
+      ]
+    },
+    {
+      "no": 9,
+      "id": "validation_and_readiness",
+      "name": "Mechanical, research and decision-readiness validation",
+      "name_zh": "机械、研究与决策就绪校验",
+      "purpose": "Run arithmetic, schema, source-date/vintage, production-profile and delivery gates without confusing formula integrity with research sufficiency.",
+      "gates": [
+        "mechanical_integrity",
+        "research_sufficiency",
+        "production_profile_and_evidence_availability_integrity",
+        "readiness_label_supported",
+        "relaxed_compatibility_switches_forbidden_in_full_company_work",
+        "typed_materiality_bounded_narrow_exception_only"
+      ],
+      "files": [
+        "references/model-mechanical-integrity.md",
+        "references/research-completeness-and-company-quality.md",
+        "references/full-company-delivery-contract.md"
+      ]
+    },
+    {
+      "no": 10,
+      "id": "publish_monitor_version",
+      "name": "Publish, monitor and version",
+      "name_zh": "发布、监测与版本化",
+      "purpose": "Publish a registry-bound immutable forecast, monitor the earliest falsification nodes and create a new version when material evidence changes.",
+      "gates": [
+        "atomic_publication_commits_snapshot",
+        "registry_bound_bundle_hashes",
+        "driver_monitor_exact_cells_sources_dates_values_owners",
+        "upgrade_and_kill_triggers",
+        "superseding_forecasts_use_new_identity"
+      ],
+      "files": [
+        "references/publication-and-monitoring.md",
+        "scripts/publish_live_forecast.py"
+      ]
+    }
+  ]
+}

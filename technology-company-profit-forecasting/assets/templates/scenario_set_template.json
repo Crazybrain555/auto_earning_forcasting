@@ -1,0 +1,39 @@
+{
+  "schema_version": "2.0",
+  "scenarios": [
+    {
+      "id": "RENAME_REFERENCE_PATH",
+      "role": "reference",
+      "probability": "REPLACE",
+      "shocks": [],
+      "profit_chain_periods": [
+        {
+          "period": "REPLACE",
+          "revenue": "REPLACE",
+          "operating_costs_and_expenses": "REPLACE",
+          "operating_profit": "REPLACE",
+          "nonoperating_income_expense_net": "REPLACE",
+          "pretax_profit": "REPLACE",
+          "tax_expense": "REPLACE",
+          "net_income": "REPLACE",
+          "net_income_attributable_to_noncontrolling_interests": "REPLACE",
+          "net_income_attributable": "REPLACE",
+          "model_cells": {
+            "revenue": "REPLACE",
+            "operating_costs_and_expenses": "REPLACE",
+            "operating_profit": "REPLACE",
+            "nonoperating_income_expense_net": "REPLACE",
+            "pretax_profit": "REPLACE",
+            "tax_expense": "REPLACE",
+            "net_income": "REPLACE",
+            "net_income_attributable_to_noncontrolling_interests": "REPLACE",
+            "net_income_attributable": "REPLACE"
+          },
+          "applied_shock_node_ids": [],
+          "joint_state_id": "REPLACE"
+        }
+      ],
+      "narrative": "Rename the reference path, replace the probability and reconcile it to the integrated statements and canonical point outputs. Add alternative scenarios only when the case contains a distinct material rival joint state."
+    }
+  ]
+}

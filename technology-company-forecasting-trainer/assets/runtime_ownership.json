@@ -1,0 +1,41 @@
+{
+  "schema_version": "forecast-runtime-ownership/v1",
+  "profiles": {
+    "shared": [
+      {"source": "scripts/artifact_registry.py", "target": "scripts/artifact_registry.py"},
+      {"source": "scripts/equation_contract.py", "target": "scripts/equation_contract.py"},
+      {"source": "scripts/freeze_snapshot.py", "target": "scripts/freeze_snapshot.py"},
+      {"source": "scripts/publication_contract.py", "target": "scripts/publication_contract.py"},
+      {"source": "scripts/provenance_contract.py", "target": "scripts/provenance_contract.py"},
+      {"source": "scripts/runtime_context.py", "target": "scripts/runtime_context.py"},
+      {"source": "scripts/scenario_contract.py", "target": "scripts/scenario_contract.py"},
+      {"source": "scripts/scope_exception_contract.py", "target": "scripts/scope_exception_contract.py"},
+      {"source": "scripts/validate_data_series.py", "target": "scripts/validate_data_series.py"},
+      {"source": "scripts/validate_delivery.py", "target": "scripts/validate_delivery.py"},
+      {"source": "scripts/validate_forward_evidence_workspace.py", "target": "scripts/validate_forward_evidence_workspace.py"},
+      {"source": "scripts/validate_internal_intangibles.py", "target": "scripts/validate_internal_intangibles.py"},
+      {"source": "scripts/validate_investment_case.py", "target": "scripts/validate_investment_case.py"},
+      {"source": "scripts/validate_model_graph.py", "target": "scripts/validate_model_graph.py"},
+      {"source": "scripts/validate_persistence_contract.py", "target": "scripts/validate_persistence_contract.py"},
+      {"source": "scripts/validate_research_completeness.py", "target": "scripts/validate_research_completeness.py"},
+      {"source": "scripts/validate_technical_evidence.py", "target": "scripts/validate_technical_evidence.py"},
+      {"source": "scripts/workbook_contract.py", "target": "scripts/workbook_contract.py"}
+    ],
+    "live": [
+      {"source": "assets/live_release/scripts/package_self_test.py", "target": "scripts/package_self_test.py"},
+      {"source": "assets/live_release/scripts/scaffold_delivery.py", "target": "scripts/scaffold_delivery.py"},
+      {"source": "scripts/publish_live_forecast.py", "target": "scripts/publish_live_forecast.py"}
+    ],
+    "trainer": [
+      {"source": "scripts/package_self_test.py", "target": "scripts/package_self_test.py"},
+      {"source": "scripts/training_runtime_policy.py", "target": "scripts/training_runtime_policy.py"},
+      {"source": "scripts/scaffold_historical_delivery.py", "target": "scripts/scaffold_historical_delivery.py"},
+      {"source": "scripts/validate_time_boundary.py", "target": "scripts/validate_time_boundary.py"},
+      {"source": "scripts/freeze_training_forecast.py", "target": "scripts/freeze_training_forecast.py"},
+      {"source": "scripts/score_training_forecast.py", "target": "scripts/score_training_forecast.py"},
+      {"source": "scripts/validate_historical_delivery.py", "target": "scripts/validate_historical_delivery.py"},
+      {"source": "scripts/validate_historical_data_series.py", "target": "scripts/validate_historical_data_series.py"},
+      {"source": "scripts/project_historical_capability_view.py", "target": "scripts/project_historical_capability_view.py"}
+    ]
+  }
+}

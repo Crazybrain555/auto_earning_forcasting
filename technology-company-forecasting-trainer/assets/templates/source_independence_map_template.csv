@@ -1,1 +1,1 @@
-﻿cluster_id,original_source_id,derived_source_id,relationship,independence_weight,notes
+source_id,cluster_id,root_original_source_id,derived_from_source_id,relationship,common_origin,publisher,authors,measurement_method_id,independence_basis,notes

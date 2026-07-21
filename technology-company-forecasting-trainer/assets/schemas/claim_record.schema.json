@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "claim_record.schema.json",
+  "title": "Claim ledger record v2",
+  "type": "object",
+  "required": ["claim_id", "text", "claim_type", "proposition_scope", "source_ids", "evidence_links", "allowed_use", "driver_node_ids", "as_of", "status"],
+  "properties": {
+    "claim_id": {"type": "string", "minLength": 1},
+    "text": {"type": "string", "minLength": 1},
+    "claim_type": {"enum": ["reported_fact", "derived_fact", "management_claim", "technical_boundary", "analyst_assumption", "scenario", "unknown"]},
+    "proposition_scope": {
+      "enum": [
+        "reported_history", "current_observed_state", "management_view_or_plan",
+        "future_execution", "external_state", "technical_boundary",
+        "analyst_inference", "causal_interpretation", "scenario_only"
+      ]
+    },
+    "source_ids": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "evidence_links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source_id", "relation", "evidence_function", "authority_scope",
+          "measurement_or_construct_basis", "incentive_conflict",
+          "reconciliation_status", "permission_rationale", "observation_ids"
+        ],
+        "properties": {
+          "source_id": {"type": "string", "minLength": 1},
+          "relation": {"enum": ["support", "contradict", "context"]},
+          "evidence_function": {
+            "description": "For model-changing future_execution or external_state propositions, causal_test and external_test require a separately recorded original source with epistemic_class=independent_external_observation.",
+            "enum": [
+              "direct_anchor", "historical_calibration", "causal_test",
+              "external_test", "context_only"
+            ]
+          },
+          "authority_scope": {"type": "string", "minLength": 1},
+          "measurement_or_construct_basis": {"type": "string", "minLength": 1},
+          "incentive_conflict": {"type": "string", "minLength": 1},
+          "reconciliation_status": {
+            "enum": ["not_applicable", "reconciled", "unresolved"]
+          },
+          "permission_rationale": {"type": "string", "minLength": 1},
+          "observation_ids": {
+            "description": "Observation-level records from data_series_register.csv. Required for an independent direct/causal/external measurement permission; empty for commentary or context.",
+            "type": "array",
+            "items": {"type": "string", "minLength": 1},
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "forecast_calibration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "historical_bias_or_range", "calibration_basis", "application_boundary"
+      ],
+      "properties": {
+        "historical_bias_or_range": {"type": "string", "minLength": 1},
+        "calibration_basis": {"type": "string", "minLength": 1},
+        "application_boundary": {"type": "string", "minLength": 1}
+      }
+    },
+    "allowed_use": {"enum": ["historical_anchor", "base_parameter", "technical_bound", "scenario_only", "monitoring_only", "discovery_only", "blocked"]},
+    "driver_node_ids": {"type": "array", "items": {"type": "string"}},
+    "as_of": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["accepted", "contested", "rejected", "human_required"]}
+  }
+}

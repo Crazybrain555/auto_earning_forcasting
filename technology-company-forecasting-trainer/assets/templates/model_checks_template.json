@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "checks": [
+    {
+      "id": "REPLACE",
+      "category": "balance_sheet",
+      "calculation": {
+        "operation": "signed_sum",
+        "terms": [
+          {"name": "assets", "coefficient": 1.0, "model_cell": "REPLACE!A1"},
+          {"name": "liabilities", "coefficient": -1.0, "model_cell": "REPLACE!A2"},
+          {"name": "equity", "coefficient": -1.0, "model_cell": "REPLACE!A3"}
+        ]
+      },
+      "value": null,
+      "tolerance": 0.0,
+      "unit": "reporting_currency",
+      "status": "pending"
+    }
+  ]
+}

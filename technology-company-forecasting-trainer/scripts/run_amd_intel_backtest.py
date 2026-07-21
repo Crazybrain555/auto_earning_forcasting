@@ -3,6 +3,8 @@ from __future__ import annotations
 import argparse,csv,json
 from pathlib import Path
 
+from legacy_backtest_diagnostics import write_legacy_backtest_diagnostics
+
 def sign(x): return 1 if x>0 else (-1 if x<0 else 0)
 def mean(values):
     vals=[v for v in values if v is not None]
@@ -101,7 +103,7 @@ def main():
     rows=calculate(cases)
     metrics={s:{v:aggregate(rows,s,v) for v in ("v74","v75")} for s in ("calibration","holdout")}
     bc=by_case(rows);old=metrics["holdout"]["v74"];new=metrics["holdout"]["v75"]
-    gates={
+    threshold_observations={
         "holdout_revenue_improves":new["revenue_mape"]<old["revenue_mape"],
         "holdout_profit_improves":new["profit_margin_mae_pp"]<old["profit_margin_mae_pp"],
         "revenue_coverage_ge_80pct":new["revenue_coverage"]>=.80,
@@ -109,8 +111,8 @@ def main():
         "all_holdout_cases_revenue_improve":all(x["v75_revenue_mape"]<x["v74_revenue_mape"] for x in bc),
         "all_holdout_cases_profit_improve":all(x["v75_profit_margin_mae_pp"]<x["v74_profit_margin_mae_pp"] for x in bc),
     }
-    result={"model_version":"technology-company-forecasting-v7.5","metrics":metrics,"by_case":bc,"gate_results":gates}
-    (args.output_dir/"metrics.json").write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    result={"model_version":"technology-company-forecasting-v7.5","metrics":metrics,"by_case":bc}
+    write_legacy_backtest_diagnostics(args.output_dir, result, threshold_observations)
     fields=[]
     for r in rows:
         for k in r:
@@ -118,5 +120,4 @@ def main():
     with (args.output_dir/"detail.csv").open("w",encoding="utf-8-sig",newline="") as f:
         w=csv.DictWriter(f,fieldnames=fields);w.writeheader();w.writerows(rows)
     print(json.dumps(result,ensure_ascii=False,indent=2))
-    if not all(gates.values()): raise SystemExit(2)
 if __name__=="__main__": main()

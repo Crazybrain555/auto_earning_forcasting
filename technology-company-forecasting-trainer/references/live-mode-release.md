@@ -1,16 +1,18 @@
-# Deterministic companion live release
+# Deterministic multi-skill release
 
-The durable trainer retains the historical-training loop and a full forecasting-method snapshot. The production artifact is emitted as the separate Skill `technology-company-profit-forecasting` and must exclude Actuals retrieval, training-round machinery, curricula, case-specific examples and benchmark archives.
+The durable trainer retains the historical-training loop and canonical method. The generated production system contains `technology-company-profit-forecasting`, three specialist skills and the non-skill contract kernel. It excludes Actuals retrieval, training-round machinery, curricula, case-specific training examples and benchmark archives.
 
-The live profile is maintained as whole files under `assets/live_release/` (SKILL.md, openai.yaml, trigger_prompts.jsonl). When a promoted method change alters anything the production skill states, update the live SKILL.md there in the same commit; the builder assembles rather than rewrites.
+The live coordinator is maintained as whole files under `assets/live_release/`; specialist and protocol sources live under `assets/skill_system/`. Generated top-level packages are never edited directly.
 
 Run:
 
 ```bash
-python3 scripts/build_live_release.py \
+python3 scripts/build_skill_system.py \
   --trainer-skill-root <trainer-skill-root> \
-  --output-root <live-skill-root>/technology-company-profit-forecasting \
-  --self-test
+  --output-parent <forecasting-skills-repo> \
+  --self-test \
+  --promote \
+  --promotion-evidence <promotion-evidence.json>
 ```
 
-The builder prunes trainer-only material, installs the live profile, verifies that no live SKILL.md pointer dangles and no trainer-only file survives, and runs the shared package self-test in its live profile. The release itself is the git commit and push that contains the rebuilt production skill.
+The system builder first assembles and self-tests the live coordinator, then generates exact specialist/protocol copies from promotion-bound sources and validates unique stage ownership, modes and handoffs. Promotion evidence may select only the fixed `trainer_structural_contracts` suite. The inner live builder resolves that suite itself without a shell, ignores evidence-supplied executable arguments, uses the real return code and refuses trainer-tree mutation. Static company backtests remain diagnostics outside this structural gate; independent causal judgment is not collapsed into a pass ratio. A plain build is only a candidate. The release is the atomic git commit and push containing the trainer and every regenerated package.

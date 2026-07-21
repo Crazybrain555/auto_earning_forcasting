@@ -1,0 +1,72 @@
+{
+  "schema_version": "forecast-skill-system/v1",
+  "system_id": "causal-company-profit-forecasting",
+  "objective": "generalizable reasoning about future revenue, operating profit and GAAP attributable net income",
+  "canonical_stage_registry": "assets/method_system.json",
+  "handoff_contract": "forecasting-system-contracts/schemas/capability_handoff.schema.json",
+  "coordinators": {
+    "live": "technology-company-profit-forecasting",
+    "training": "technology-company-forecasting-trainer"
+  },
+  "capabilities": {
+    "company-evidence-research": {
+      "capability_id": "evidence_research",
+      "input_bundle_kinds": [
+        "decision_bundle",
+        "evidence_request_bundle"
+      ],
+      "output_bundle_kind": "evidence_bundle",
+      "owned_stage_ids": [
+        "evidence_system"
+      ]
+    },
+    "company-operating-modeling": {
+      "capability_id": "operating_model",
+      "input_bundle_kinds": [
+        "decision_bundle",
+        "evidence_bundle"
+      ],
+      "output_bundle_kind": "operating_model_bundle",
+      "owned_stage_ids": [
+        "causal_graph",
+        "operating_model"
+      ]
+    },
+    "company-financial-forecasting": {
+      "capability_id": "financial_forecast",
+      "input_bundle_kinds": [
+        "decision_bundle",
+        "evidence_bundle",
+        "operating_model_bundle"
+      ],
+      "output_bundle_kind": "financial_forecast_bundle",
+      "owned_stage_ids": [
+        "integrated_statements",
+        "value_creation",
+        "valuation"
+      ]
+    }
+  },
+  "stage_owners": {
+    "decision_contract": "technology-company-profit-forecasting",
+    "evidence_system": "company-evidence-research",
+    "causal_graph": "company-operating-modeling",
+    "operating_model": "company-operating-modeling",
+    "integrated_statements": "company-financial-forecasting",
+    "value_creation": "company-financial-forecasting",
+    "valuation": "company-financial-forecasting",
+    "scenarios_and_red_team": "technology-company-profit-forecasting",
+    "validation_and_readiness": "technology-company-profit-forecasting",
+    "publish_monitor_version": "technology-company-profit-forecasting"
+  },
+  "change_contract": {
+    "default_scope": "one_primary_capability_owner",
+    "cross_contract_change_requires_explicit_shared_failure": true
+  },
+  "non_skills": [
+    "forecasting-system-contracts",
+    "deterministic_validators",
+    "industry_calibration_lenses",
+    "independent_reviewer_roles"
+  ]
+}

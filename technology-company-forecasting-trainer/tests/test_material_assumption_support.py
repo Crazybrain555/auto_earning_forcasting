@@ -1,74 +1,142 @@
-"""Materiality must be computed (a perturbation and its measured effect),
-never an assigned weight, and material assumptions must be corroborated
-across research lanes."""
-import csv
-import json
-import subprocess
+"""Reference-thesis evidence is gated by causal lineage, not labels or quotas."""
+from __future__ import annotations
+
 import sys
-import tempfile
 from pathlib import Path
 
+
 SKILL = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(SKILL / "scripts"))
 
-HEADER = ["assumption_id", "claim", "driver_link", "test_delta", "revenue_impact_pct",
-          "profit_impact_pct", "changes_conclusion", "support_status", "source_ids",
-          "lanes", "falsification_trigger", "horizon", "scenario", "notes"]
-
-SOURCES = [
-    {"source_id": "S1", "source_type": "SEC_filing_10K", "publisher": "Example Corp",
-     "location": "https://sec.gov/x", "claim_or_fact": "segment revenue", "evidence_tier": "E0"},
-    {"source_id": "S2", "source_type": "earnings_call_transcript", "publisher": "Example Corp",
-     "location": "https://example.com/call", "claim_or_fact": "management guidance", "evidence_tier": "E1"},
-    {"source_id": "S3", "source_type": "industry_research", "publisher": "TrendForce",
-     "location": "https://trendforce.com/x", "claim_or_fact": "shipment data", "evidence_tier": "E3"},
-]
+from provenance_contract import ProvenanceNode
+from validate_research_completeness import validate_material_assumption_lineage
 
 
-def run_case(rows):
-    with tempfile.TemporaryDirectory() as td:
-        ws = Path(td)
-        (ws / "run_manifest.json").write_text(json.dumps({"entity": "TEST", "as_of": "2026-07-18"}), encoding="utf-8")
-        (ws / "source_manifest.json").write_text(json.dumps({"sources": SOURCES}), encoding="utf-8")
-        with (ws / "material_assumption_support.csv").open("w", encoding="utf-8", newline="") as fh:
-            w = csv.writer(fh)
-            w.writerow(HEADER)
-            w.writerows(rows)
-        subprocess.run([sys.executable, str(SKILL / "scripts/validate_delivery.py"),
-                        "--workspace", str(ws)], capture_output=True, text=True)
-        result = json.loads((ws / "delivery_validation.json").read_text(encoding="utf-8"))
-    for c in result["checks"]:
-        if c["check"] == "research:material-corroboration":
-            return c
-    return None
+GRAPH = {
+    "nodes": [
+        {"id": "end_demand", "kind": "observable", "unit": "unit"},
+        {"id": "revenue", "kind": "derived", "unit": "USD"},
+        {"id": "demand_break", "kind": "falsification", "unit": "ratio"},
+        {"id": "minor_opex", "kind": "input", "unit": "USD"},
+    ],
+    "equations": [
+        {"id": "eq:revenue", "output": "revenue", "operation": "identity", "inputs": ["end_demand"]},
+    ],
+}
 
 
-def test_uncomputed_importance_is_rejected():
-    """An assumption with no perturbation test cannot claim importance."""
-    check = run_case([["A01", "ASP rises", "seg:AI.price", "", "", "", "no", "corroborated", "S1;S2", "", "trigger", "FY+2", "Base", ""]])
-    assert check is not None and not check["passed"]
-    assert "no computed sensitivity" in check["detail"], check["detail"]
+def _node(source_id: str, root: str, publisher: str, team: str, method: str) -> ProvenanceNode:
+    return ProvenanceNode(
+        source_id=source_id,
+        root_original_source_id=root,
+        derived_from_source_id="" if source_id == root else root,
+        common_origin=source_id != root,
+        independence_cluster=root,
+        publisher=publisher,
+        authors=frozenset({team}),
+        measurement_method_id=method,
+        source_type="measurement",
+    )
 
 
-def test_material_assumption_needs_two_lanes():
-    """Computed as material (8% revenue) but single lane -> rejected."""
-    check = run_case([["A01", "ASP rises 20%", "seg:AI.price", "-5pp ASP", "8.0", "19.0", "no", "corroborated", "S1", "", "trigger", "FY+2", "Base", ""]])
-    assert check is not None and not check["passed"]
-    assert "needs >=2 research lanes" in check["detail"], check["detail"]
+INDEPENDENT = {
+    "S1": _node("S1", "S1", "issuer", "issuer team", "acceptance census"),
+    "S2": _node("S2", "S2", "industry body", "panel team", "sell through panel"),
+}
 
 
-def test_conclusion_flipping_assumption_needs_falsification_trigger():
-    check = run_case([["A01", "ramp lands", "seg:AI.volume", "slip 2 quarters", "1.0", "1.0", "yes", "corroborated", "S1;S3", "", "", "FY+2", "Base", ""]])
-    assert check is not None and not check["passed"]
-    assert "falsification trigger" in check["detail"], check["detail"]
+def _row(**updates) -> dict[str, str]:
+    row = {
+        "assumption_id": "A1",
+        "claim": "end demand persists",
+        "driver_link": "end_demand",
+        "test_delta": "end demand -10%",
+        "revenue_impact_pct": "10",
+        "profit_impact_pct": "18",
+        "changes_conclusion": "yes",
+        "support_status": "corroborated",
+        "source_ids": "S1;S2",
+        "lanes": "",
+        "falsification_trigger": "demand_break",
+        "horizon": "FY+2",
+        "scenario": "central_operating_path",
+        "notes": "",
+    }
+    row.update(updates)
+    return row
 
 
-def test_well_supported_material_assumption_passes():
-    """Computed material, two lanes with an anchoring one, trigger stated."""
-    check = run_case([["A01", "ASP rises 20%", "seg:AI.price", "-5pp ASP", "8.0", "19.0", "no", "corroborated", "S1;S3", "", "contract price falls 10% qoq", "FY+2", "Base", ""]])
-    assert check is not None and check["passed"], check["detail"]
+def _validate(rows, provenance=INDEPENDENT):
+    return validate_material_assumption_lineage(
+        rows,
+        graph=GRAPH,
+        carriers={"end_demand"},
+        falsifiers={"demand_break"},
+        known_scenario_ids={"central_operating_path", "demand_contraction"},
+        reference_scenario_ids={"central_operating_path"},
+        known_source_ids=set(provenance),
+        eligible_source_ids=set(provenance),
+        provenance_graph=provenance,
+    )[0]
 
 
-def test_immaterial_assumption_is_not_gated():
-    """Below the computed floors -> no corroboration burden."""
-    check = run_case([["A01", "minor opex line", "opex:misc", "-10%", "0.3", "0.4", "no", "single_lane", "S3", "", "", "FY+1", "Base", ""]])
-    assert check is not None and check["passed"], check["detail"]
+def test_uncomputed_main_line_assumption_is_rejected():
+    errors = _validate([_row(test_delta="")])
+    assert "test_delta" in " ".join(errors)
+
+
+def test_corrobated_label_must_be_true_not_two_lane_text():
+    copied = {
+        "S1": INDEPENDENT["S1"],
+        "S2": _node("S2", "S1", "issuer", "issuer team", "renamed copy"),
+    }
+    errors = _validate([_row()], copied)
+    assert "independent" in " ".join(errors)
+
+
+def test_one_direct_hard_anchor_is_not_rejected_by_a_universal_source_quota():
+    errors = _validate([
+        _row(support_status="hard_anchor", source_ids="S1")
+    ])
+    assert errors == []
+
+
+def test_main_line_assumption_needs_a_declared_falsification_node():
+    errors = _validate([_row(falsification_trigger="price fell in a report")])
+    assert "falsification" in " ".join(errors)
+
+
+def test_off_main_line_detail_is_not_promoted_to_a_universal_gate():
+    errors = _validate([
+        _row(
+            driver_link="minor_opex",
+            changes_conclusion="no",
+            test_delta="",
+            support_status="single_lane",
+            source_ids="",
+            falsification_trigger="",
+        )
+    ])
+    assert errors == []
+
+
+def test_genuinely_independent_main_line_support_passes():
+    assert _validate([_row()]) == []
+
+
+def test_reference_role_uses_free_scenario_id_not_literal_base_label():
+    assert _validate([_row(scenario="central_operating_path")]) == []
+    errors = _validate([_row(scenario="Base")])
+    assert "unknown scenario IDs Base" in " ".join(errors)
+
+
+def test_alternative_scenario_does_not_inherit_reference_evidence_permission():
+    assert _validate([
+        _row(
+            scenario="demand_contraction",
+            support_status="scenario_only",
+            source_ids="",
+            test_delta="",
+            falsification_trigger="",
+        )
+    ]) == []

@@ -1,0 +1,27 @@
+{
+  "schema_version": "forecast-skill-profile/v1",
+  "profile": "live",
+  "runtime_scripts": [
+    "artifact_registry.py",
+    "equation_contract.py",
+    "freeze_snapshot.py",
+    "publication_contract.py",
+    "provenance_contract.py",
+    "runtime_context.py",
+    "scenario_contract.py",
+    "scope_exception_contract.py",
+    "validate_data_series.py",
+    "validate_delivery.py",
+    "validate_forward_evidence_workspace.py",
+    "validate_internal_intangibles.py",
+    "validate_investment_case.py",
+    "validate_model_graph.py",
+    "validate_persistence_contract.py",
+    "validate_research_completeness.py",
+    "validate_technical_evidence.py",
+    "workbook_contract.py",
+    "package_self_test.py",
+    "scaffold_delivery.py",
+    "publish_live_forecast.py"
+  ]
+}

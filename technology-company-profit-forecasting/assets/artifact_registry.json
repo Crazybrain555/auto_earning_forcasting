@@ -1,0 +1,379 @@
+{
+  "schema_version": "artifact-registry/v2",
+  "publication_bundles": [
+    {
+      "id": "evidence_bundle",
+      "stages": [
+        "evidence_system"
+      ]
+    },
+    {
+      "id": "operating_model_bundle",
+      "stages": [
+        "causal_graph",
+        "operating_model"
+      ]
+    },
+    {
+      "id": "financial_forecast_bundle",
+      "stages": [
+        "integrated_statements",
+        "value_creation",
+        "valuation"
+      ]
+    }
+  ],
+  "materiality_routes": [
+    {
+      "id": "technology_ip",
+      "description": "Technology, paper, patent, IP, qualification, and commercialization evidence is material to the profit thesis."
+    },
+    {
+      "id": "operating_cycle",
+      "description": "Industry profit-pool, inventory, capacity, utilization, pricing, or cycle state is material to normalized earnings."
+    },
+    {
+      "id": "internal_intangible",
+      "description": "Expensed internal investment is material to reported-to-economic earnings or valuation."
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "run_manifest",
+      "path": "run_manifest.json",
+      "requirement": "core",
+      "artifact_role": "input",
+      "stage": "decision_contract",
+      "format": "json",
+      "template": "assets/templates/run_manifest_template.json",
+      "scaffold": true
+    },
+    {
+      "id": "source_manifest",
+      "path": "source_manifest.json",
+      "requirement": "core",
+      "artifact_role": "input",
+      "stage": "evidence_system",
+      "format": "json",
+      "template": "assets/templates/source_manifest_template.json",
+      "scaffold": true
+    },
+    {
+      "id": "assumption_register",
+      "path": "assumption_register.csv",
+      "requirement": "core",
+      "artifact_role": "input",
+      "stage": "operating_model",
+      "format": "csv",
+      "template": "assets/templates/assumption_register_v2_template.csv",
+      "scaffold": true
+    },
+    {
+      "id": "claim_ledger",
+      "path": "claim_ledger.jsonl",
+      "requirement": "core",
+      "artifact_role": "input",
+      "stage": "evidence_system",
+      "format": "jsonl",
+      "template": "assets/templates/claim_ledger_template.jsonl",
+      "scaffold": true
+    },
+    {
+      "id": "data_series_register",
+      "path": "data_series_register.csv",
+      "requirement": "core",
+      "artifact_role": "input",
+      "stage": "evidence_system",
+      "format": "csv",
+      "template": "assets/templates/data_series_register_template.csv",
+      "scaffold": true
+    },
+    {
+      "id": "financial_fact_ledger",
+      "path": "financial_fact_ledger.csv",
+      "requirement": "core",
+      "artifact_role": "input",
+      "stage": "evidence_system",
+      "format": "csv",
+      "template": "assets/templates/financial_fact_ledger_template.csv",
+      "scaffold": true
+    },
+    {
+      "id": "source_independence_map",
+      "path": "source_independence_map.csv",
+      "requirement": "core",
+      "artifact_role": "input",
+      "stage": "evidence_system",
+      "format": "csv",
+      "template": "assets/templates/source_independence_map_template.csv",
+      "scaffold": true
+    },
+    {
+      "id": "research_coverage_matrix",
+      "path": "research_coverage_matrix.csv",
+      "requirement": "core",
+      "artifact_role": "input",
+      "stage": "evidence_system",
+      "format": "csv",
+      "template": "assets/templates/research_coverage_matrix_template.csv",
+      "scaffold": true
+    },
+    {
+      "id": "forward_signal_cards",
+      "path": "forward_signal_cards.csv",
+      "requirement": "core",
+      "artifact_role": "input",
+      "stage": "evidence_system",
+      "format": "csv",
+      "template": "assets/templates/forward_signal_card_template.csv",
+      "scaffold": true
+    },
+    {
+      "id": "research_quality_review",
+      "path": "research_quality_review.json",
+      "requirement": "core",
+      "artifact_role": "input",
+      "stage": "validation_and_readiness",
+      "format": "json",
+      "template": "assets/templates/research_quality_review_template.json",
+      "scaffold": false
+    },
+    {
+      "id": "historical_segment_bridge",
+      "path": "historical_segment_bridge.csv",
+      "requirement": "core",
+      "artifact_role": "derived",
+      "stage": "integrated_statements",
+      "format": "csv",
+      "template": "assets/templates/historical_segment_bridge_template.csv",
+      "scaffold": true
+    },
+    {
+      "id": "company_quality_moat_register",
+      "path": "company_quality_moat_register.csv",
+      "requirement": "core",
+      "artifact_role": "derived",
+      "stage": "value_creation",
+      "format": "csv",
+      "template": "assets/templates/company_quality_moat_template.csv",
+      "scaffold": true
+    },
+    {
+      "id": "product_customer_driver_schedule",
+      "path": "product_customer_driver_schedule.csv",
+      "requirement": "core",
+      "artifact_role": "derived",
+      "stage": "operating_model",
+      "format": "csv",
+      "template": "assets/templates/product_customer_driver_template.csv",
+      "scaffold": true
+    },
+    {
+      "id": "material_assumption_support",
+      "path": "material_assumption_support.csv",
+      "requirement": "core",
+      "artifact_role": "derived",
+      "stage": "operating_model",
+      "format": "csv",
+      "template": "assets/templates/material_assumption_support_template.csv",
+      "scaffold": true
+    },
+    {
+      "id": "model_graph",
+      "path": "model_graph.json",
+      "requirement": "core",
+      "artifact_role": "derived",
+      "stage": "causal_graph",
+      "format": "json",
+      "template": "assets/templates/model_graph_template.json",
+      "scaffold": true
+    },
+    {
+      "id": "scenario_set",
+      "path": "scenario_set.json",
+      "requirement": "core",
+      "artifact_role": "input",
+      "stage": "scenarios_and_red_team",
+      "format": "json",
+      "template": "assets/templates/scenario_set_template.json",
+      "scaffold": true
+    },
+    {
+      "id": "model_checks",
+      "path": "model_checks.json",
+      "requirement": "core",
+      "artifact_role": "derived",
+      "stage": "validation_and_readiness",
+      "format": "json",
+      "template": "assets/templates/model_checks_template.json",
+      "scaffold": true
+    },
+    {
+      "id": "driver_monitoring",
+      "path": "driver_monitoring.csv",
+      "requirement": "core",
+      "artifact_role": "derived",
+      "stage": "publish_monitor_version",
+      "format": "csv",
+      "template": "assets/templates/driver_monitoring_template.csv",
+      "scaffold": true
+    },
+    {
+      "id": "earnings_power_bridge",
+      "path": "earnings_power_bridge.csv",
+      "requirement": "core",
+      "artifact_role": "derived",
+      "stage": "value_creation",
+      "format": "csv",
+      "template": "assets/templates/earnings_power_bridge_template.csv",
+      "scaffold": true
+    },
+    {
+      "id": "red_team",
+      "path": "red_team.md",
+      "requirement": "core",
+      "artifact_role": "publication",
+      "stage": "scenarios_and_red_team",
+      "format": "markdown",
+      "template": "assets/templates/red_team_template.md",
+      "scaffold": true
+    },
+    {
+      "id": "forecast_snapshot",
+      "path": "forecast_snapshot.json",
+      "requirement": "core",
+      "artifact_role": "publication",
+      "stage": "publish_monitor_version",
+      "format": "json",
+      "template": "assets/templates/forecast_snapshot_template.json",
+      "scaffold": true
+    },
+    {
+      "id": "report",
+      "path": "report.md",
+      "requirement": "core",
+      "artifact_role": "publication",
+      "stage": "publish_monitor_version",
+      "format": "markdown",
+      "template": "assets/templates/final_report_outline.md",
+      "scaffold": true
+    },
+    {
+      "id": "delivery_quality_rubric",
+      "path": "delivery_quality_rubric.json",
+      "requirement": "core",
+      "artifact_role": "input",
+      "stage": "validation_and_readiness",
+      "format": "json",
+      "template": "assets/templates/delivery_quality_rubric.json",
+      "scaffold": true
+    },
+    {
+      "id": "model_workbook",
+      "path": "model/model.xlsx",
+      "requirement": "core",
+      "artifact_role": "publication",
+      "stage": "integrated_statements",
+      "format": "xlsx",
+      "template": "assets/examples/generic_v80/Technology_Company_Forecasting_v8.0_Gold_Model_Template.xlsx",
+      "scaffold": false
+    },
+    {
+      "id": "research_completeness",
+      "path": "research_completeness.json",
+      "requirement": "core",
+      "artifact_role": "receipt",
+      "stage": "validation_and_readiness",
+      "format": "json",
+      "scaffold": false
+    },
+    {
+      "id": "delivery_validation",
+      "path": "delivery_validation.json",
+      "requirement": "core",
+      "artifact_role": "receipt",
+      "stage": "validation_and_readiness",
+      "format": "json",
+      "scaffold": false
+    },
+    {
+      "id": "forecast_seal",
+      "path": "forecast_seal.json",
+      "requirement": "core",
+      "artifact_role": "receipt",
+      "stage": "publish_monitor_version",
+      "format": "json",
+      "scaffold": false
+    },
+    {
+      "id": "technical_evidence_records",
+      "path": "technical_evidence_records.jsonl",
+      "requirement": "conditional",
+      "artifact_role": "input",
+      "stage": "evidence_system",
+      "format": "jsonl",
+      "template": "assets/templates/technical_evidence_records_template.jsonl",
+      "scaffold": true,
+      "activation": {
+        "route_any": [
+          "technology_ip"
+        ]
+      }
+    },
+    {
+      "id": "technology_commercialization_register",
+      "path": "technology_commercialization_register.csv",
+      "requirement": "conditional",
+      "artifact_role": "derived",
+      "stage": "operating_model",
+      "format": "csv",
+      "template": "assets/templates/technology_commercialization_template.csv",
+      "scaffold": true,
+      "activation": {
+        "route_any": [
+          "technology_ip"
+        ]
+      }
+    },
+    {
+      "id": "industry_profit_pool",
+      "path": "industry_profit_pool.csv",
+      "requirement": "core",
+      "artifact_role": "derived",
+      "stage": "operating_model",
+      "format": "csv",
+      "template": "assets/templates/industry_profit_pool_template.csv",
+      "scaffold": true
+    },
+    {
+      "id": "operating_cycle_register",
+      "path": "operating_cycle_register.csv",
+      "requirement": "conditional",
+      "artifact_role": "derived",
+      "stage": "operating_model",
+      "format": "csv",
+      "template": "assets/templates/operating_cycle_template.csv",
+      "scaffold": true,
+      "activation": {
+        "route_any": [
+          "operating_cycle"
+        ]
+      }
+    },
+    {
+      "id": "internal_intangible_investment",
+      "path": "internal_intangible_investment.json",
+      "requirement": "conditional",
+      "artifact_role": "derived",
+      "stage": "value_creation",
+      "format": "json",
+      "template": "assets/templates/internal_intangible_investment_template.json",
+      "scaffold": true,
+      "activation": {
+        "route_any": [
+          "internal_intangible"
+        ]
+      }
+    }
+  ]
+}

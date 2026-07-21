@@ -13,7 +13,12 @@
 |---|---|---|---|---|---|---|---|
 | RT-001 | P0/P1/P2 | evidence / demand / supply / accounting / cash / valuation / leakage / overfit |  |  |  |  | open |
 
-Add at least five substantive findings. At least one must test double counting, one must challenge the Base case, one must test accounting/cash, one must test evidence leakage or unsupported inference, and one must test valuation/normalization.
+Record every material finding and no filler. Challenge the thesis-carrying path
+first, then select the relevant attack angles from double counting, rival
+causes, accounting/cash, evidence permission or leakage, normalization and
+valuation. The reviewer decides which angles are material and explains any
+important omission; no finding count or mandatory topic list substitutes for
+that judgment.
 
 ## Readiness recommendation
 

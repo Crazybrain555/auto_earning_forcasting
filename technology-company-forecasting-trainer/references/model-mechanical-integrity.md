@@ -1,97 +1,235 @@
-# Model mechanical integrity (Check rows and diagnostic rails)
+# Model Mechanical Integrity
 
-A model earns trust two ways: the logic is defensible, and the arithmetic
-ties. This file governs the second. Calibrated against a Goldman Sachs
-US-equity model (SNDK) and the FAST Standard's consistency principles.
+Mechanical integrity proves that the workbook implements its stated equations.
+It does not prove that the evidence or assumptions are good. Report process
+integrity and research sufficiency separately.
 
-The single test: **a reviewer must be able to find every Check row and see
-zero.** If a model has no Check rows, it has not been checked.
+## Workbook architecture
 
-## 1. Required Check rows
+Use a consistent left-to-right flow:
 
-Every delivered workbook carries these reconciliations as explicit rows whose
-value is zero (or within stated rounding tolerance). They are formulas, never
-typed zeros.
+sources and controls → historical normalization → causal drivers → segment
+schedules → statements and roll-forwards → value creation → scenarios →
+valuation → checks and monitoring.
 
-| Check | Formula | Tolerance |
-|---|---|---|
-| `chk_balance_sheet` | Total assets − (Total liabilities + Total equity) | 0 |
-| `chk_cash_tie` | Ending cash (cash-flow statement) − Cash (balance sheet) | 0 |
-| `chk_segment_sum` | Σ segment revenue − Total revenue | ≤1% |
-| `chk_crosscut_sum` | Σ second-cut revenue − Total revenue | ≤1% |
-| `chk_gaap_bridge` | GAAP NI + Σ named adjustments − Non-GAAP NI | 0 |
-| `chk_quarter_roll` | Σ quarters − fiscal year | 0 |
+Separate inputs, formulas and outputs visually and structurally. Avoid hidden
+hardcodes inside formulas, repeated magic numbers, merged-cell calculations,
+uncontrolled external links and formulas that silently change across a row.
+Document units, sign convention, period basis and accounting basis.
 
-A failed Check row is a hard delivery failure, not a warning. Do not "fix" a
-Check by hardcoding the difference into a plug line; if a genuine plug is
-needed (e.g. interest income computed from average cash), label the row
-`PLUG` and state the driver and rate.
+## Typed accounting basis and comparability
 
-## 2. The quarterly spine
+`GAAP` is not a usable accounting contract. In `run_manifest.json`, declare a
+dated basis record with `basis_id`, `framework` (`US_GAAP`, `IFRS`,
+`PRC_GAAP`, or a named `OTHER_LOCAL_GAAP`), jurisdiction, version,
+`effective_at`, `presentation_currency`, and sourced `major_policy_choices`.
+Use the accounting basis effective for the reported facts and forecast when the
+bundle is frozen. Every historical fact names one declared historical basis,
+and the forecast snapshot names the forecast basis.
 
-FY+1 is modeled **by quarter** whenever the company reports quarterly; the
-annual column is the sum of quarters (`chk_quarter_roll`). Reasons:
+When a historical basis differs from the forecast basis, use a sourced,
+quantified comparability bridge by period and financial-statement line. A
+qualitative note or a normalized-margin plug is not a conversion. Accounting
+policy choices describe recognition and measurement; an accounting policy is
+not a company driver parameter, assumption weight, growth rate, or causal-node override.
 
-- The forecast gets falsified or confirmed every 90 days, not every year.
-- Seasonality, ramp timing, and inventory corrections live in quarters; an
-  annual-only model hides the timing risk that usually breaks a thesis.
-- Breakpoint monitoring needs a quarterly cadence to be actionable.
+## Quarterly spine
 
-FY+2 may be annual with a quarterly split only for the ramp segments.
-FY+3 is annual/distribution. If quarterly disclosure does not exist, say so
-in `human-required` rather than inventing quarters.
+Where the company reports quarterly, build FY+1 by quarter. Annual values equal
+the sum or appropriate average of quarterly values. Show qoq, yoy and percent-
+of-revenue diagnostic rails beside material forecast lines. These diagnostics
+surface implausible flow-through; they do not become forecast inputs.
 
-## 3. Diagnostic rails on every forecast line
+For longer horizons, use annual columns only after the near-term recognition,
+working-capital and seasonality path is resolved.
 
-Each forecast line carries, as standing rows: **qoq, yoy, and % of revenue**
-(or % of the relevant parent). These are not decoration - they are how an
-absurd implication becomes visible before it ships. A line whose implied yoy
-is +2,108% must be seen and either defended in the report or corrected.
+## Required zero-valued checks
 
-Related required diagnostics:
+Create visible check rows that evaluate to zero, or to a documented immaterial
+rounding tolerance:
 
-- **Incremental margin** = Δ gross profit ÷ Δ revenue, shown for every year
-  where revenue moves more than ±20%. A commodity upcycle can legitimately
-  show ~90-100% flow-through; a diversified business cannot. State which
-  regime is assumed and why.
-- **Implied CAGR** for FY+1→FY+3 on revenue and on the main-line driver.
-- **Implied market share / TAM share** where a total market is known - a
-  forecast implying >100% of a market is the classic silent failure.
+- analytical segments + eliminations − consolidated revenue;
+- quarters − fiscal year;
+- gross profit from revenue and cost − statement gross profit;
+- opening + movements − closing for inventory, working capital, PPE, debt,
+  retained earnings and cash;
+- assets − liabilities − equity;
+- cash-flow ending cash − balance-sheet cash;
+- reported-to-normalized bridge;
+- sell-in − sell-through − change in channel/customer inventory, shipments −
+  production − opening company inventory + closing company inventory, and
+  recognized revenue − accepted quantity × realized price for every applicable
+  operating-cycle branch;
+- revenue − operating costs − operating profit, operating profit + signed
+  non-operating items − pretax profit, and pretax profit − signed tax expense
+  − non-controlling-interest income − GAAP attributable net income for every
+  forecast period;
+- enterprise value − equity bridge;
+- equity value / valuation-date fully diluted shares − value per share, when
+  valuation is in scope;
+- for an authored probabilistic scenario set, scenario probabilities − 100%;
+  every shock enters through its declared node-compatible unit, workbook
+  cell/formula, effective period and lag.
 
-## 4. Two independent decompositions
+Every scenario-period row must recompute the same full reported-profit chain:
+revenue − operating costs = operating profit; operating profit + signed
+non-operating items = pretax profit; pretax profit − tax expense = consolidated
+net income; consolidated net income − NCI income = GAAP attributable net
+income. Bind every layer to an exact model cell or executable formula and bind
+every named shock to every affected row. Exactly one freely named scenario has
+`role=reference` and reconciles to the integrated statements and canonical
+point outputs; each `role=alternative` scenario names a causal shock. Each
+published low/high tuple must name one **joint scenario** and
+reconcile every layer to that same scenario-period row; independent **marginal
+intervals** (that is, marginal intervals assembled independently) may not be
+spliced across revenue, `operating_profit_low`/high,
+pretax profit, tax, NCI and attributable net income.
 
-Total revenue must be decomposed at least **two independent ways** that both
-reconcile to the same total, for example:
+Checks cannot be disabled merely because a scenario changes. Any non-zero
+check blocks publication until explained and repaired.
 
-- by product / customer (the driver tree of `driver-tree-modeling.md`), and
-- by end market (datacenter / edge / consumer) or geography.
+`model_checks.json` does not pass because an analyst entered zero and selected
+`passed`. Each check binds its signed operands to exact workbook cells. The
+runtime reads those cached operands, recomputes the residual, compares it with
+the declared residual, and then applies the tolerance. This generic signed-sum
+contract covers consolidation, statement and roll-forward conservation without
+rewarding a check count or prescribing company-specific rows.
 
-Independent cuts catch errors a single tree cannot: if the product tree says
-+150% but the end-market cut cannot say which customer segment absorbs it,
-the forecast has an unowned assumption. Record both cuts and their Check rows.
+Aggregation has an additional scope contract. State the partition ID and
+dimension and explicitly declare exhaustiveness and mutual exclusivity. Only
+then may customer/product/region/segment members be required to add to the
+parent. Partial top-customer disclosures and overlapping analytical cuts are
+not failed for summing below or above 100%; they are barred only from claiming
+a parent reconciliation.
 
-## 5. Working capital by days, not by percentages
+## Integrated three statements
 
-Balance-sheet forecasting uses operating ratios with physical meaning:
-**DSO** (receivable days), **DIO / inventory days**, **DPO** (payable days),
-each shown historically and forecast explicitly. Cash conversion follows from
-them. A working-capital line forecast as "% of revenue, flat" is acceptable
-only for immaterial items, and must be labeled as such.
+The income statement drives retained earnings and operating cash. Working
+capital, capex, depreciation, financing and capital allocation drive both the
+balance sheet and cash-flow statement. Build explicit roll-forwards for:
 
-## 6. Non-GAAP discipline
+- revenue recognition and deferred balances where material;
+- receivables, inventory, payables and other operating working capital;
+- PPE, depreciation, impairments and disposals;
+- debt, interest and financing fees;
+- leases, pensions, taxes, minorities and provisions where material;
+- ending basic shares, period weighted-average basic/diluted EPS denominators,
+  valuation-date fully diluted shares, SBC, issuance and repurchases;
+- cash, restricted cash and FX effects.
 
-The GAAP → Non-GAAP bridge is a table with named adjustment lines
-(goodwill impairment, SBC, separation costs, termination benefits, tax
-effects), not prose. Every adjustment states whether it recurs. Valuation
-must state which basis it uses and apply it consistently; SBC is never
-silently excluded from the valuation basis without a stated argument.
+For a full-company decision memo or a three-year-or-longer forecast or
+valuation, the final answer itself must show period rows—not merely workbook
+tabs—for the minimum identities below:
 
-## 7. FAST-style layout discipline
+```text
+closing net PPE = opening net PPE + capex - depreciation - disposals/impairments +/- perimeter/FX
+closing operating working capital = opening operating working capital + change
+closing debt = opening debt + borrowings - repayments +/- non-cash/perimeter/FX
+ending basic shares = opening basic shares + basic issuance - repurchases +/- other basic-share changes
+period weighted-average basic/diluted EPS shares = time-weighted in-period basic shares + GAAP incremental dilution for that period
+valuation-date fully diluted shares = valuation-date basic shares + economically dilutive options/awards/convertibles on the stated valuation basis
+closing cash = opening cash + CFO + CFI + CFF +/- FX = balance-sheet cash
+assets = liabilities + equity
+```
 
-- One formula per row, copied consistently across all period columns; if a
-  column needs a different formula, it needs its own row.
-- Inputs (hardcodes) live in dedicated input rows/cells and are visually
-  distinct (blue-text convention); calculation rows never mix hardcodes.
-- Every hardcoded input carries a source note: filing / call / dataset, date,
-  and location.
-- No hidden rows or columns in the delivered workbook.
+The first row is a point-in-time capital stock, the second is a period-average
+GAAP EPS denominator, and the third is a point-in-time valuation denominator.
+Do not roll an "ending diluted share" stock and reuse it for EPS or valuation;
+the timing and dilution tests differ.
+
+Each row names its P&L link, CFS link, closing balance-sheet amount and check
+residual. Unknown numbers remain `human-required` cells; they do not remove the
+row or permit a full-company conclusion.
+
+The reported profit chain is one period-by-period machine contract, not three
+similar summaries.  `integrated_model`, `forecast_snapshot.outputs` and
+`earnings_power_bridge.csv` must contain every forecast period and agree on
+revenue, GAAP operating profit, pretax profit, signed tax expense,
+non-controlling-interest net income and GAAP attributable net income.  State
+non-controlling-interest net income as explicit zero when absent.  A generic
+`financial_role: profit` is not a valid causal-graph destination: the main line
+must pass through typed revenue, operating-profit, pretax-profit and tax nodes
+and terminate at `gaap_net_income_attributable`.
+
+The GAAP operating-profit row also carries the earnings-quality conservation
+bridge: operating profit less operating tax equals NOPAT, and NOPAT equals
+after-tax operating free cash flow plus the change in net operating assets.
+The residual is recomputed; a qualitative accrual label cannot replace it.
+
+Do not use cash, debt, tax, other income or retained earnings as a balancing
+plug. Circular financing must be solved transparently or isolated as an
+intentional iterative calculation.
+
+### Narrow-scope materiality exception
+
+A genuinely narrow audit—such as one patent family, one segment, or one
+accounting event—that does not forecast or value the whole company may limit
+the roll-forwards to economically affected items. It must state the scope, run
+a named materiality test with a numeric perturbation and decision threshold,
+show the affected statement links, and list blocked full-company conclusions.
+Missing disclosure, a read-only request, or a `not-decision-ready` label is not
+a scope test. Narrowing the title after beginning a full-company forecast does not waive the full schedule.
+
+## Two independent revenue views
+
+For each thesis carrier, maintain:
+
+1. the primary operating equation used in the statements; and
+2. an independently constructed demand, customer, capacity or recognition
+   cross-check.
+
+The second view is diagnostic and must not be added to revenue. Investigate
+differences through units, scope, timing, price and accounting basis.
+
+## Conditional value-creation identities
+
+When earnings-power, capital-allocation or valuation analysis is in scope, the
+workbook must also reconcile:
+
+- ROIC = NOPAT / average invested capital;
+- incremental ROIC = change in NOPAT / change in invested capital;
+- reinvestment rate = reinvestment / NOPAT;
+- fundamental growth = reinvestment rate × incremental ROIC;
+- DCF present values and terminal value;
+- residual-income book value and abnormal-earnings path.
+
+Acquisitions, divestitures, goodwill, expensed investment and working-capital
+funding require explicit bridges before these identities are interpreted.
+
+## Input and formula audit
+
+For every conclusion-critical input verify:
+
+- it is labeled as reported, derived, assumed, scenario or unknown;
+- source ID and date are present when evidence-based;
+- units and periods match all dependent formulas;
+- the formula chain reaches statements and value;
+- sensitivity uses a named perturbation;
+- no stale hardcode remains in a forecast formula.
+
+Scan for broken references, formula errors, missing sheets, inconsistent signs,
+unexplained blank cells and formula-pattern deviations. Recalculate in an
+independent engine when practical and inspect cached values before delivery.
+
+## Case-routed stress tests
+
+Select shocks that are material to the requested outputs or discriminate a
+named rival.  Common candidates include:
+
+- zero volume or zero new bookings where economically possible;
+- capacity or qualification delay;
+- adverse price and unit-cost state;
+- working-capital and capex shock;
+- tax, FX, debt and share-count bridge changes;
+- terminal growth and incremental-return limits when valuation is active.
+
+The statements must still close. Impossible outputs such as negative physical
+units, utilization above documented capacity, terminal growth at or above the
+discount rate, or value generated without required reinvestment must fail a
+gate rather than pass silently.
+
+## Review record
+
+Record check ID, formula or invariant, tolerance, observed residual, status,
+reviewer and timestamp. A green workbook is reproducible evidence of arithmetic
+closure only. Research, causal and valuation gates remain independent.

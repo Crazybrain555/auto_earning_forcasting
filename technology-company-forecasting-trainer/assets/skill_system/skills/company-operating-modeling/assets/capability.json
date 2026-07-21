@@ -1,0 +1,19 @@
+{
+  "schema_version": "forecast-capability-profile/v2",
+  "skill_name": "company-operating-modeling",
+  "capability_id": "operating_model",
+  "input_bundle_kinds": ["decision_bundle", "evidence_bundle"],
+  "output_bundle_kind": "operating_model_bundle",
+  "owned_stage_ids": ["causal_graph", "operating_model"],
+  "reasoning_invariant_refs": [
+    "alternative_path_closure",
+    "conditional_analysis_routing",
+    "minimum_sufficient_presentation"
+  ],
+  "forbidden_inputs": [
+    "unaccepted_orchestrator_bundle",
+    "unrestricted_source_access",
+    "raw_actuals_channel"
+  ],
+  "storage_access": "read_only_bundle_and_evidence_request_output"
+}

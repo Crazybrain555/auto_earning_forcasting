@@ -1,0 +1,193 @@
+{
+  "schema_version": "forecast-evidence-kernel/v1",
+  "purpose": "reuse dated, versioned evidence without turning storage, extraction or scores into investment truth; orchestrators establish case-specific permissions before capability handoff",
+  "bundle_boundary": {
+    "input_policy": "specialists_consume_only_orchestrator_accepted_handoffs",
+    "candidate_output_policy": "specialist_outputs_return_to_orchestrator_for_validation_and_acceptance",
+    "acceptance_lineage_field": "orchestrator_acceptance_ref",
+    "snapshot_time_semantics": "audit_identity_only_no_permission_inference",
+    "source_access_policy": "only_adapters_authorized_by_the_accepted_request_bundle"
+  },
+  "records": {
+    "source_asset": {
+      "lifecycle": "append_only_identity_by_content_hash",
+      "owns": [
+        "original_bytes_or_external_object_ref",
+        "publisher_and_origin",
+        "publication_and_availability_time",
+        "raw_locator_and_content_hash"
+      ],
+      "must_not_own": [
+        "case_specific_allowed_use",
+        "forecast_conclusion",
+        "global_trust_score"
+      ]
+    },
+    "evidence_record": {
+      "lifecycle": "append_only_versioned",
+      "kind_values": [
+        "numeric_observation",
+        "financial_fact",
+        "source_claim",
+        "derived_claim"
+      ],
+      "owns": [
+        "raw_anchor",
+        "raw_value",
+        "minimally_normalized_value",
+        "definition_unit_period_scope_vintage",
+        "direct_input_refs_for_derived_records"
+      ]
+    },
+    "evidence_use": {
+      "lifecycle": "versioned_per_case_proposition_and_snapshot",
+      "owns": [
+        "case_and_driver_binding",
+        "permitted_and_forbidden_use",
+        "conflict_and_corroboration_state",
+        "independent_review_binding"
+      ]
+    },
+    "action_log": {
+      "lifecycle": "append_only",
+      "owns": [
+        "producer",
+        "rule_model_and_contract_versions",
+        "direct_inputs_and_outputs",
+        "status_and_timestamps"
+      ]
+    },
+    "evidence_request": {
+      "lifecycle": "open_working_satisfied_blocked_cancelled",
+      "owns": [
+        "forecast_gap",
+        "required_source_or_measurement",
+        "budget_and_stop_condition",
+        "request_status"
+      ]
+    },
+    "forecast_snapshot": {
+      "lifecycle": "append_only_immutable",
+      "owns": [
+        "method_and_contract_version",
+        "bound_bundle_hashes",
+        "published_outputs_and_readiness",
+        "supersedes_reference"
+      ]
+    }
+  },
+  "lineage": {
+    "recording": "direct_refs_only",
+    "normal_consumption": "one_hop",
+    "audit": "recursive_traversal",
+    "producer_details_live_in": "action_log"
+  },
+  "reasoning_invariants": {
+    "proposition_fidelity": {
+      "owner": "company-evidence-research",
+      "purpose": "normalization may improve representation but may not expand what the source asserted",
+      "protected_dimensions": [
+        "direction",
+        "magnitude",
+        "period",
+        "scope",
+        "causal_relation"
+      ],
+      "normalization_permission": "representation_only",
+      "missing_dimension_policy": "remain_unknown",
+      "conflict_policy": "preserve_only_source_asserted_positions",
+      "scenario_authorship": "forbidden"
+    },
+    "alternative_path_closure": {
+      "owner": "company-operating-modeling",
+      "purpose": "alternative economic constructions stay comparable without double counting or orphan equations",
+      "scope": "each_mutually_exclusive_construction_set",
+      "execution_contract": [
+        "compile_each_path_to_one_declared_canonical_output_node",
+        "select_exactly_one_path_for_execution",
+        "selected_path_reaches_operating_profit_exactly_once",
+        "unselected_paths_do_not_execute"
+      ],
+      "handoff_boundary": "operating_profit",
+      "downstream_execution_domains": [
+        "integrated_statements",
+        "share_denominators",
+        "joint_scenario_probabilities",
+        "competitive_fade",
+        "valuation"
+      ]
+    },
+    "share_basis_separation": {
+      "owner": "company-financial-forecasting",
+      "purpose": "point-in-time capital stocks and period EPS denominators are different economic constructs",
+      "share_types": {
+        "ending_basic_share_stock": {
+          "time_semantics": "point_in_time_stock",
+          "permitted_use": "basic_shares_outstanding_roll_forward"
+        },
+        "period_weighted_average_eps_shares": {
+          "time_semantics": "period_average",
+          "variants": [
+            "basic",
+            "diluted"
+          ],
+          "permitted_use": "gaap_eps_denominator"
+        },
+        "valuation_date_fully_diluted_shares": {
+          "time_semantics": "valuation_date_stock",
+          "permitted_use": "equity_value_per_share_denominator"
+        }
+      }
+    },
+    "conditional_analysis_routing": {
+      "owners": [
+        "company-evidence-research",
+        "company-operating-modeling",
+        "company-financial-forecasting",
+        "technology-company-profit-forecasting"
+      ],
+      "purpose": "advanced analysis earns its place by changing a requested material profit conclusion or discriminating a rival",
+      "conditional_modules": [
+        "joint_scenarios_and_probabilities",
+        "competitive_fade",
+        "secondary_valuation_method",
+        "technology_commercialization_gates"
+      ],
+      "activation_reasons": [
+        "explicitly_requested",
+        "material_to_requested_profit_output",
+        "needed_to_discriminate_a_named_rival"
+      ],
+      "inactive_module_policy": "omit_without_placeholder"
+    },
+    "minimum_sufficient_presentation": {
+      "owners": "all_capabilities",
+      "purpose": "preserve auditability without letting protocol ceremony obscure the forecast question",
+      "machine_handoff": "complete_under_shared_schema",
+      "human_output": "minimum_sufficient_for_requested_decision",
+      "blocker_policy": "author_once_then_reference",
+      "originating_blocker_id_field": "blockers[].blocker_id",
+      "downstream_blocker_reference_field": "input_refs[]"
+    }
+  },
+  "ports": [
+    "register_source_asset",
+    "append_evidence_records",
+    "adjudicate_evidence_use",
+    "query_evidence",
+    "get_lineage",
+    "open_evidence_request",
+    "close_evidence_request",
+    "publish_forecast_snapshot",
+    "export_case_bundle"
+  ],
+  "ingest_rule": "LLM_proposes_candidates_deterministic_contracts_and_review_decide_admission",
+  "update_rule": "new_evidence_never_silently_rewrites_a_published_forecast",
+  "not_in_v1": [
+    "full_text_knowledge_graph",
+    "vector_store_as_source_of_truth",
+    "global_confidence_score",
+    "event_bus",
+    "automatic_forecast_mutation"
+  ]
+}

@@ -1,0 +1,243 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "technical_evidence_record.schema.json",
+  "title": "Proposition-level technical evidence permission record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "record_id", "technology_or_product", "source_id", "doi",
+    "doi_unavailable_reason", "stable_identifier", "version", "publication_status",
+    "scholarly_record_status", "status_checked_at", "status_source_ids", "evidence_design",
+    "exact_claim", "experimental_conditions", "sample_applicability",
+    "sample_applicability_reason", "sample_description", "sample_size_value", "sample_size_unit",
+    "benchmark_applicability", "benchmark_applicability_reason", "benchmark_name",
+    "benchmark_version", "benchmark_result", "uncertainty",
+    "data_availability", "data_location_or_reason", "code_availability", "code_location_or_reason",
+    "computational_reproducibility", "reproduction_source_ids", "independent_replication_status",
+    "independent_replication_source_ids", "orthogonal_engineering_evidence",
+    "orthogonal_engineering_evidence_source_ids", "funding", "conflicts_of_interest",
+    "competing_technologies", "negative_results", "production_transfer_status",
+    "production_transfer_differences", "production_transfer_bridge", "technical_boundary",
+    "allowed_use", "driver_node_ids", "scenario_ids", "commercialization_permission", "limitations"
+  ],
+  "properties": {
+    "schema_version": {"const": "technical-evidence-record/v2"},
+    "record_id": {"type": "string", "minLength": 1},
+    "technology_or_product": {"type": "string", "minLength": 1},
+    "source_id": {"type": "string", "minLength": 1},
+    "doi": {"type": "string"},
+    "doi_unavailable_reason": {"type": "string"},
+    "stable_identifier": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "minLength": 1},
+    "publication_status": {"type": "string", "minLength": 1},
+    "scholarly_record_status": {
+      "enum": ["current", "corrected_current", "expression_of_concern", "retracted", "withdrawn", "unknown"]
+    },
+    "status_checked_at": {"type": "string", "format": "date-time"},
+    "status_source_ids": {"$ref": "#/$defs/idArray"},
+    "evidence_design": {
+      "enum": [
+        "experimental", "observational", "theoretical", "methods",
+        "review_or_meta_analysis", "standard_or_specification"
+      ]
+    },
+    "exact_claim": {"type": "string", "minLength": 1},
+    "experimental_conditions": {"type": ["string", "null"]},
+    "sample_applicability": {"enum": ["applicable", "not_applicable", "unknown"]},
+    "sample_applicability_reason": {"type": ["string", "null"]},
+    "sample_description": {"type": ["string", "null"]},
+    "sample_size_value": {
+      "oneOf": [
+        {"type": "number", "exclusiveMinimum": 0},
+        {"type": "null"}
+      ]
+    },
+    "sample_size_unit": {"type": ["string", "null"]},
+    "benchmark_applicability": {"enum": ["applicable", "not_applicable", "unknown"]},
+    "benchmark_applicability_reason": {"type": ["string", "null"]},
+    "benchmark_name": {"type": ["string", "null"]},
+    "benchmark_version": {"type": ["string", "null"]},
+    "benchmark_result": {"type": ["string", "null"]},
+    "uncertainty": {"type": "string", "minLength": 1},
+    "data_availability": {"enum": ["available", "restricted", "not_available", "unknown"]},
+    "data_location_or_reason": {"type": "string", "minLength": 1},
+    "code_availability": {"enum": ["available", "restricted", "not_available", "unknown"]},
+    "code_location_or_reason": {"type": "string", "minLength": 1},
+    "computational_reproducibility": {
+      "enum": ["reproduced", "partially_reproduced", "failed", "not_attempted", "not_applicable"]
+    },
+    "reproduction_source_ids": {"$ref": "#/$defs/idArray"},
+    "independent_replication_status": {
+      "enum": ["replicated", "partially_replicated", "failed", "not_found", "not_checked", "not_applicable"]
+    },
+    "independent_replication_source_ids": {"$ref": "#/$defs/idArray"},
+    "orthogonal_engineering_evidence": {"type": "string", "minLength": 1},
+    "orthogonal_engineering_evidence_source_ids": {"$ref": "#/$defs/idArray"},
+    "funding": {"type": "string", "minLength": 1},
+    "conflicts_of_interest": {"type": "string", "minLength": 1},
+    "competing_technologies": {"type": "string", "minLength": 1},
+    "negative_results": {"type": "string", "minLength": 1},
+    "production_transfer_status": {
+      "enum": ["matched_with_quantified_bridge", "mismatch_scenario_only", "laboratory_only", "production_evidence_missing", "not_applicable"]
+    },
+    "production_transfer_differences": {"type": "string", "minLength": 1},
+    "production_transfer_bridge": {"$ref": "#/$defs/structuredNumericBridge"},
+    "technical_boundary": {"type": "string", "minLength": 1},
+    "allowed_use": {
+      "enum": ["base_technical_parameter", "technical_bound", "scenario_only", "monitoring", "background", "rejected", "human_required"]
+    },
+    "driver_node_ids": {"$ref": "#/$defs/idArray"},
+    "scenario_ids": {"$ref": "#/$defs/idArray"},
+    "commercialization_permission": {"const": "none"},
+    "limitations": {"type": "string", "minLength": 1}
+  },
+  "$defs": {
+    "idArray": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "bridgeAdjustment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adjustment_id", "operation", "value", "source_ids"],
+      "properties": {
+        "adjustment_id": {"type": "string", "minLength": 1},
+        "operation": {"enum": ["add", "subtract"]},
+        "value": {"type": "number"},
+        "source_ids": {"$ref": "#/$defs/idArray"}
+      }
+    },
+    "structuredNumericBridge": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": [
+        "operation", "source_value", "source_unit", "source_source_ids",
+        "adjustments", "bridged_value", "target_value", "target_unit",
+        "target_source_ids", "residual_value", "residual_unit"
+      ],
+      "properties": {
+        "operation": {"enum": ["identity", "additive", "scale_then_add"]},
+        "source_value": {"type": "number"},
+        "source_unit": {"type": "string", "minLength": 1},
+        "source_source_ids": {"$ref": "#/$defs/idArray"},
+        "scale": {"type": "number"},
+        "adjustments": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/bridgeAdjustment"}
+        },
+        "bridged_value": {"type": "number"},
+        "target_value": {"type": "number"},
+        "target_unit": {"type": "string", "minLength": 1},
+        "target_source_ids": {"$ref": "#/$defs/idArray"},
+        "residual_value": {"type": "number"},
+        "residual_unit": {"enum": ["absolute", "percent"]}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"doi": {"maxLength": 0}}},
+      "then": {
+        "properties": {
+          "doi_unavailable_reason": {"type": "string", "minLength": 1},
+          "stable_identifier": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"allowed_use": {"const": "scenario_only"}}},
+      "then": {"properties": {"scenario_ids": {"minItems": 1}}}
+    },
+    {
+      "if": {"properties": {"sample_applicability": {"const": "applicable"}}},
+      "then": {
+        "properties": {
+          "experimental_conditions": {"type": "string", "minLength": 1},
+          "sample_description": {"type": "string", "minLength": 1},
+          "sample_size_value": {"type": "number", "exclusiveMinimum": 0},
+          "sample_size_unit": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"sample_applicability": {"const": "not_applicable"}}},
+      "then": {
+        "properties": {
+          "sample_applicability_reason": {"type": "string", "minLength": 1},
+          "experimental_conditions": {"type": "null"},
+          "sample_description": {"type": "null"},
+          "sample_size_value": {"type": "null"},
+          "sample_size_unit": {"type": "null"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"sample_applicability": {"const": "unknown"}}},
+      "then": {
+        "properties": {
+          "sample_applicability_reason": {"type": "string", "minLength": 1},
+          "sample_size_value": {"type": "null"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"benchmark_applicability": {"const": "applicable"}}},
+      "then": {
+        "properties": {
+          "benchmark_name": {"type": "string", "minLength": 1},
+          "benchmark_version": {"type": "string", "minLength": 1},
+          "benchmark_result": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"benchmark_applicability": {"const": "not_applicable"}}},
+      "then": {
+        "properties": {
+          "benchmark_applicability_reason": {"type": "string", "minLength": 1},
+          "benchmark_name": {"type": "null"},
+          "benchmark_version": {"type": "null"},
+          "benchmark_result": {"type": "null"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"benchmark_applicability": {"const": "unknown"}}},
+      "then": {
+        "properties": {
+          "benchmark_applicability_reason": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "evidence_design": {"enum": ["experimental", "observational"]},
+          "allowed_use": {
+            "enum": ["base_technical_parameter", "technical_bound", "scenario_only", "monitoring"]
+          }
+        }
+      },
+      "then": {"properties": {"sample_applicability": {"const": "applicable"}}}
+    },
+    {
+      "if": {
+        "properties": {
+          "evidence_design": {
+            "enum": ["theoretical", "methods", "review_or_meta_analysis", "standard_or_specification"]
+          }
+        }
+      },
+      "then": {"properties": {"allowed_use": {"not": {"const": "base_technical_parameter"}}}}
+    },
+    {
+      "if": {
+        "properties": {
+          "production_transfer_status": {"const": "matched_with_quantified_bridge"}
+        }
+      },
+      "then": {"properties": {"production_transfer_bridge": {"type": "object"}}}
+    }
+  ]
+}

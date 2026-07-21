@@ -3,6 +3,8 @@ from __future__ import annotations
 import argparse,csv,json
 from datetime import datetime,timezone
 from pathlib import Path
+
+from legacy_backtest_diagnostics import write_legacy_backtest_diagnostics
 V62_REV=[.15,.30,.45];V62_PB=[.10,.18,.25]
 def sign(x):return 1 if x>0 else (-1 if x<0 else 0)
 def mean(v):v=[x for x in v if x is not None];return sum(v)/len(v) if v else None
@@ -56,14 +58,13 @@ def perimeter(d,v):
 def main():
     p=argparse.ArgumentParser();p.add_argument('--benchmark',type=Path,required=True);p.add_argument('--cases',type=Path,required=True);p.add_argument('--output-dir',type=Path,required=True);a=p.parse_args();a.output_dir.mkdir(parents=True,exist_ok=True)
     rows,cases=load(a.benchmark,a.cases);d=calc(rows,cases);metrics={'calibration':{v:agg(d,'calibration',v) for v in ('v62','v63')},'holdout':{v:agg(d,'holdout',v) for v in ('v62','v63')},'perimeter_break':{v:perimeter(d,v) for v in ('v62','v63')}}
-    old,new=metrics['holdout']['v62'],metrics['holdout']['v63'];g={'revenue_mape_le_8pct':new['revenue_mape']<=.08,'profit_margin_mae_le_5pp':new['profit_margin_mae_pp']<=5,'revenue_direction_ge_85pct':new['revenue_direction_accuracy']>=.85,'profit_sign_ge_90pct':new['profit_sign_accuracy']>=.90,'revenue_coverage_ge_80pct':new['revenue_coverage']>=.80,'profit_coverage_ge_80pct':new['profit_coverage']>=.80,'revenue_interval_score_improves_30pct':1-new['revenue_interval_score']/old['revenue_interval_score']>=.30,'profit_interval_score_improves_30pct':1-new['profit_interval_score']/old['profit_interval_score']>=.30,'perimeter_break_revenue_coverage':metrics['perimeter_break']['v63']['revenue_coverage']>=.80,'perimeter_break_profit_coverage':metrics['perimeter_break']['v63']['profit_coverage']>=.80}
-    result={'model_version':'ai-hardware-forecasting-v6.3','generated_at':datetime.now(timezone.utc).isoformat(),'metrics':metrics,'gate_results':g,'limitations':['Retrospective point-in-time simulation, not pre-registered live performance.','Small Marvell-only sample.','FY2020 perimeter-break is distribution-only.']}
-    (a.output_dir/'metrics.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+    old,new=metrics['holdout']['v62'],metrics['holdout']['v63'];threshold_observations={'revenue_mape_le_8pct':new['revenue_mape']<=.08,'profit_margin_mae_le_5pp':new['profit_margin_mae_pp']<=5,'revenue_direction_ge_85pct':new['revenue_direction_accuracy']>=.85,'profit_sign_ge_90pct':new['profit_sign_accuracy']>=.90,'revenue_coverage_ge_80pct':new['revenue_coverage']>=.80,'profit_coverage_ge_80pct':new['profit_coverage']>=.80,'revenue_interval_score_improves_30pct':1-new['revenue_interval_score']/old['revenue_interval_score']>=.30,'profit_interval_score_improves_30pct':1-new['profit_interval_score']/old['profit_interval_score']>=.30,'perimeter_break_revenue_coverage':metrics['perimeter_break']['v63']['revenue_coverage']>=.80,'perimeter_break_profit_coverage':metrics['perimeter_break']['v63']['profit_coverage']>=.80}
+    result={'model_version':'ai-hardware-forecasting-v6.3','generated_at':datetime.now(timezone.utc).isoformat(),'metrics':metrics,'limitations':['Retrospective point-in-time simulation, not pre-registered live performance.','Small Marvell-only sample.','FY2020 perimeter-break is distribution-only.']}
+    write_legacy_backtest_diagnostics(a.output_dir, result, threshold_observations)
     fields=[]
     for x in d:
         for k in x:
             if k not in fields:fields.append(k)
     with (a.output_dir/'detail.csv').open('w',encoding='utf-8-sig',newline='') as f:w=csv.DictWriter(f,fieldnames=fields);w.writeheader();w.writerows(d)
     print(json.dumps(result,ensure_ascii=False,indent=2))
-    if not all(g.values()):raise SystemExit(2)
 if __name__=='__main__':main()

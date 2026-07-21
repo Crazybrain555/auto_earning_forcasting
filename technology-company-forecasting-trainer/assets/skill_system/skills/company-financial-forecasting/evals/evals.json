@@ -1,0 +1,17 @@
+{
+  "skill_name": "company-financial-forecasting",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "已有验收的证据包和分部量价成本经营模型。请做五年三表、归母净利润、现金与股份滚动、盈利能力和反推估值；某分部没有现金流披露，不能假装为0。",
+      "expected_output": "A reconciled formula-driven financial forecast with attributable-profit chain, explicit human-required allocation limitation, ending basic shares separated from period weighted-average EPS shares and valuation-date fully diluted shares, and valuation tied to model outputs; scenarios, probabilities, fade and a second valuation method appear only when supplied or materially needed rather than as mandatory placeholders.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "审计一个科技公司的模型：收入和营业利润对得上，但少数股东损益、资本化研发、SBC回加、回购和稀释股数处理混乱。请定位最早的财务交接错误，不要重写经营假设。",
+      "expected_output": "An accounting-basis and ownership audit that isolates the earliest failing bridge, recomputes the affected statements and valuation, and returns upstream gaps rather than changing operating causality.",
+      "files": []
+    }
+  ]
+}

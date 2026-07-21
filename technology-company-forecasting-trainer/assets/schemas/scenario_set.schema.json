@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "scenario_set.schema.json",
+  "title": "Named-node scenario set v2",
+  "type": "object",
+  "required": ["schema_version", "scenarios"],
+  "$defs": {
+    "profitChainPeriod": {
+      "type": "object",
+      "required": [
+        "period", "revenue", "operating_costs_and_expenses", "operating_profit",
+        "nonoperating_income_expense_net", "pretax_profit", "tax_expense",
+        "net_income", "net_income_attributable_to_noncontrolling_interests",
+        "net_income_attributable", "model_cells", "applied_shock_node_ids",
+        "joint_state_id"
+      ],
+      "properties": {
+        "period": {"type": "string", "minLength": 1},
+        "revenue": {"type": "number"},
+        "operating_costs_and_expenses": {"type": "number"},
+        "operating_profit": {"type": "number"},
+        "nonoperating_income_expense_net": {"type": "number"},
+        "pretax_profit": {"type": "number"},
+        "tax_expense": {"type": "number"},
+        "net_income": {"type": "number"},
+        "net_income_attributable_to_noncontrolling_interests": {"type": "number"},
+        "net_income_attributable": {"type": "number"},
+        "model_cells": {
+          "type": "object",
+          "required": [
+            "revenue", "operating_costs_and_expenses", "operating_profit",
+            "nonoperating_income_expense_net", "pretax_profit", "tax_expense",
+            "net_income", "net_income_attributable_to_noncontrolling_interests",
+            "net_income_attributable"
+          ],
+          "properties": {
+            "revenue": {"type": "string", "minLength": 1},
+            "operating_costs_and_expenses": {"type": "string", "minLength": 1},
+            "operating_profit": {"type": "string", "minLength": 1},
+            "nonoperating_income_expense_net": {"type": "string", "minLength": 1},
+            "pretax_profit": {"type": "string", "minLength": 1},
+            "tax_expense": {"type": "string", "minLength": 1},
+            "net_income": {"type": "string", "minLength": 1},
+            "net_income_attributable_to_noncontrolling_interests": {"type": "string", "minLength": 1},
+            "net_income_attributable": {"type": "string", "minLength": 1}
+          }
+        },
+        "applied_shock_node_ids": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "joint_state_id": {"type": "string", "minLength": 1}
+      }
+    }
+  },
+  "properties": {
+    "schema_version": {"const": "2.0"},
+    "scenarios": {
+      "type": "array",
+      "minItems": 1,
+      "contains": {
+        "type": "object",
+        "required": ["role"],
+        "properties": {"role": {"const": "reference"}}
+      },
+      "minContains": 1,
+      "maxContains": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "role", "probability", "shocks", "profit_chain_periods", "narrative"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "role": {"enum": ["reference", "alternative"]},
+          "probability": {"type": "number", "minimum": 0, "maximum": 1},
+          "narrative": {"type": "string"},
+          "shocks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "node_id", "operation", "value", "unit", "model_cell_or_formula",
+                "effective_period", "lag_periods"
+              ],
+              "properties": {
+                "node_id": {"type": "string"},
+                "model_cell_or_formula": {"type": "string", "minLength": 1},
+                "dimension": {"type": "string"},
+                "cohort_id": {"type": "string"},
+                "operation": {"type": "string"},
+                "value": {"type": "number"},
+                "unit": {"type": "string"},
+                "effective_period": {"type": "string"},
+                "lag_periods": {"type": "integer", "minimum": 0}
+              }
+            }
+          },
+          "profit_chain_periods": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"$ref": "#/$defs/profitChainPeriod"}
+          }
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"role": {"const": "alternative"}}},
+            "then": {"properties": {"shocks": {"minItems": 1}}}
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,2 @@
+fact_id,entity_id,accounting_basis_id,source_id,accession_or_filing_id,filed_at,retrieved_at,form,fiscal_year,fiscal_period,period_start,period_end,fact_name,taxonomy,tag,dimensions,unit,decimals,scale,sign,reported_value,normalized_value,currency,statement_or_note_anchor,extraction_method,amendment_or_restatement,predecessor_fact_id,comparability_adjustment,status,conflict_note
+TBD,,,,,,,,,,,,,,,,,,,,,,,,,,,,pending,

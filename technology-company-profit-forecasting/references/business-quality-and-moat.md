@@ -1,131 +1,152 @@
-# Business quality and moat (the persistence question)
+# Business Quality, Moat and Value Creation
 
-**Scope: this file exists only to make FY+2/FY+3 forecasts more accurate.**
-The objective is revenue and profit accuracy (`profit-forecast-accuracy.md`),
-not investment philosophy. A multi-year forecast contains one persistence
-claim - that today's growth and margin economics continue - and that claim is
-what this file forces you to argue instead of inherit. Use the parts that set
-a number in the model; ignore the rest.
+Business quality is an economic persistence claim, not a checklist score.
+Evaluate whether the company can reinvest at attractive incremental returns,
+why competitors or customers cannot rapidly take those returns, and what
+evidence would show the advantage fading.
 
-The one thing that must come out of this analysis is a **stated fade
-assumption**: over the forecast horizon, do growth and margin hold, decay, or
-expand, and on what evidence. That assumption directly sets FY+2/FY+3 and is
-where round-1 lost most of its accuracy.
+## Historical value-creation base
 
-Sources studied: Michael Mauboussin's *Measuring the Moat* framework, the
-Business Breakdowns ASML and Moody's episodes, and Li Lu's value-investing
-lecture. Calibration notes at the end of this file.
+Reformulate reported statements into operating and financing activities, then
+calculate with documented definitions:
 
-## 1. The value-creation test comes before the growth story
+- NOPAT and average invested capital;
+- ROIC and incremental ROIC;
+- organic and acquired reinvestment;
+- reinvestment rate and fundamental growth;
+- FCF conversion through the cycle;
+- dilution and per-share compounding;
+- balance-sheet resilience.
 
-**ROIC − WACC is the non-negotiable test.** A company can report record
-profits and still destroy capital. Every delivery states, for the historical
-period and the forecast horizon:
+Bridge goodwill, acquired intangibles, leases, customer prepayments, capitalized
+development and expensed R&D when material. Show results both with and without
+disputed analytical adjustments.
 
-- ROIC (NOPAT ÷ invested capital), computed and shown, not asserted;
-- the WACC or a stated hurdle rate, with its inputs;
-- the **spread**, historically and forecast.
+## Source of excess returns
 
-If the forecast implies an expanding spread, that expansion is a claim
-requiring the same evidence discipline as a revenue driver. Growth on a
-negative spread destroys value faster - say so plainly when it happens.
+For every claimed advantage, state the causal mechanism:
 
-## 2. Fade is the default; persistence is the claim
+- lower delivered cost or structurally better yield;
+- differentiated performance with measured customer value;
+- switching, qualification or redesign cost;
+- network, ecosystem or installed-base complement;
+- scarce assets, rights, data, distribution or standard position;
+- scale or learning that survives replication attempts;
+- governance and capital allocation that preserve per-share economics.
 
-High returns attract capital. Empirically, high-ROIC cohorts are dragged
-toward the mean - economic gravity. Therefore:
+Then identify who pays, who can respond, the response cost and lead time, and
+the earliest observable erosion signal. Brand adjectives, patent counts,
+market-share rank and historical margin are not standalone proof.
 
-- The Base case must state **an explicit fade assumption**: over the forecast
-  horizon, does the spread hold, decay, or expand, and *why*.
-- "It compounds because it has compounded" is not a reason. The reason must
-  be a barrier that blocks the specific competitive response.
-- Conversely, do not mechanically fade a company whose barrier is documented
-  and strengthening (round-1 training found systematic under-forecasting of
-  durable compounders - the discipline runs both ways: **argue the fade
-  either way, never inherit it**).
+## Industry profit pool
 
-## 3. Two-level analysis: industry first, then company
+Map the company's share of revenue, gross profit, operating profit and invested
+capital across the value chain. Explain whether bargaining power rests with
+suppliers, the company, distributors, customers or complements, and how that
+distribution changes across the cycle.
 
-**Level 1 - profit pool.** Map the value chain and locate where economic
-profit actually sits. Compute the value-creation spread for each link.
-A structurally poor link cannot be rescued by good management; a structurally
-rich link forgives a lot. Ask explicitly: *is this company positioned in the
-profitable part of its chain, and is that position moving?*
+A moat claim is incomplete without a competitor-response function. High
+returns may reflect a temporary shortage, accounting perimeter, favorable
+cycle, underinvestment or customer concentration rather than durable quality.
 
-For technology chains this is decisive - e.g. in lithography the equipment
-vendor captures ~20-25% of wafer-fab equipment spend and a durable share of
-the fab's economics, while several adjacent links earn their cost of capital
-at best.
+## Reinvestment runway
 
-**Level 2 - barriers to entry.** Of Porter's five forces, the one that
-matters most for a multi-year holder is the threat of new entry, because
-barriers are what protect the incumbent's profit. State the barrier
-concretely and test it against the actual competitive response:
+Separate:
 
-| Barrier type | Evidence that it is real |
-|---|---|
-| Technology / know-how lead | rivals' demonstrated parameters lag by N years (see `technology-trend-evidence.md`) |
-| Scale / cost position | unit cost gap computed, not assumed |
-| Switching costs | customer requalification cost/time, contract structure, historical churn |
-| Network / ecosystem | attach and retention data, third-party investment in the ecosystem |
-| Regulatory / standards position | seat at the standards body, certification held |
-| Customer co-investment | joint development programs, customer capital in the vendor's roadmap |
+- reinvestment needed to maintain current earnings;
+- reinvestment that expands an existing advantage;
+- adjacent investment with unproven economics;
+- acquisitions and buybacks;
+- working-capital and capacity funding supplied by customers or partners.
 
-## 4. The value stick: how the moat converts to money
+Forecast growth from reinvestment and incremental returns. State the addressable
+runway, required capital, organizational constraint, cannibalization and
+competitive response. Growth without an investable runway is not automatically
+valuable; a high-ROIC business with no reinvestment opportunities may instead
+be a cash-distribution case.
 
-Profit is price minus cost, but a moat is about widening the **total value
-created**: raising customers' willingness to pay, or lowering what suppliers
-and employees will accept. Two clean strategies:
+## Fade is a causal forecast
 
-- **Differentiation** - better product, brand, network effects → price premium.
-- **Cost leadership** - scale, process, unique assets → margin at market price.
+Build explicit paths for revenue growth, margins, incremental ROIC and
+reinvestment to converge toward a sustainable state. Do not mechanically fade
+every high-return company, and do not assume permanent excess returns.
 
-State which one the company runs, and check the driver tree reflects it: a
-differentiation claim should show up as ASP/mix, a cost-leadership claim as
-unit cost. A moat claim that touches no line in the model is decoration.
+The fade path must name:
 
-**Pricing restraint is evidence, not weakness.** A dominant supplier that
-does not extract maximum price (ASML's collaborative pricing across two
-decades of dominance) is buying customer co-investment and roadmap lock-in -
-that is moat maintenance, and it shows up as durability rather than as
-near-term margin.
+- barrier that slows competition;
+- rival action and lead time;
+- customer or regulatory counterforce;
+- investment needed to renew the advantage;
+- observable event that accelerates or delays fade.
 
-## 5. Quality of the earnings stream
+Use this path in terminal valuation and reverse-implied analysis.
 
-Beyond level and durability of returns, characterise the stream:
+## Management, governance and capital allocation
 
-- **Recurring share** - installed-base service, subscriptions, consumables:
-  revenue that arrives without a new sale each period.
-- **Customer concentration and their switching cost** - concentration is a
-  risk only where the customer can actually leave.
-- **Capital intensity and reinvestment runway** - can the company redeploy
-  capital at similar returns, or does high ROIC come with nowhere to spend?
-- **Cyclicality vs secular** - separate the two explicitly; a cycle peak
-  mistaken for a new plateau is the classic technology-forecast error.
+Evaluate actions against prior commitments and per-share value creation:
 
-## 6. What this requires in the delivery
+- forecast and execution record;
+- investment hurdle and post-investment outcomes;
+- acquisition price, integration and incremental returns;
+- buyback price versus intrinsic value and dilution;
+- compensation, related parties and minority treatment;
+- balance-sheet and downside stewardship;
+- disclosure quality and accounting-estimate changes.
 
-`company_quality_moat_register.csv` (already scaffolded) must carry, per
-claim: the barrier type, the concrete evidence, the competitive response it
-must survive, the model line it touches, and its falsification condition -
-the observation that would prove the moat is eroding. A moat claim with no
-falsification condition is a belief, not an analysis.
+Management access or confidence is evidence about claims and incentives, not an
+independent economic moat.
 
-## Calibration notes
+## Output contract
 
-- **Mauboussin, *Measuring the Moat***: ROIC vs WACC as the value test;
-  economic gravity and return fade; profit-pool mapping of the value chain;
-  barriers to entry as the decisive force; the value stick (WTP up or
-  supplier cost down) and the differentiation / cost-leadership split.
-- **Business Breakdowns - ASML**: a technology barrier expressed as
-  generational lead; share of WFE spend as the chain-position metric; margin
-  expansion from leadership (mid-40s → ~50% GM over a decade); deliberate
-  pricing restraint as moat maintenance.
-- **Business Breakdowns - Moody's**: duopoly with regulatory and network
-  position; pricing power tied to issuance necessity rather than to service
-  cost; recurring surveillance revenue as stream quality.
-- **Li Lu**: ownership mindset over paper-shuffling; a large margin of safety
-  precisely *because* the analyst does not control the business; circle of
-  competence - a career yields few genuine insights, and betting outside them
-  is the unforgivable error; work the thesis to completion before sizing, and
-  when the work disproves the thesis, take the loss and move on.
+For each conclusion-critical quality claim record:
+
+- causal advantage and protected profit-pool node;
+- dated evidence and rival explanation;
+- historical and forecast ROIC/incremental-ROIC effect;
+- reinvestment requirement and runway;
+- competitive response and fade path;
+- sensitivity of NOPAT, FCF and value;
+- monitor, trigger and kill condition.
+
+The machine contract is `company_quality_moat_register.csv`. An accepted row
+binds known root-source IDs, known driver nodes, a `value_creation.fade`
+schedule link and known monitoring or falsification nodes.  Its ROIC/cash,
+runway, downside, valuation and monitor fields point to executed model
+sensitivities or named observations.  The deterministic validator checks those
+links and types; an independent investment reviewer decides whether the
+reference class, proposition-scoped source authority, causal advantage,
+competitor response and quantified effect are economically persuasive. A
+deterministic independent-source quota can neither prove nor disprove a moat;
+claimed corroboration must still be genuinely independent. Word length, digit
+presence, row count and a self-reported cluster count are not moat evidence.
+
+The report must distinguish demonstrated advantage, analyst hypothesis and
+scenario option. No composite quality or moat score may replace this schedule.
+
+## Practitioner method basis and limits
+
+- [Berkshire Hathaway shareholder letters](https://www.berkshirehathaway.com/letters/letters.html)
+  motivate an owner-oriented view of normalized distributable cash, per-share
+  compounding and capital allocation.  A letter is not company evidence, and
+  "owner earnings" is not CFO minus total capex without a maintenance/growth,
+  working-capital, dilution and liability bridge.
+- Mauboussin and Callahan's [Measuring the
+  Moat](https://www.morganstanley.com/im/publication/insights/articles/article_measuringthemoat.pdf)
+  motivates tying strategy to the magnitude and duration of ROIC above the cost
+  of capital, industry structure and competitive response.  Its checklist is a
+  research map, not a moat score or proof of persistence.
+- Mauboussin and Rappaport's [Expectations
+  Investing](https://cup.columbia.edu/book/expectations-investing/9780231203043/)
+  motivates solving price into operating expectations and locating the
+  disagreement at named value drivers.  Reverse-implied assumptions are what
+  the price is consistent with, not what "the market believes" as an observable
+  fact.
+- Damodaran's [Investment Philosophies supporting
+  materials](https://pages.stern.nyu.edu/~adamodar/New_Home_Page/invphil3edbook.htm)
+  motivate testing the evidence, behavioral premise and implementation costs
+  behind a value or contrarian strategy.  Low multiples and price declines are
+  not proof of undervaluation; the earnings-power and balance-sheet case must
+  survive independently.
+
+These practitioner sources shape questions.  Only dated company, customer,
+competitor, industry and accounting evidence may set a company parameter.

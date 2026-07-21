@@ -17,8 +17,8 @@ def main():
         text=' '.join([s.get('source_id',''),s.get('model_impact',''),s.get('limitations','')]).lower()
         for token in c.get('forbidden_future_tokens',[]):
             if token.lower() in text:errs.append('future token '+token+' in '+s['signal_id'])
-        fam=s['source_family'].lower();allowed=s['allowed_use'].lower()
-        if ('technical' in fam or 'paper' in fam or 'standard' in fam) and allowed in {'base_point','base_driver'}:errs.append('technical-to-base '+s['signal_id'])
+        role=s.get('evidence_role','').strip().lower();allowed=s['allowed_use'].lower()
+        if role in {'failure_boundary','feasibility_bound','technical_bound'} and allowed in {'base_point','base_driver','base_parameter'}:errs.append('boundary-to-base '+s['signal_id'])
         if s['evidence_tier']=='E4' and allowed not in {'monitor','monitor_trigger'}:errs.append('E4 permission '+s['signal_id'])
     if a.query_log:
         with Path(a.query_log).open(encoding='utf-8-sig',newline='') as f:qs=list(csv.DictReader(f))
@@ -31,9 +31,6 @@ def main():
         with Path(a.independence_map).open(encoding='utf-8-sig',newline='') as f:im=list(csv.DictReader(f))
         mapped={r['cluster_id'].strip() for r in im if r.get('cluster_id')};needed={s['independence_cluster'].strip() for s in ss if s.get('independence_cluster')};missing=needed-mapped
         if missing:errs.append('unmapped '+','.join(sorted(missing)))
-    for cid,c in cases.items():
-        clusters={s['independence_cluster'] for s in ss if s['case_id']==cid and s['allowed_use']=='base_driver'}
-        if any(c['point_evaluable']) and len(clusters)<2:errs.append(f'insufficient Base clusters {cid}: {len(clusters)}')
     if errs:
         print('\n'.join('FAIL: '+e for e in errs));raise SystemExit(2)
     print(f'PASS: {len(ss)} pre-cutoff signals across {len(cases)} cases')

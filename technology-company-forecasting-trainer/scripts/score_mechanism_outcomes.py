@@ -14,11 +14,15 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--predictions", required=True)
     ap.add_argument("--actuals", required=True)
-    ap.add_argument("--contract", required=True)
+    ap.add_argument(
+        "--contract",
+        required=False,
+        help="Deprecated compatibility input; thresholds never decide method quality.",
+    )
     ap.add_argument("--output", required=True)
     args = ap.parse_args()
 
-    pred_obj, act_obj, contract = load(args.predictions), load(args.actuals), load(args.contract)
+    pred_obj, act_obj = load(args.predictions), load(args.actuals)
     preds = {r["outcome_id"]: r for r in pred_obj.get("outcomes", [])}
     acts = {r["outcome_id"]: r for r in act_obj.get("outcomes", [])}
     rows = []
@@ -54,24 +58,18 @@ def main() -> int:
         "mean_abs_timing_error_periods": sum(timing) / len(timing) if timing else None,
     }
 
-    checks = []
-    for metric, rule in contract.get("metrics", {}).items():
-        value = metrics.get(metric)
-        if value is None:
-            passed = bool(rule.get("allow_unavailable", False))
-        elif "minimum" in rule:
-            passed = value >= float(rule["minimum"])
-        elif "maximum" in rule:
-            passed = value <= float(rule["maximum"])
-        else:
-            passed = True
-        checks.append({"metric": metric, "value": value, "passed": passed, "rule": rule})
-
-    status = "PASS" if checks and all(c["passed"] for c in checks) else ("PARTIAL" if any(c["passed"] for c in checks) else "FAIL")
-    result = {"protocol_version": "2.1", "right_reason_status": status, "metrics": metrics, "checks": checks, "rows": rows}
+    result = {
+        "protocol_version": "3.0",
+        "interpretation": (
+            "diagnostic_vector_only; an independent reviewer attributes each miss and "
+            "decides whether the mechanism moved for the right reason"
+        ),
+        "metrics": metrics,
+        "rows": rows,
+    }
     Path(args.output).write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(json.dumps(result, indent=2, ensure_ascii=False))
-    return 0 if status == "PASS" else (3 if status == "PARTIAL" else 2)
+    return 0
 
 
 if __name__ == "__main__":

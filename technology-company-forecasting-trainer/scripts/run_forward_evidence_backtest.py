@@ -3,6 +3,8 @@ from __future__ import annotations
 import argparse,csv,json
 from pathlib import Path
 
+from legacy_backtest_diagnostics import write_legacy_backtest_diagnostics
+
 def sign(x): return 1 if x>0 else (-1 if x<0 else 0)
 def mean(v):
     v=[x for x in v if x is not None]
@@ -38,9 +40,8 @@ def main():
         return {'cases':len({r['case_id'] for r in ss}),'revenue_mape':mean([r[f'{pre}_point_error'] for r in rev]),'profit_margin_mae_pp':mean([r[f'{pre}_margin_error_pp'] for r in pr]),'revenue_direction_accuracy':mean([1 if r[f'{pre}_direction_correct'] else 0 for r in rev if r[f'{pre}_direction_correct'] is not None]),'profit_sign_accuracy':mean([1 if r[f'{pre}_sign_correct'] else 0 for r in pr if r[f'{pre}_sign_correct'] is not None]),'revenue_coverage':mean([1 if r[f'{pre}_hit'] else 0 for r in rev]),'profit_coverage':mean([1 if r[f'{pre}_hit'] else 0 for r in pr]),'revenue_interval_score':mean([r[f'{pre}_interval_score'] for r in rev]),'profit_interval_score':mean([r[f'{pre}_interval_score'] for r in pr])}
     result={'metrics':{s:{v:met(s,v,s!='perimeter-break') for v in ['official','enhanced']} for s in ['calibration','holdout','perimeter-break']}}
     h0=result['metrics']['holdout']['official'];h1=result['metrics']['holdout']['enhanced'];p1=result['metrics']['perimeter-break']['enhanced']
-    result['gate_results']={'holdout_revenue_mape_not_worse':h1['revenue_mape']<=h0['revenue_mape'],'holdout_profit_margin_not_worse':h1['profit_margin_mae_pp']<=h0['profit_margin_mae_pp'],'holdout_revenue_interval_not_worse':h1['revenue_interval_score']<=h0['revenue_interval_score'],'holdout_profit_interval_not_worse':h1['profit_interval_score']<=h0['profit_interval_score'],'perimeter_revenue_coverage':p1['revenue_coverage']>=.8,'perimeter_profit_coverage':p1['profit_coverage']>=.8}
+    threshold_observations={'holdout_revenue_mape_not_worse':h1['revenue_mape']<=h0['revenue_mape'],'holdout_profit_margin_not_worse':h1['profit_margin_mae_pp']<=h0['profit_margin_mae_pp'],'holdout_revenue_interval_not_worse':h1['revenue_interval_score']<=h0['revenue_interval_score'],'holdout_profit_interval_not_worse':h1['profit_interval_score']<=h0['profit_interval_score'],'perimeter_revenue_coverage':p1['revenue_coverage']>=.8,'perimeter_profit_coverage':p1['profit_coverage']>=.8}
     with (out/'detail.csv').open('w',encoding='utf-8-sig',newline='') as f:w=csv.DictWriter(f,fieldnames=list(rows[0]));w.writeheader();w.writerows(rows)
-    (out/'metrics.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
-    if not all(result['gate_results'].values()):raise SystemExit('forward-evidence gates failed')
+    write_legacy_backtest_diagnostics(out, result, threshold_observations)
     print(json.dumps(result,ensure_ascii=False,indent=2))
 if __name__=='__main__':main()

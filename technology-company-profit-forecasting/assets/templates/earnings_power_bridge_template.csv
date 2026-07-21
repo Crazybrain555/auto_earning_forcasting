@@ -1,0 +1,6 @@
+period,profit_layer,reported_amount,bridge_from_prior_layer,tax_expense,net_income_attributable_to_noncontrolling_interests,normalization_adjustment,normalized_amount,cash_support,accrual_component,operating_tax_expense,nopat,noa_bridge_residual,investment_adjustment,cycle_adjustment,persistence_driver,competitive_response,fade_target,fade_horizon,source_ids,driver_node_ids,status,notes
+TBD,revenue,,,,,,,,,,,,,,,,,,,,pending,
+TBD,core_operating_profit,,,,,,,,,,,,,,,,,,,,pending,
+TBD,gaap_operating_profit,,,,,,,,,,,,,,,,,,,,pending,
+TBD,pretax_profit,,,,,,,,,,,,,,,,,,,,pending,
+TBD,gaap_net_income_attributable,,,,,,,,,,,,,,,,,,,,pending,

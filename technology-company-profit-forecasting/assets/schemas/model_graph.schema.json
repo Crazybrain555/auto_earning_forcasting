@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "model_graph.schema.json",
+  "title": "Typed causal model graph v2",
+  "type": "object",
+  "required": ["schema_version", "graph_id", "as_of", "nodes", "equations", "main_line"],
+  "properties": {
+    "schema_version": {"const": "2.0"},
+    "graph_id": {"type": "string", "minLength": 1},
+    "as_of": {"type": "string", "format": "date-time"},
+    "financial_role_contract": {
+      "type": "array",
+      "const": [
+        "revenue",
+        "operating_profit",
+        "pretax_profit",
+        "tax_expense",
+        "noncontrolling_interest_net_income",
+        "gaap_net_income_attributable"
+      ]
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "unit"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "kind": {"type": "string", "minLength": 1},
+          "unit": {"type": "string", "minLength": 1},
+          "financial_role": {
+            "enum": [
+              "revenue",
+              "operating_profit",
+              "pretax_profit",
+              "tax_expense",
+              "noncontrolling_interest_net_income",
+              "gaap_net_income_attributable",
+              "free_cash_flow"
+            ]
+          }
+        }
+      }
+    },
+    "equations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "output", "operation", "inputs"],
+        "properties": {
+          "partition": {
+            "type": "object",
+            "required": ["partition_id", "dimension", "exhaustive", "mutually_exclusive", "reconciles_to_parent"],
+            "properties": {
+              "partition_id": {"type": "string", "minLength": 1},
+              "dimension": {"type": "string", "minLength": 1},
+              "exhaustive": {"type": "boolean"},
+              "mutually_exclusive": {"type": "boolean"},
+              "reconciles_to_parent": {"type": "boolean"}
+            }
+          }
+        }
+      }
+    },
+    "main_line": {"type": "object", "required": ["carrier_node_ids", "target_node_ids", "falsification_ids", "competitor_response_node_ids"]}
+  }
+}

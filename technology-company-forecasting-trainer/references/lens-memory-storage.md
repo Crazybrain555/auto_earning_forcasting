@@ -53,7 +53,12 @@ Effective price-protected share
 × execution rate
 ```
 
-RPO, backlog or a firm financial commitment may improve revenue visibility, but does **not** prove that ASP, gross margin or product mix is locked. Unless a filing or official disclosure states the price floor or margin protection, set product-level protected ASP share to zero in the base case and use the contract only as a revenue-visibility cross-check.
+RPO, backlog or a firm financial commitment may improve revenue visibility, but
+does **not** prove that ASP, gross margin or product mix is locked. Unless the
+contract or an authorized disclosure establishes price or margin protection,
+do not give the Base case that protection. Mark the protected share
+`unobserved`/`human-required` and test unprotected pricing; missing disclosure
+is not evidence that the economic share is literally zero.
 
 Customer prepayments and contract liabilities belong in the cash and working-capital bridge until revenue is recognized.
 
@@ -160,7 +165,8 @@ Do not assume an authorization is renewed after it is exhausted. Test whether re
 
 ## 9. Valuation contract
 
-Show at least two lenses:
+Use the valuation lenses that expose the material uncertainty; common choices
+include:
 
 1. **cycle value** using one- to three-year scenario EPS or free cash flow;
 2. **normalized value** using post-cycle revenue, gross margin, capital intensity, FCFE/FCF and a terminal multiple.
@@ -176,6 +182,7 @@ Also run a reverse model from the current price to implied revenue, gross margin
 - customer and AI-storage cross-check;
 - JV/fab economic-capital bridge;
 - working-capital, cash and share-count roll-forward;
-- bear/base/bull scenarios including under-utilization/NRV in downside;
+- a free-named reference path plus only the material rival states selected for
+  the case, including under-utilization/NRV when a downside state makes them relevant;
 - cycle and normalized valuation;
 - monitoring triggers tied to exact assumptions.

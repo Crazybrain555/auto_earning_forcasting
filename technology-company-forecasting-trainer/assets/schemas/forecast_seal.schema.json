@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forecast_seal.schema.json",
+  "title": "Workspace drift-evident live forecast publication seal",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "seal_kind", "status", "forecast_id", "run_id",
+    "frozen_at", "registry", "bundle_hashes", "supersedes",
+    "validated_input_pack_hash", "snapshot_hash", "delivery_receipt_hash",
+    "files", "pack_hash"
+  ],
+  "properties": {
+    "schema_version": {"const": "forecast-seal/v1"},
+    "seal_kind": {"const": "live_publication"},
+    "status": {"const": "published"},
+    "forecast_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "frozen_at": {"type": "string", "format": "date-time"},
+    "registry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_version", "profile", "schema_version", "sha256",
+        "publication_bundles", "artifacts"
+      ],
+      "properties": {
+        "contract_version": {"const": "forecast-publication-registry/v1"},
+        "profile": {"const": "live"},
+        "schema_version": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "publication_bundles": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "stages"],
+            "properties": {
+              "id": {
+                "enum": [
+                  "evidence_bundle",
+                  "operating_model_bundle",
+                  "financial_forecast_bundle"
+                ]
+              },
+              "stages": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {"type": "string", "minLength": 1}
+              }
+            }
+          }
+        },
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["artifact_id", "path", "stage", "artifact_role"],
+            "properties": {
+              "artifact_id": {"type": "string", "minLength": 1},
+              "path": {"type": "string", "minLength": 1},
+              "stage": {"type": "string", "minLength": 1},
+              "artifact_role": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    },
+    "bundle_hashes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_bundle", "operating_model_bundle", "financial_forecast_bundle"],
+      "properties": {
+        "evidence_bundle": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "operating_model_bundle": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "financial_forecast_bundle": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "supersedes": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["forecast_id", "pack_hash", "frozen_at"],
+          "properties": {
+            "forecast_id": {"type": "string", "minLength": 1},
+            "pack_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "frozen_at": {"type": "string", "format": "date-time"}
+          }
+        }
+      ]
+    },
+    "validated_input_pack_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "snapshot_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "delivery_receipt_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["artifact_id", "path", "stage", "artifact_role", "sha256", "size_bytes"],
+        "properties": {
+          "artifact_id": {"type": "string", "minLength": 1},
+          "path": {"type": "string", "minLength": 1},
+          "stage": {"type": "string", "minLength": 1},
+          "artifact_role": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+          "size_bytes": {"type": "integer", "minimum": 0}
+        }
+      }
+    },
+    "pack_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

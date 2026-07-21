@@ -49,4 +49,10 @@ The registry must be evaluated with company-cluster bootstrap, robust statistics
 
 ## Research-sufficiency validation — v7.6 Research Parity
 
-A sealed blind CASE-01 delivery passed the v7.5 structural validator but contained only about 611 accepted-source words and lacked product/technology, company-quality, management and material-assumption support artifacts. It is retained as a negative process fixture: process integrity passed, research sufficiency failed. The new validator rejects this class of thin package.
+A sealed blind CASE-01 delivery passed the v7.5 structural validator but its
+evidence could not be traced to the thesis-carrying operating nodes and no
+independent reviewer had challenged the missing company/industry explanation.
+It is retained as a negative process fixture: process integrity passed,
+research sufficiency failed. Its roughly 611 accepted-source words describe the
+fixture but are not the failure criterion; adding generic text would not repair
+the missing causal lineage or independent judgment.

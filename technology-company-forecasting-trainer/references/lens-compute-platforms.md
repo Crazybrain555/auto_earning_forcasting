@@ -67,7 +67,12 @@ Publish both reported and normalized profit when material one-offs or accounting
 - platform/ecosystem regime break;
 - mature platform normalization.
 
-For regime breaks, use discrete probability branches and convex tails. Base probability may increase only after at least two independent E0/E1 signals, such as material revenue, customer deployment/capex, supply commitments, or multi-customer production adoption.
+For regime breaks, use discrete probability branches and convex tails. Base
+probability may increase only when proposition-appropriate evidence from
+independent measurement roots resolves the important rival explanations—for
+example material revenue, customer deployment/capex, supply commitments or
+multi-customer production adoption. Do not convert a fixed source count or an
+E-label into forecast permission.
 
 ## NVIDIA retrospective lessons
 

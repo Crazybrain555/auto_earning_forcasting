@@ -1,191 +1,216 @@
-# Driver-tree modeling (the modeling constitution)
+# Driver-Tree Modeling
 
-This file defines HOW a forecast model is built. Mechanism modules are
-decomposition templates used inside this structure - they are never scored,
-weighted, or blended. A forecast is one arithmetic tree with evidence on its
-branches, not a weighted combination of mechanisms.
+This file implements references/analysis-kernel.md in a forecast model. The
+driver tree is the arithmetic projection of the causal DAG; it is not a score,
+a list of themes or a weighted blend of mechanisms.
 
-Calibration references: sell-side analyst models (华泰-style 分部量价拆分
-three-statement models) whose structure this file encodes.
+## Historical base
 
-## The seven-layer structure
+Reconstruct at least three comparable fiscal years plus the latest interim
+period before forecasting. A period label is not a historical base. For every
+annual consolidated period preserve numeric revenue, cost, gross profit,
+operating profit and GAAP net income attributable, with the currency, statement
+scope and source IDs. Reconcile revenue less cost to gross profit, and reconcile
+the signed sum of reported segments and eliminations to consolidated revenue.
+Before summing customer, product, geography or segment rows, declare the
+partition ID, dimension, whether the members are exhaustive, and whether they
+are mutually exclusive. Only a partition declared both exhaustive and mutually
+exclusive may reconcile to its parent. Historical-base rows use one explicit
+period-state contract: `annual` and `interim` rows are `actual`, while
+`first_forecast` rows are `forecast`; another combination is a data-contract
+error, not an unvalidated extra row. Every input row is validated: a blank,
+`TBD` or `PENDING` period is an input error and cannot disappear before the
+partition check. Period, period type, actual/forecast state
+and currency form a stable period identity: every segment or elimination row
+must resolve to exactly one consolidated parent with that identity. Every
+member must resolve its declared `partition_dimension` to exactly one explicit,
+non-placeholder member-ID field. The existing reported-segment view maps
+`reported_operating_segment` to `reported_segment`; the normalized economics
+view maps `normalized_economic_branch` to `normalized_segment`; every other
+dimension uses the general `partition_member_id` field. There is no fallback
+to whichever alias happens to be populated. Uniqueness and error display use
+only that resolved member ID, so changing `row_type`, another alias or another
+descriptive field cannot create a second member. A full-partition member also
+has a numeric revenue value.
+A consolidated-only first forecast remains valid; an orphan
+forecast member, unnamed segment or unnamed elimination cannot disappear from
+the sum. A
+disclosed top-customer table or an overlapping product/geography view is a
+cross-check, not a 100% decomposition.
+The runtime recomputes the signed member residual; a typed zero or a green
+status cannot substitute for the member values.  For a numeric consolidated
+actual, `segment_reconciliation_status=not_applicable` is a narrow exception
+only when the period has no segment or elimination partition rows.  Once such
+numeric rows exist, use `reconciled` or `single_segment` and recompute their
+signed sum, or use `disclosure_limited` with a company-specific reason and cap
+readiness at `screen-grade`.  A partial Top-N customer disclosure remains a
+non-exhaustive cross-check under the limited route; it is not forced to 100%.
+Use one marked `latest_actual` row so the forecast bridge has an unambiguous
+starting point.
 
-```
-L0 历史基座   Historical base: 3 FY + latest interim, segment-level actuals
-L1 终端需求锚 Terminal-demand anchors: external, monitorable series
-L2 驱动树     Driver tree: revenue = Σ segments; each leaf = volume × price
-L3 单位经济   Unit economics: price - unit cost = unit profit, per leaf
-L4 三表联动   Three-statement integration: opex, tax, WC, capex, cash
-L5 情景分布   Scenarios/distribution on the MAIN LINE variables only
-L6 监测因子表 Monitoring table: every anchor mapped to a trackable series
-```
+Preserve reported segment totals and build explicit bridges for recasts,
+acquisitions, disposals, FX, accounting-policy changes and share-count changes.
+Every period states its perimeter and accounting bridge; `none_no_change` is a
+valid finding, while `bridged` requires both a substantive explanation and a
+metric-level `reported + comparability_delta = comparable` reconciliation for
+revenue, cost, gross profit, operating profit and GAAP net income attributable.
+If that adjustment cannot be quantified, use the limited route; narrative alone
+does not create comparability. Do not manufacture zeroes for an undisclosed line. Use the typed
+`disclosure_limited` state, state the company-specific reason and cap readiness
+at `screen-grade`. Use `not_applicable` with a reason when no interim period has
+yet ended since the annual filing; that calendar fact does not by itself lower
+readiness. Keep a latest-interim status row in either case so absence is
+auditable rather than silently omitted.
 
-## L0 - The historical base comes first
+Forecast columns continue to the right of history using the same definitions.
+The first forecast period must name the marked latest-actual period and show
+numeric deltas for revenue, cost, gross profit, operating profit and GAAP net
+income attributable. Those deltas reconcile latest actual plus change to the
+first forecast and map to named causal driver nodes; a prose CAGR is not a
+bridge. A new business may lack its own history, but its addressable demand,
+capacity, qualification, unit economics and capital needs still require a
+historical or externally measured base.
 
-Before forecasting anything, rebuild the company's OWN disclosed history at
-segment level: revenue, yoy, % of total, segment cost, segment gross margin
-for at least 3 fiscal years plus the latest interim period. The forecast
-columns continue this table to the right - history and forecast share rows,
-units, and definitions. If the segment table cannot be rebuilt from filings,
-say so explicitly and mark the affected branch `ratio_carry` (see L2).
+## From causal graph to arithmetic tree
 
-Hard rule: the first forecast year must reconcile against the most recent
-actual (base = last reported FY / LTM). No forecast line may exist without
-its historical row.
+For each material branch record:
 
-## L1 - Terminal-demand anchors
+- stable branch and causal-node IDs;
+- reported segment and analytical subsegment;
+- customer, product, geography and revenue-recognizing unit where material;
+- equation primitive and variable definitions;
+- units, price basis, period and accounting-recognition basis;
+- dated evidence, analyst assumptions and named uncertainty state;
+- upstream demand and supply constraints;
+- canonical revenue, cost and operating-profit output nodes plus downstream
+  handoff mappings;
+- monitor and falsification condition.
 
-Each major branch of the tree hangs from an EXTERNAL, monitorable series -
-not from the company's own guidance alone. Examples: global iPhone units ×
-ASP (IDC), hyperscaler capex, WFE spend, NAND bit demand, EV deliveries.
-Record for every anchor: source, frequency (quarterly preferred), latest
-value, and the transmission link into the company line (share %, content per
-unit, attach rate). These anchors feed the monitoring table (L6) and the
-forward-evidence SignalCards.
+The consolidated tree must identify one primary full partition and reconcile:
 
-## L2 - The driver tree
+Total revenue = sum of segment and subsegment revenue + eliminations
 
-```
-Total revenue
-├── Segment A (customer × product line)     basis: volume_price
-│     volume → ASP → revenue → unit cost → segment GM
-├── Segment B                               basis: subscriber_economics
-│     subscribers → ARPU → revenue → contribution margin
-├── Segment C (disclosure-limited)          basis: ratio_carry
-│     % of total + yoy continuation, flagged as weak
-└── New business main line (主线)            basis: capacity_ramp
-      capacity → shipments → ASP → revenue  (built from ramp, not from history)
-```
+Segment revenue sum must equal total revenue under the shared equation numeric
+tolerance contract, and the model should normally tie exactly.  There is no
+fixed percentage-of-revenue allowance.  A larger allowance for reported
+rounding must come from the financial facts' declared precision/scale and be
+represented in an explicit signed reconciliation row; it cannot be chosen by
+the analyst. Historical comparability, revenue-cost-gross-profit and
+latest-actual-to-forecast identities use the same contract. Other useful views
+may be partial or overlapping, but they remain
+labeled cross-checks and are never added to the primary tree.
+Make this routing decision in `product_customer_driver_schedule.csv` before
+model execution: primary rows carry the full-partition declaration, while a
+non-exhaustive or overlapping row is labeled `cross_check`.
 
-Rules:
+## General leaf equations
 
-- Leaves must sum: Σ segment revenue = total revenue (tolerance 1%).
-- Every leaf declares its `basis` - the decomposition template used:
-  `volume_price` | `capacity_ramp` | `subscriber_economics` |
-  `usage_economics` | `orders_backlog` | `program_conversion` |
-  `ratio_carry` | `other` (explain).
-- `ratio_carry` (占比+同比延续) is allowed ONLY when disclosure genuinely
-  prevents a volume/price split, and must be labeled as such - it is a
-  weakness declaration, not a modeling choice.
-- Mechanism modules map to bases: unit-volume-price-cost → volume_price;
-  capacity-utilization-yield → capacity_ramp; recurring-contract-revenue /
-  subscriber-content-economics → subscriber_economics; platform-usage-adoption
-  → usage_economics; orders-backlog-recognition → orders_backlog;
-  program-stage-conversion → program_conversion. One company uses several
-  bases at once - one per branch, chosen by the router's selection questions.
+Choose equations by economic unit and constraint, not company label. Common
+leaves include:
 
-## L2b - The main line (主线) is explicit
+- units × net ASP;
+- end-market units × supplier share × content × price;
+- capacity × utilization × yield × price, capped by demand;
+- order cohorts × survival × delivery × acceptance × price;
+- average installed base × attach × service price;
+- beginning contract stock − churn + expansion + new stock, followed by
+  contract-cohort recognition;
+- workloads × usage × effective price;
+- average subscribers × ARPU;
+- organic + acquired − disposed + FX and recast bridges.
 
-Every model declares 1-2 main-line drivers: the branches that carry the
-thesis (e.g. "AI CCL capacity ramp", "HBM bit share gain"). Requirements:
+Full definitions are in references/equation-primitives.md. Modules provide
+specialized implementation detail for these equations. They do not vote on the
+answer.
 
-- The main line is modeled bottom-up from capacity/orders/design-wins - not
-  extrapolated from its own (often tiny) history.
-- The main line carries the strongest evidence in the pack: capacity numbers,
-  signed orders, customer qualification status - E0/E1 where possible.
-- The red team MUST attack the main line first; an unchallenged main line is
-  an automatic P1.
-- Scenario spread (L5) is driven primarily by main-line outcomes, not by
-  uniform haircuts on everything.
+## Main line and thesis compression
 
-## L2c - The forecast must bottom out in a physical unit
+Declare the smallest causally sufficient set of thesis carriers: causal paths
+whose perturbation explains most of the change in revenue and operating profit.
+One or
+two is common, but no numeric cap may hide a genuinely material path. Each
+carrier must:
 
-Every main-line branch terminates in a **physical or contractual unit** that
-exists outside the model: bits shipped, wafers, tools, units, subscribers,
-workloads, tonnes, licensed seats. Revenue = unit × price. A branch whose
-deepest level is a growth rate is not modeled - it is asserted.
+1. begin with observable evidence or an explicit analyst assumption;
+2. terminate in a physical, contractual or usage unit;
+3. pass through price and cost into a canonical operating-profit output;
+4. state sign, lag, rival explanation and falsification condition;
+5. show reference-path and material rival-state values for the named variables;
+6. report sensitivity of revenue and operating profit, then expose the named
+   output nodes so the financial capability can extend the chain.
 
-Calibration example (Goldman, SNDK): the entire revenue build is two rows -
-`NAND GB shipped` and `ASP per 1GB-equivalent` - and the forecast's whole
-claim is that ASP moves ~5x while bits grow modestly. Two numbers carry the
-report. That is the standard of compression to aim for.
+The red team attacks the main line first. Uniform percentage haircuts to the
+whole model are not scenarios.
 
-## L2d - Thesis compression: name the numbers that carry the call
+## Demand, supply, price and cost stay separate
 
-The model must identify the **1-3 quantities whose variation dominates the
-outcome**, state them in the report's opening, and show a sensitivity around
-each (typically ±1 standard case step). Requirements:
+For each branch build, where material:
 
-- Each carrier is a driver, never an output: "FY+2 NAND ASP $/GB", not
-  "FY+2 EPS".
-- Show what the carrier must do for the Bear / Base / Bull cases to hold.
-- If no small set of carriers dominates, the thesis is diffuse - say so
-  explicitly; a diffuse thesis is a legitimate finding, a hidden one is not.
+- external end demand or usage;
+- sell-through, sell-in and channel inventory;
+- addressable scope, customer share and supplier share;
+- nameplate capacity, qualified capacity, utilization and yield;
+- orders, cancellations, delivery and acceptance;
+- gross and net price, mix, rebates and contract protection;
+- materials, conversion, fixed-cost absorption, warranty and logistics;
+- recognized revenue and the timing facts or state changes that downstream
+  accounting may need.
 
-This is the operational meaning of "logic, not scoring": a reader should be
-able to disagree with the forecast by disagreeing with a specific number.
+A platform deployment is not a supplier order. A design selection is not
+qualified production. Backlog is not recognized revenue. Shipment is not
+acceptance. Revenue is not cash.
 
-## L3 - Unit economics (量价成本五件套)
+## Unit economics
 
-For every manufacturing leaf, model the five-line unit table:
-capacity → volume → price → unit cost → unit profit (and its margin).
-Price and unit cost move for stated reasons (mix, pass-through BOM, yield,
-utilization) - never as unexplained percentages. Subscription leaves use the
-equivalent: subscribers → ARPU → gross adds/churn → contribution.
+Manufacturing branches ordinarily show:
 
-## L4 - Three-statement integration
+capacity → saleable volume → net price → unit cost → unit gross profit.
 
-Segment gross profits roll up; opex lines are forecast by driver (headcount,
-% of revenue with stated operating leverage), then tax, minority interest,
-working capital (by DSO/DIO/DPO days), capex/depreciation, and cash.
+Recurring or usage branches use an economically equivalent state bridge. Price
+and unit cost move only through named drivers. Gross margin is calculated from
+the branch schedules; it is not independently forecast and then forced to agree.
 
-FY+1 is modeled **quarterly** where the company reports quarterly; the annual
-column is the sum of quarters. Every forecast line carries qoq / yoy / % of
-revenue diagnostic rows, and the statements must tie through explicit Check
-rows (balance sheet balances, cash-flow ending cash equals balance-sheet
-cash, quarters sum to the year, GAAP↔Non-GAAP bridge sums).
+When alternative constructions estimate the same economic output, group them
+before execution.  Every path compiles to one declared canonical output node;
+one and only one is selected for the run, its output reaches operating profit
+exactly once, and all unselected paths remain non-executing cross-checks.  For
+example, an all-in observed hosting-cost path and a decomposed serve/capacity/
+support path must both output the same hosting-cost node rather than leaving one
+path outside the operating-profit equation.
 
-Full requirements: `references/model-mechanical-integrity.md`. That file is
-not optional - a model that does not tie is not a model.
+## Ratio-carry fallback
 
-## L5 - Scenarios and distribution
+ratio_carry is permitted only when disclosure genuinely prevents a causal
+decomposition. It must record:
 
-Bear/Base/Bull differ by NAMED main-line assumptions (e.g. Bull: AI CCL
-ships 5,000t at 48万/t; Bear: qualification slips two quarters) - not by
-±X% on the total. FY+3 is expressed as a distribution (p10/p50/p90) whose
-width comes from main-line dispersion plus cycle state.
+- the missing variable and attempted sources;
+- the ratio carried and historical stability;
+- sensitivity range and revenue/operating-profit impact;
+- why the branch is not a thesis carrier;
+- monitoring trigger and readiness limitation.
 
-## L6 - The monitoring table (核心驱动表)
+Ratio carry is an explicit uncertainty state, not a professional preference.
 
-The deliverable includes a monitoring table: every L1 anchor and main-line
-assumption mapped to {series, source, frequency, current value, trigger
-level, action if breached}. This is the operational form of breakpoints -
-a forecast whose drivers cannot be monitored cannot be maintained.
+## Downstream handoff, not downstream execution
 
-## No assigned weights anywhere in the method
+The operating model ends after revenue, branch cost and operating profit close.
+It exports the canonical nodes, their evidence bindings, the relevant timing or
+stock-state mappings, and any material named rival to the financial capability
+and coordinator.  It does not roll tax, cash, debt, shares or the three
+statements; assign scenario probabilities; model competitive fade; or value the
+equity.  Those are distinct capability contracts and should not be copied into
+an operating answer merely because their inputs begin here.
 
-`mechanism_weights` was the first offender; assumption `materiality_weight`
-was the second. The rule is general: **importance is never a number someone
-assigns - it is a derivative someone computes.**
+Map each material carrier to its earliest observable monitor.  A causal shock
+proposal is conditional: include it only when requested, when it changes the
+requested profit distribution materially, or when it distinguishes the named
+rival.  Otherwise the compact executable operating path is the complete output.
 
-- Which mechanism matters? The one whose branch carries the revenue - visible
-  in the driver tree's arithmetic, not in a weight vector.
-- Which assumption matters? The one whose perturbation moves the output -
-  measured via `test_delta` and its impact, not via a 0-1 weight.
-- Which evidence matters? The one attached to a material driver parameter -
-  traced through the transmission chain, not scored.
+## No assigned weights
 
-Descriptive tags on SignalCards (specificity, causal proximity, falsifiability,
-incentive bias) are exactly that - tags for reading and filtering. They are
-never summed into a composite signal score. If a reviewer ever needs to ask
-"where did that number come from", the answer must be an arithmetic path, not
-a scoring rubric.
-
-## What replaced mechanism weights
-
-`mechanism_weights` (sum-to-1) is retired as a modeling concept. It made the
-method look like factor scoring. The snapshot now carries:
-
-```json
-"driver_tree": {
-  "main_line": "AI CCL capacity ramp",
-  "segments": [
-    {"name": "覆铜板-传统", "basis": "volume_price",  "revenue_point": 23100, "main_line": false},
-    {"name": "覆铜板-AI",   "basis": "capacity_ramp", "revenue_point": 2500,  "main_line": true}
-  ]
-}
-```
-
-Σ segments.revenue_point must equal outputs.year_1.revenue_point within 1%.
-`mechanism_weights` may still appear as optional legacy metadata; it is no
-longer validated or interpreted.
+mechanism_weights and manual materiality weights are retired. Importance is
+measured first by perturbing an input and tracing the effect on revenue and
+operating profit; downstream capabilities may extend that same path to NOPAT,
+FCF and value. Evidence properties help review a claim but are not added into
+a truth score. The answer to where a number came from must be a reversible
+evidence-and-equation path.

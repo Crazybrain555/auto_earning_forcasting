@@ -1,5 +1,6 @@
 {
-  "as_of": "2026-07-18T00:00:00Z",
+  "schema_version": "3.0",
+  "as_of": "2026-07-20T00:00:00Z",
   "entity": "Example Corp",
   "security": "EXAMPLE",
   "timezone": "UTC",
@@ -7,16 +8,37 @@
     {
       "source_id": "REPLACE_FILING",
       "source_type": "filing",
+      "origin_record_kind": "entity_primary_disclosure",
+      "epistemic_class": "official_reported_fact",
       "publisher": "REPLACE",
+      "authors": [
+        "REPLACE_ORIGINATING_TEAM"
+      ],
+      "root_original_source_id": "REPLACE_FILING",
+      "derived_from_source_id": null,
+      "common_origin": false,
+      "independence_cluster": "REPLACE_ROOT_CLUSTER",
+      "measurement_method_id": "REPLACE_MEASUREMENT_METHOD",
       "published_at": "2026-01-01T00:00:00Z",
-      "retrieved_at": "2026-07-18T00:00:00Z",
+      "retrieved_at": "2026-07-20T00:00:00Z",
       "period_scope": "REPLACE",
-      "evidence_tier": "E0",
       "content_hash": "sha256:REPLACE",
       "location": "REPLACE",
+      "authority": "audited_filing",
+      "independence": "first_party",
+      "directness": "direct",
+      "role": "historical_fact",
+      "scope_match": {
+        "entity": true,
+        "product": false,
+        "geography": true,
+        "period": true,
+        "unit": true
+      },
+      "evidence_tier": "E0",
       "claim_or_fact": "REPLACE",
-      "allowed_use": "historical/base anchor",
-      "limitations": "",
+      "allowed_use": "historical_anchor",
+      "limitations": [],
       "document_depth": "full_document",
       "word_count": 0,
       "anchor_count": 0,
@@ -27,8 +49,7 @@
       "page_or_section_anchors": [],
       "event_at": null,
       "version_at": "2026-01-01T00:00:00Z",
-      "source_time_status": "eligible_pre_cutoff",
-      "forecast_permission": "eligible"
+      "available_at": "2026-01-01T00:00:00Z"
     }
   ],
   "conflicts": [],

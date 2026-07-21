@@ -1,13 +1,15 @@
 {
-  "protocol_version": "2.1",
-  "metrics": {
-    "required_coverage": {"minimum": 0.8},
-    "activation_accuracy": {"minimum": 1.0},
-    "direction_accuracy": {"minimum": 0.8},
-    "state_accuracy": {"minimum": 0.7, "allow_unavailable": false},
-    "mean_abs_timing_error_periods": {"maximum": 1.0, "allow_unavailable": true},
-    "magnitude_band_coverage": {"minimum": 0.7, "allow_unavailable": true},
-    "financial_line_accuracy": {"minimum": 1.0},
-    "cash_classification_accuracy": {"minimum": 1.0, "allow_unavailable": true}
-  }
+  "protocol_version": "3.0",
+  "purpose": "diagnostic_vector_only",
+  "dimensions": [
+    "required_coverage",
+    "activation_accuracy",
+    "direction_accuracy",
+    "state_accuracy",
+    "mean_abs_timing_error_periods",
+    "magnitude_band_coverage",
+    "financial_line_accuracy",
+    "cash_classification_accuracy"
+  ],
+  "decision_rule": "No threshold, weighted score, PASS/PARTIAL/FAIL label or single metric authorizes a method change. Preserve the vector and row-level misses for independent causal attribution."
 }

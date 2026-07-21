@@ -4,12 +4,8 @@
   "type": "object",
   "additionalProperties": true,
   "required": [
-    "model_version",
-    "benchmark_id",
-    "generated_at",
     "metrics",
-    "gate_results",
-    "limitations"
+    "legacy_threshold_diagnostics"
   ],
   "properties": {
     "model_version": {
@@ -25,8 +21,14 @@
     "metrics": {
       "type": "object"
     },
-    "gate_results": {
-      "type": "object"
+    "legacy_threshold_diagnostics": {
+      "type": "object",
+      "required": ["artifact", "diagnostic_only", "promotion_authority"],
+      "properties": {
+        "artifact": {"const": "diagnostics.json"},
+        "diagnostic_only": {"const": true},
+        "promotion_authority": {"const": "none"}
+      }
     },
     "limitations": {
       "type": "array",

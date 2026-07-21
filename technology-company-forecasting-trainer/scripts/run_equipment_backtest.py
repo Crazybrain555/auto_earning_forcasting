@@ -4,6 +4,8 @@ import argparse,csv,json
 from pathlib import Path
 from datetime import datetime,timezone
 
+from legacy_backtest_diagnostics import write_legacy_backtest_diagnostics
+
 REV61=[.10,.18,.25]; PB61=[.04,.07,.10]
 REV62={'wafer-fab-equipment':[.08,.15,.22],'process-control':[.08,.14,.20]}
 PB62={'wafer-fab-equipment':[.035,.06,.085],'process-control':[.03,.05,.075]}
@@ -55,19 +57,18 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--benchmark',type=Path,required=True);p.add_argument('--cases',type=Path,required=True);p.add_argument('--output-dir',type=Path,required=True);a=p.parse_args();a.output_dir.mkdir(parents=True,exist_ok=True)
     rows,cases=load(a.benchmark,a.cases);details=calculate(rows,cases);metrics={}
     for split in ('calibration','holdout'):metrics[split]={v:aggregate(details,split,v) for v in ('v61','v62')}
-    old=metrics['holdout']['v61'];new=metrics['holdout']['v62'];gates={
+    old=metrics['holdout']['v61'];new=metrics['holdout']['v62'];threshold_observations={
     'revenue_mape_le_10pct':new['revenue_mape']<=.10,'profit_margin_mae_le_5pp':new['profit_margin_mae_pp']<=5,
     'direction_ge_85pct':new['revenue_direction_accuracy']>=.85,'profit_sign_ge_90pct':new['profit_sign_accuracy']>=.90,
     'revenue_interval_score_improves_30pct':1-new['revenue_interval_score']/old['revenue_interval_score']>=.30,
     'profit_interval_score_improves_30pct':1-new['profit_interval_score']/old['profit_interval_score']>=.30}
-    result={'model_version':'ai-hardware-forecasting-v6.2','generated_at':datetime.now(timezone.utc).isoformat(),'metrics':metrics,'gate_results':gates,
+    result={'model_version':'ai-hardware-forecasting-v6.2','generated_at':datetime.now(timezone.utc).isoformat(),'metrics':metrics,
     'limitations':['Retrospective point-in-time simulation, not pre-registered live performance.','Small equipment/process-control sample remains vulnerable to hindsight bias.']}
-    (a.output_dir/'metrics.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    write_legacy_backtest_diagnostics(a.output_dir, result, threshold_observations)
     fields=[]
     for d in details:
         for k in d:
             if k not in fields:fields.append(k)
     with (a.output_dir/'detail.csv').open('w',encoding='utf-8-sig',newline='') as f:w=csv.DictWriter(f,fieldnames=fields);w.writeheader();w.writerows(details)
     print(json.dumps(result,ensure_ascii=False,indent=2))
-    if not all(gates.values()):raise SystemExit(2)
 if __name__=='__main__':main()

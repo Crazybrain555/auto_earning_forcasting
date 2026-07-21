@@ -1,5 +1,7 @@
 import subprocess,sys,unittest
+import pytest
 from pathlib import Path
+pytestmark = pytest.mark.diagnostic_benchmark
 ROOT=Path(__file__).resolve().parents[1]
 class RegressionTest(unittest.TestCase):
     def test_locked_legacy(self):

@@ -1,0 +1,17 @@
+{
+  "skill_name": "company-operating-modeling",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "根据已经验收的证据包，为一家DRAM/NAND厂商搭经营驱动模型。要求处理库存周期、供给纪律、bit shipment、ASP、单位成本和HBM产能爬坡，并给出一个真正不同的反方机制。不要做三表和估值。",
+      "expected_output": "A parsimonious stock-flow causal model with separate demand, supply, price, mix and cost paths; explicit lags and commercialization gates; evidence bindings; a rival; and requests for unidentifiable inputs.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "用同一套通用方法给企业软件公司建经营模型，已有证据只有客户数、NRR、合同负债、用量和托管成本。不要套用芯片行业lens，也不要做打分。",
+      "expected_output": "A company-specific recurring/usage equation system selected from general primitives, with no sector-scorecard routing and no double counting between customers, usage and deferred revenue; every mutually exclusive all-in/decomposed cost construction compiles to one canonical cost node, exactly one path executes into operating profit, and financial statements, share rolls and scenario probabilities stay downstream.",
+      "files": []
+    }
+  ]
+}

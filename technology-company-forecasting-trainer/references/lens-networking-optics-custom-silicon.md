@@ -51,7 +51,12 @@ GAAP operating income = adjusted program economics - acquired amortization - inv
 
 ## Regime tail
 
-A convex AI branch needs at least two independent E0/E1 signals: production award/material revenue, customer deployment acceleration, capacity commitment, reported optical/custom growth, or multiple programs/customers.
+A convex AI branch needs proposition-appropriate evidence whose independent
+measurement roots discriminate it from the serious rival: production
+award/material revenue, customer deployment acceleration, capacity commitment,
+reported optical/custom growth, or multiple programs/customers may be useful.
+No fixed signal count or E-label is itself permission to move the branch into
+Base.
 
 # Semiconductor materials and optics playbook
 
