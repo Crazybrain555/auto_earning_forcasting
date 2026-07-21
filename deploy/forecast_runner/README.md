@@ -153,9 +153,14 @@ python3 deploy/forecast_runner/render_units.py \
    sudo systemctl enable --now forecast-replica-backup.timer
    ```
 
-2. **本地每日异地副本**：操作机用 launchd/cron 定时运行 `deploy/forecast_runner/pull_and_prune.sh`
-   （内部调用 `pull_replica.sh --apply`），本地保留最近 `FORECAST_REPLICA_KEEP`（默认 14）个快照，
-   永不删除 `replica/current` 指向的快照。
+2. **本地异地副本（手动触发）**：在副本模式仪表盘（`PORT=8792 backend/run-replica.sh`）点
+   "拉取最新"，或手动运行 `deploy/forecast_runner/pull_and_prune.sh`（内部调用
+   `pull_replica.sh --apply`，带跨进程锁，同一时刻只允许一次拉取）。本地保留最近
+   `FORECAST_REPLICA_KEEP`（默认 14）个快照，永不删除 `replica/current` 指向的快照。
+   曾经的每日自动拉取 launchd 任务已停用（`~/Library/LaunchAgents/
+   com.yuye.forecast-replica-pull.plist.disabled`，想恢复自动拉取改回文件名并
+   `launchctl bootstrap` 即可）。提醒阶梯：副本超过 36 小时时仪表盘变黄提示拉取，
+   超过 50 小时时看门狗发 macOS 通知。
 
 3. **看门狗**：`deploy/forecast_runner/watchdog.py --site-url <站点URL> --replica-current <项目>/replica/current --notify`
    检查桥心跳、快照新鲜度与本地副本年龄，失败时非零退出并在 macOS 弹出通知；建议每 30 分钟一次。

@@ -10,11 +10,12 @@ from typing import Literal
 
 from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import control, curriculum, data, jobs, method, quotes, state
+from . import control, curriculum, data, jobs, method, quotes, replica, state
 from .config import CONFIG
 
 app = FastAPI(title="Technology Company Forecasting Backend", version="0.1.0")
@@ -26,6 +27,13 @@ app.add_middleware(
     allow_origins=[f"http://{h}:{p}" for h in ("localhost", "127.0.0.1") for p in (8787, 8791)],
     allow_methods=["*"],
     allow_headers=["*"],
+)
+# DNS rebinding makes an attacker page same-origin with 127.0.0.1, sidestepping
+# both CORS and the X-Dashboard header guard; rejecting foreign Host headers
+# closes that for every endpoint. "testserver" keeps FastAPI TestClient usable.
+app.add_middleware(
+    TrustedHostMiddleware,
+    allowed_hosts=["localhost", "127.0.0.1", "testserver"],
 )
 
 
@@ -83,6 +91,8 @@ def index():
             "POST /api/control",
             "GET  /api/jobs",
             "POST /api/jobs",
+            "GET  /api/replica",
+            "POST /api/replica/pull",
             "GET  /api/jobs/{job_id}",
             "GET  /api/jobs/{job_id}/log",
             "POST /api/jobs/{job_id}/stop",
@@ -278,6 +288,23 @@ def set_control(req: ControlRequest):
         raise HTTPException(422, str(exc))
 
 
+@app.get("/api/replica")
+def replica_status():
+    """Replica identity and pull state. mode=false on the runner and the Site."""
+    return replica.status()
+
+
+@app.post("/api/replica/pull", **MUTATING)
+def replica_pull():
+    """Pull a fresh production replica. All guards live in replica.start_pull."""
+    try:
+        return replica.start_pull()
+    except RuntimeError as exc:          # busy: pull in flight, or a job is running
+        raise HTTPException(409, str(exc))
+    except (PermissionError, FileNotFoundError) as exc:
+        raise HTTPException(404, str(exc))
+
+
 @app.get("/api/jobs")
 def all_jobs():
     return jobs.list_jobs()
@@ -292,6 +319,8 @@ def create_job(req: JobRequest, x_idempotency_key: str | None = Header(None)):
             req.params,
             idempotency_key=x_idempotency_key or "",
         )
+    except RuntimeError as exc:          # replica pull in progress
+        raise HTTPException(409, str(exc))
     except PermissionError as exc:
         raise HTTPException(501, str(exc))
     except ValueError as exc:
@@ -450,7 +479,7 @@ def dashboard_index():
     plain refresh always picks up edits while unchanged files still cache.
     """
     html = (WEBAPP_DIR / "index.html").read_text(encoding="utf-8")
-    for name in ("style.css", "app.js"):
+    for name in ("style.css", "app.js", "replica-controls.js"):
         html = html.replace(f'"{name}"', f'"{name}?v={_asset_version(name)}"')
     return HTMLResponse(html)
 

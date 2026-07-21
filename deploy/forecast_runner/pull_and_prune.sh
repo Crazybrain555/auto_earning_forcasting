@@ -14,6 +14,26 @@ if [[ ! "$keep_count" =~ ^[0-9]+$ ]] || (( keep_count < 1 )); then
   exit 2
 fi
 
+# One pull at a time, across the dashboard, cron, and manual shells alike.
+# mkdir is the portable atomic lock (macOS has no flock); a lock whose recorded
+# pid is dead is stale (e.g. the backend was killed mid-pull) and is taken over.
+lock_dir="$project_root/replica/.pull.lock"
+mkdir -p "$project_root/replica"
+if ! mkdir "$lock_dir" 2>/dev/null; then
+  holder="$(cat "$lock_dir/pid" 2>/dev/null || true)"
+  if [[ -n "$holder" ]] && kill -0 "$holder" 2>/dev/null; then
+    echo "another pull is already running (pid $holder)" >&2
+    exit 3
+  fi
+  rm -rf "$lock_dir"
+  if ! mkdir "$lock_dir" 2>/dev/null; then
+    echo "another pull grabbed the lock first" >&2
+    exit 3
+  fi
+fi
+printf '%s\n' "$$" > "$lock_dir/pid"
+trap 'rm -rf "$lock_dir"' EXIT HUP INT TERM
+
 "$script_dir/pull_replica.sh" --apply
 
 snapshots_dir="$project_root/replica/snapshots"

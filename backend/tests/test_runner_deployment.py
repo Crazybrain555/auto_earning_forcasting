@@ -300,8 +300,11 @@ class RunnerServiceAssetTests(unittest.TestCase):
                 clear=False,
             ):
                 loaded = module.load_config()
-            self.assertEqual(loaded["runs_root"], str(runs.resolve()))
-            self.assertEqual(loaded["jobs_dir"], str(jobs.resolve()))
+            # abspath, not resolve(): replica overrides must keep the
+            # replica/current symlink so a pull is visible without a restart
+            # (see test_replica_mode.ReplicaPathResolutionTests).
+            self.assertEqual(loaded["runs_root"], os.path.abspath(runs))
+            self.assertEqual(loaded["jobs_dir"], os.path.abspath(jobs))
 
         db_source = (ROOT / "backend" / "app" / "db.py").read_text(encoding="utf-8")
         self.assertIn("FORECAST_DB_PATH", db_source)

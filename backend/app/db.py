@@ -25,10 +25,14 @@ from pathlib import Path
 
 from .config import CONFIG
 
-DB_PATH = Path(
-    os.environ.get("FORECAST_DB_PATH")
-    or Path(CONFIG.get("_config_path", ".")).parent / "state" / "forecast.db"
-).resolve()
+_DB_OVERRIDE = os.environ.get("FORECAST_DB_PATH")
+DB_PATH = (
+    # Keep the replica/current symlink intact so a pull swaps the database for
+    # the next connection; every query opens its own connection (see _connect).
+    Path(os.path.abspath(os.path.expanduser(_DB_OVERRIDE)))
+    if _DB_OVERRIDE
+    else (Path(CONFIG.get("_config_path", ".")).parent / "state" / "forecast.db").resolve()
+)
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 _LOCK = threading.Lock()

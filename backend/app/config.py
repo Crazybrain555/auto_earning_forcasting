@@ -13,6 +13,17 @@ BACKEND_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_CONFIG_PATH = BACKEND_DIR / "config.json"
 
 
+def _absolute_keeping_links(value: str) -> Path:
+    """Absolute path without resolving symlinks.
+
+    Replica overrides point through replica/current, a symlink that a pull
+    re-points at a new snapshot. Resolving it here would pin the process to one
+    snapshot, so a pull would not show up until the backend restarted — and the
+    snapshot it kept reading could later be pruned.
+    """
+    return Path(os.path.abspath(os.path.expanduser(value)))
+
+
 def load_config() -> dict:
     path = Path(os.environ.get("FORECAST_BACKEND_CONFIG", DEFAULT_CONFIG_PATH)).resolve()
     cfg = json.loads(path.read_text(encoding="utf-8"))
@@ -22,16 +33,20 @@ def load_config() -> dict:
     cfg["project_root"] = str(project_root)
     runs_override = os.environ.get("FORECAST_RUNS_ROOT")
     cfg["runs_root"] = str(
-        Path(runs_override).resolve()
+        _absolute_keeping_links(runs_override)
         if runs_override
         else (project_root / cfg.get("runs_root", "training-runs")).resolve()
     )
     cfg["skills_repo"] = str((project_root / cfg.get("skills_repo", ".claude/skills")).resolve())
     jobs_override = os.environ.get("FORECAST_JOBS_DIR")
-    jobs_dir = Path(jobs_override) if jobs_override else Path(cfg.get("jobs_dir", "jobs"))
-    if not jobs_dir.is_absolute():
-        jobs_dir = path.parent / jobs_dir
-    cfg["jobs_dir"] = str(jobs_dir.resolve())
+    if jobs_override:
+        cfg["jobs_dir"] = str(_absolute_keeping_links(jobs_override))
+    else:
+        jobs_dir = Path(cfg.get("jobs_dir", "jobs"))
+        if not jobs_dir.is_absolute():
+            jobs_dir = path.parent / jobs_dir
+        cfg["jobs_dir"] = str(jobs_dir.resolve())
+    cfg["replica_mode"] = os.environ.get("FORECAST_REPLICA_MODE") == "1"
     return cfg
 
 

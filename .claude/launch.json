@@ -6,6 +6,12 @@
       "runtimeExecutable": "sh",
       "runtimeArgs": ["backend/run.sh"],
       "port": 8787
+    },
+    {
+      "name": "forecast-replica",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "PORT=8792 backend/run-replica.sh"],
+      "port": 8792
     }
   ]
 }

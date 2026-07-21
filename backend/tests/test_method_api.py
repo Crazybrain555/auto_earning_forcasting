@@ -35,7 +35,8 @@ def get(path: str, params: dict[str, str] | None = None):
         "path": path,
         "raw_path": path.encode(),
         "query_string": urlencode(params or {}).encode(),
-        "headers": [],
+        # Real clients always send Host; TrustedHostMiddleware rejects without it.
+        "headers": [(b"host", b"127.0.0.1")],
         "client": ("test-client", 1234),
         "server": ("test-server", 80),
         "root_path": "",

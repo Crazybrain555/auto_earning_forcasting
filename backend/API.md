@@ -60,11 +60,18 @@ The backend is read-only over case data; its only writes are
   - `type: "live_forecast"` — params `{entity, security?, as_of?, extra?}`; workspace `training-runs/live/<security>@<as_of>/`. Here `as_of` names the snapshot/workspace only: production research uses all current evidence available through bundle freeze.
   - `type: "training_case"` — params `{entity, security?, as_of, round_id, case_role: development|validation|regression, extra?}`. Historical training alone treats `as_of` as an evidence cutoff and seals before retrieving Actuals.
   - `type: "training_round"` — params `{round_id, group_a:[{entity, security?, as_of}...], group_b:[...], extra?}` — a case-selected autonomous round. Each group must contain at least one case; identities must be unique within and across groups. Omit both groups to load the saved round plan. "Stop" = POST pause + stop the job.
-  - Errors: 422 bad params, 501 only when the selected engine is disabled in deployment configuration.
+  - Errors: 422 bad params; 409 while a replica pull is in progress (retry after it
+    finishes) or when runner capacity is full; 501 when the selected engine is
+    disabled or not logged in on this runner.
 - `GET /api/jobs` — newest-first job records `{id, type, engine, params, pid, status: running|finished|failed|stopped|running_detached|interrupted, started_at, ended_at, returncode}`.
 - `GET /api/jobs/{id}` — one record.
 - `GET /api/jobs/{id}/log?tail=200` — `text/plain` log tail (poll this for live progress). Add `safe=1` for remote synchronization: the backend removes the exact stored prompt prefix and fails closed if it cannot verify that boundary.
 - `POST /api/jobs/{id}/stop` — SIGTERM the process group.
+
+## Replica (local mirror mode only)
+
+- `GET /api/replica` — `{mode, snapshot:{snapshot_id, created_at, root_commit, site_commit}|null, pulling, started_at, finished_at, error}`. `mode` is true only when the backend was started by `backend/run-replica.sh`; the production runner and the hosted Site always report `mode: false`.
+- `POST /api/replica/pull` — start a background pull of a fresh verified production replica (`deploy/forecast_runner/pull_and_prune.sh`), then poll `GET /api/replica` until `pulling` clears. Errors: 409 when a pull is already running or a job is running (pull and job launch are mutually exclusive so data is never swapped under a running agent); 404 outside replica mode or when the backend is pinned to one snapshot via `FORECAST_REPLICA_CURRENT`.
 
 ## Watchlist & portfolio (投资看板)
 

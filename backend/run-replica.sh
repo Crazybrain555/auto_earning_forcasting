@@ -12,6 +12,7 @@ if [ ! -d "$replica_current/training-runs" ] || \
   exit 1
 fi
 
+export FORECAST_REPLICA_MODE=1
 export FORECAST_RUNS_ROOT="$replica_current/training-runs"
 export FORECAST_JOBS_DIR="$replica_current/backend/jobs"
 export FORECAST_DB_PATH="$replica_current/backend/state/forecast.db"

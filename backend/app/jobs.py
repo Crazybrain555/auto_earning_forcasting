@@ -9,6 +9,7 @@ import os
 import secrets
 import signal
 import shutil
+import socket
 import subprocess
 import sys
 import threading
@@ -25,6 +26,8 @@ RUNS_ROOT = Path(CONFIG["runs_root"])
 
 _LOCK = threading.Lock()
 _PROCS: dict[str, subprocess.Popen] = {}
+
+HOSTNAME = socket.gethostname()
 
 JOB_TYPES = {"live_forecast", "training_case", "training_round", "plan_round", "suggest_watch"}
 ROUND_ID_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,63}")
@@ -264,7 +267,21 @@ def _managed_running_count() -> int:
     return sum(1 for proc in _PROCS.values() if proc.poll() is None)
 
 
+def _foreign(record: dict) -> bool:
+    """True for job records this machine must never signal or reconcile.
+
+    A replica pull copies the production runner's job records here; their pids
+    belong to the runner's pid space, so probing or killing them would hit
+    unrelated local processes. Only enforced in replica mode: legacy local
+    records predate the host field and stay fully owned in normal mode.
+    """
+    if not CONFIG.get("replica_mode"):
+        return False
+    return record.get("host") != HOSTNAME
+
+
 def start_job(job_type: str, engine: str, params: dict, idempotency_key: str = "") -> dict:
+    from . import replica
     if job_type not in JOB_TYPES:
         raise ValueError(f"job type must be one of {sorted(JOB_TYPES)}")
     spec = engines().get(engine)
@@ -288,6 +305,10 @@ def start_job(job_type: str, engine: str, params: dict, idempotency_key: str = "
         if token:
             env.setdefault("CLAUDE_CODE_OAUTH_TOKEN", token)
     with _LOCK:
+        # Same lock replica.start_pull holds while arming a pull, so a job can
+        # never spawn while a pull swaps replica/current (and vice versa).
+        if replica.is_pulling():
+            raise RuntimeError("a replica pull is in progress; start the job after it finishes")
         if idempotency_key:
             existing = _find_idempotent_job(idempotency_key)
             if existing is not None:
@@ -322,6 +343,7 @@ def start_job(job_type: str, engine: str, params: dict, idempotency_key: str = "
             "id": job_id,
             "type": job_type,
             "engine": engine,
+            "host": HOSTNAME,
             "params": normalized,
             "prompt": prompt,
             "pid": proc.pid,
@@ -388,6 +410,10 @@ def stop_job(job_id: str) -> dict | None:
     record = _load(job_id)
     if record is None:
         return None
+    if _foreign(record):
+        raise PermissionError(
+            "this job record came from the production runner; it cannot be stopped from the replica"
+        )
     with _LOCK:
         proc = _PROCS.get(job_id)
     if proc is not None and proc.poll() is None:
@@ -450,6 +476,8 @@ def _refresh(record: dict) -> dict:
     status = record.get("status")
     if status not in {"running", "running_detached"} or record["id"] in _PROCS:
         return record
+    if _foreign(record):
+        return record  # production pids mean nothing here; show what the pull captured
     pid = record.get("pid")
     alive = False
     if pid:
