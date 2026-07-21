@@ -13,10 +13,15 @@
       gap:10px;padding:8px 12px;border-radius:10px;font:500 12px/1.4 "IBM Plex Mono",ui-monospace,monospace;
       background:var(--panel,#faf9f6);color:var(--ink,#14161a);
       border:1px solid var(--line,#e7e7e2);box-shadow:0 6px 20px rgba(20,22,26,.12);max-width:min(92vw,460px)}
-    #replica-bar.rb-min{padding:5px 6px;gap:0;box-shadow:0 3px 10px rgba(20,22,26,.10)}
-    #replica-bar.rb-min .rb-text,#replica-bar.rb-min button{display:none}
-    #replica-bar .rb-tag{padding:2px 7px;border:0;border-radius:999px;background:var(--accent,#2f6fde);
-      color:#fff;font:inherit;font-weight:600;letter-spacing:.02em;white-space:nowrap;cursor:pointer;user-select:none}
+    /* 收起态:外层不画任何东西,可见的每个像素都是按钮本身(没有点不中的死区) */
+    #replica-bar.rb-min{padding:0;gap:0;background:transparent;border:0;box-shadow:none}
+    #replica-bar.rb-min .rb-text,#replica-bar.rb-min button:not(.rb-tag){display:none}
+    #replica-bar.rb-min .rb-tag{padding:9px 15px;font-size:13px;box-shadow:0 3px 12px rgba(20,22,26,.22)}
+    #replica-bar .rb-tag{padding:5px 10px;border:0;border-radius:999px;background:var(--accent,#2f6fde);
+      color:#fff;font:inherit;font-weight:600;letter-spacing:.02em;white-space:nowrap;cursor:pointer;
+      user-select:none;transition:filter .12s ease}
+    #replica-bar .rb-tag:hover{filter:brightness(1.12)}
+    #replica-bar .rb-tag:focus-visible{outline:2px solid var(--ink,#14161a);outline-offset:2px}
     #replica-bar .rb-tag.rb-warn-bg{background:var(--warning,#9a6b00)}
     #replica-bar .rb-tag.rb-err-bg{background:var(--critical,#b3261e)}
     #replica-bar .rb-text{color:var(--soft,#4a4d54);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -74,16 +79,26 @@
     tag = el("button", "rb-tag"); tag.type = "button"; tag.textContent = "副本";
     tag.title = "点击展开 / 收起";
     tag.setAttribute("aria-label", "副本状态栏:展开或收起");
-    tag.onclick = () => {
-      collapsed = !collapsed;
-      localStorage.setItem(COLLAPSE_KEY, collapsed ? "1" : "0");
-      if (lastState) render(lastState);
-    };
+    tag.onclick = toggleCollapsed;
     text = el("span", "rb-text");
     button = el("button"); button.type = "button"; button.textContent = "拉取最新";
     button.onclick = onPull;
     bar.append(tag, text, button);
+    // 收起态下点容器任何位置都展开:即便将来外层又有了内边距,也不会出现死区
+    bar.onclick = event => {
+      if (collapsed && event.target !== tag && event.target !== button) toggleCollapsed();
+    };
     document.body.append(bar);
+  }
+
+  function toggleCollapsed() {
+    collapsed = !collapsed;
+    try {
+      localStorage.setItem(COLLAPSE_KEY, collapsed ? "1" : "0");
+    } catch {
+      /* 隐私模式下 localStorage 可能抛错;不能因此吞掉这次展开 */
+    }
+    if (lastState) render(lastState);
   }
 
   function render(state) {
