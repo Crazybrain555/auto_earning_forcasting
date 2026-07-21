@@ -12,6 +12,7 @@ import copy
 import csv
 import datetime as dt
 import json
+import re
 import shutil
 from pathlib import Path
 
@@ -534,31 +535,88 @@ def delete_round(round_id: str) -> str | None:
     return _trash_move(round_dir)
 
 
-def save_round_plan(round_id: str, group_a: list, group_b: list, notes: str, base_commit: str) -> dict:
-    import re
-    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,63}", round_id or ""):
-        raise ValueError("round_id must be alphanumeric/dash/underscore")
-    def norm(group, role):
-        out = []
+def _round_case_key(item: dict) -> str | None:
+    """Return the stable case identity used by plans and runners."""
+    if not isinstance(item, dict):
+        return None
+    entity = str(item.get("entity", "")).strip()
+    security = str(item.get("security", "") or entity).strip().upper()
+    as_of = str(item.get("as_of", "")).strip()
+    if not entity or not security or not as_of:
+        return None
+    return f"{security}@{as_of}"
+
+
+def normalize_round_groups(group_a: list, group_b: list, existing: dict | None = None) -> tuple[list, list]:
+    """Normalize one case-selected development/validation split.
+
+    Group size is intentionally not a quality proxy: each side needs evidence,
+    while uniqueness protects holdout independence. When a planned round is
+    edited, case-level diagnostics and curriculum metadata survive unchanged.
+    """
+    if not isinstance(group_a, list) or not isinstance(group_b, list):
+        raise ValueError("group_a and group_b must be lists")
+    if not group_a or not group_b:
+        raise ValueError("a round needs at least one development and at least one validation case")
+
+    prior_by_case: dict[str, dict] = {}
+    if isinstance(existing, dict):
+        for group_name in ("group_a", "group_b"):
+            prior_group = existing.get(group_name)
+            if not isinstance(prior_group, list):
+                continue
+            for item in prior_group:
+                key = _round_case_key(item)
+                if key:
+                    prior_by_case[key] = copy.deepcopy(item)
+
+    def normalize(group: list, role: str) -> list:
+        normalized = []
+        seen: set[str] = set()
         for item in group:
+            if not isinstance(item, dict):
+                raise ValueError(f"each {role} case must be an object")
             entity = str(item.get("entity", "")).strip()
             security = str(item.get("security", "") or entity).strip().upper()
             as_of = str(item.get("as_of", "")).strip()
-            if not entity or not as_of:
+            if not entity or not security or not as_of:
                 raise ValueError(f"each {role} case needs entity and as_of")
-            out.append({"entity": entity, "security": security, "as_of": as_of,
-                        "case_id": f"{security}@{as_of}", "role": role})
-        return out
-    plan_a, plan_b = norm(group_a, "development"), norm(group_b, "validation")
-    if len(plan_a) != 2 or len(plan_b) != 2:
-        raise ValueError(f"a round is 2 training + 2 validation companies (got {len(plan_a)}+{len(plan_b)})")
+            case_id = f"{security}@{as_of}"
+            if case_id in seen:
+                raise ValueError(f"duplicate case {case_id} in the {role} group")
+            seen.add(case_id)
+            merged = {
+                **prior_by_case.get(case_id, {}),
+                **copy.deepcopy(item),
+                "entity": entity,
+                "security": security,
+                "as_of": as_of,
+                "case_id": case_id,
+                "role": role,
+            }
+            normalized.append(merged)
+        return normalized
+
+    plan_a = normalize(group_a, "development")
+    plan_b = normalize(group_b, "validation")
+    overlap = {item["case_id"] for item in plan_a} & {item["case_id"] for item in plan_b}
+    if overlap:
+        case_id = sorted(overlap)[0]
+        raise ValueError(f"case {case_id} cannot appear in both development and validation groups")
+    return plan_a, plan_b
+
+
+def save_round_plan(round_id: str, group_a: list, group_b: list, notes: str, base_commit: str) -> dict:
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,63}", round_id or ""):
+        raise ValueError("round_id must be alphanumeric/dash/underscore")
     if round_id in RESERVED_ROUNDS:
         raise ValueError("'live' is reserved for live forecasts")
     round_dir = RUNS_ROOT / round_id
-    round_dir.mkdir(parents=True, exist_ok=True)
     existing = read_json(round_dir / "round.json") or {}
     if existing.get("status") not in (None, "planned", "abandoned"):
         raise ValueError(f"round {round_id} is '{existing.get('status')}'; only planned/abandoned rounds can be re-planned")
+    plan_a, plan_b = normalize_round_groups(group_a, group_b, existing)
+    round_dir.mkdir(parents=True, exist_ok=True)
     plan = {
         **existing,
         "round_id": round_id,
