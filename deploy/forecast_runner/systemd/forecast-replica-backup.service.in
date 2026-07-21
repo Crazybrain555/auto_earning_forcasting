@@ -1,0 +1,18 @@
+[Unit]
+Description=Forecast Ops scheduled replica bundle
+# sqlite .backup keeps the bundle consistent even while the backend is running.
+After=forecast-ops-backend.service
+
+[Service]
+Type=oneshot
+User=@RUNNER_USER@
+Group=@RUNNER_USER@
+UMask=0077
+Nice=10
+IOSchedulingClass=idle
+Environment=HOME=@RUNNER_ROOT@/home
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=@RUNNER_ROOT@
+ExecStart=@RUNNER_ROOT@/deploy/forecast_runner/scheduled_backup.sh @RUNNER_ROOT@

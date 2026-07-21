@@ -14,6 +14,11 @@ class _FakeProcess:
         return 0
 
 
+class _RunningProcess:
+    def poll(self):
+        return None
+
+
 def _prepare(monkeypatch, tmp_path):
     launches = []
     monkeypatch.setattr(jobs, "JOBS_DIR", tmp_path)
@@ -77,3 +82,19 @@ def test_job_start_rejects_unsafe_idempotency_key(monkeypatch, tmp_path, key):
     with pytest.raises(ValueError, match="Idempotency-Key"):
         jobs.start_job("live_forecast", "codex", {"entity": "Micron", "security": "MU"}, idempotency_key=key)
     assert launches == []
+
+
+def test_job_start_refuses_to_exceed_runner_concurrency(monkeypatch, tmp_path):
+    launches = _prepare(monkeypatch, tmp_path)
+    monkeypatch.setitem(jobs.CONFIG, "max_concurrent_jobs", 1)
+    jobs._PROCS["already-running"] = _RunningProcess()
+
+    with pytest.raises(PermissionError, match="capacity"):
+        jobs.start_job(
+            "live_forecast",
+            "codex",
+            {"entity": "Micron", "security": "MU"},
+        )
+
+    assert launches == []
+    jobs._PROCS.clear()

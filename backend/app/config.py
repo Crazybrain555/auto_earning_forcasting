@@ -20,9 +20,15 @@ def load_config() -> dict:
 
     project_root = (path.parent / cfg.get("project_root", "..")).resolve()
     cfg["project_root"] = str(project_root)
-    cfg["runs_root"] = str((project_root / cfg.get("runs_root", "training-runs")).resolve())
+    runs_override = os.environ.get("FORECAST_RUNS_ROOT")
+    cfg["runs_root"] = str(
+        Path(runs_override).resolve()
+        if runs_override
+        else (project_root / cfg.get("runs_root", "training-runs")).resolve()
+    )
     cfg["skills_repo"] = str((project_root / cfg.get("skills_repo", ".claude/skills")).resolve())
-    jobs_dir = Path(cfg.get("jobs_dir", "jobs"))
+    jobs_override = os.environ.get("FORECAST_JOBS_DIR")
+    jobs_dir = Path(jobs_override) if jobs_override else Path(cfg.get("jobs_dir", "jobs"))
     if not jobs_dir.is_absolute():
         jobs_dir = path.parent / jobs_dir
     cfg["jobs_dir"] = str(jobs_dir.resolve())

@@ -17,6 +17,7 @@ from __future__ import annotations
 import datetime as dt
 import hashlib
 import json
+import os
 import sqlite3
 import threading
 import time
@@ -24,7 +25,10 @@ from pathlib import Path
 
 from .config import CONFIG
 
-DB_PATH = Path(CONFIG.get("_config_path", ".")).parent / "state" / "forecast.db"
+DB_PATH = Path(
+    os.environ.get("FORECAST_DB_PATH")
+    or Path(CONFIG.get("_config_path", ".")).parent / "state" / "forecast.db"
+).resolve()
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 _LOCK = threading.Lock()

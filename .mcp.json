@@ -4,7 +4,7 @@
       "type": "stdio",
       "command": "/bin/bash",
       "args": [
-        "/Users/yuye/programs/quant/AI_stock_framework/scripts/mcp/edgartools.sh"
+        "scripts/mcp/edgartools.sh"
       ],
       "env": {
         "EDGAR_IDENTITY": "${EDGAR_IDENTITY:-}"
@@ -14,8 +14,18 @@
       "type": "stdio",
       "command": "/bin/bash",
       "args": [
-        "/Users/yuye/programs/quant/AI_stock_framework/scripts/mcp/arxiv.sh"
+        "scripts/mcp/arxiv.sh"
       ]
+    },
+    "youtube-transcript": {
+      "type": "stdio",
+      "command": "/bin/bash",
+      "args": [
+        "scripts/mcp/youtube-transcript.sh"
+      ],
+      "env": {
+        "YOUTUBE_COOKIES_FROM_BROWSER": "${YOUTUBE_COOKIES_FROM_BROWSER:-}"
+      }
     }
   }
 }

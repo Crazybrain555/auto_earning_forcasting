@@ -8,11 +8,14 @@ import re
 import os
 import secrets
 import signal
+import shutil
 import subprocess
+import sys
 import threading
 from pathlib import Path
 
 from .config import CONFIG
+from . import data as run_data
 from . import state as ui_state
 
 JOBS_DIR = Path(CONFIG["jobs_dir"])
@@ -47,14 +50,35 @@ def engines() -> dict:
     return CONFIG.get("engines", {})
 
 
+def _claude_login_missing() -> bool:
+    # macOS keeps Claude Code credentials in the keychain; Linux runners expose
+    # login state only as this file, so its absence means jobs cannot start.
+    if sys.platform == "darwin":
+        return False
+    return not (Path.home() / ".claude" / ".credentials.json").is_file()
+
+
 def engine_status() -> list[dict]:
-    return [
-        {"engine": name, "available": bool(spec.get("available")), "note": spec.get("note", ""),
-         "default_model": spec.get("default_model"), "models": spec.get("models") or []}
-        # CONTRACT (user requirement): BOTH engines stay listed - the dashboard
-        # offers claude and codex side by side. Do not filter to one engine.
-        for name, spec in engines().items()
-    ]
+    status = []
+    for name, spec in engines().items():
+        command = str((spec.get("cmd") or [name])[0])
+        installed = bool(shutil.which(command))
+        configured = bool(spec.get("available"))
+        note = spec.get("note", "")
+        if configured and not installed:
+            note = f"{command} is not installed on this runner."
+        available = configured and installed
+        if available and name == "claude" and _claude_login_missing():
+            available = False
+            note = "claude is not logged in on this runner (run: claude setup-token)."
+        status.append({
+            "engine": name,
+            "available": available,
+            "note": note,
+            "default_model": spec.get("default_model"),
+            "models": spec.get("models") or [],
+        })
+    return status
 
 
 def _record_path(job_id: str) -> Path:
@@ -108,15 +132,26 @@ def build_prompt(job_type: str, params: dict) -> tuple[str, dict]:
         case_id = f"{security}@{as_of}"
     elif job_type == "training_round":
         round_id = _check_round_id(params.get("round_id"), required=True)
-        # groups may come inline or from a saved round plan (round.json)
-        if not params.get("group_a") or not params.get("group_b"):
+        # Groups come either fully inline or from the saved round plan. The
+        # shared normalizer is the single contract for planner and runner.
+        saved_plan = None
+        if "group_a" not in params and "group_b" not in params:
             plan_path = RUNS_ROOT / round_id / "round.json"
-            if plan_path.is_file():
-                plan = json.loads(plan_path.read_text(encoding="utf-8"))
-                params = {**params, "group_a": plan.get("group_a"), "group_b": plan.get("group_b")}
-        for group in ("group_a", "group_b"):
-            if not isinstance(params.get(group), list) or len(params[group]) != 2:
-                raise ValueError(f"params.{group} must have exactly 2 companies (2+2 round; inline or in the round plan)")
+            if not plan_path.is_file():
+                raise ValueError("params.group_a and params.group_b are required inline or in the saved round plan")
+            try:
+                saved_plan = json.loads(plan_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as exc:
+                raise ValueError(f"saved round plan is unreadable: {exc}") from exc
+            params = {
+                **params,
+                "group_a": saved_plan.get("group_a"),
+                "group_b": saved_plan.get("group_b"),
+            }
+        plan_a, plan_b = run_data.normalize_round_groups(
+            params.get("group_a"), params.get("group_b"), saved_plan
+        )
+        params = {**params, "group_a": plan_a, "group_b": plan_b}
         as_of, case_id, case_role = "", "", ""
     elif job_type == "suggest_watch":  # assistant: recommend watchlist candidates, no forecasting
         round_id, as_of, case_id, case_role = "", "", "", ""
@@ -203,6 +238,17 @@ def _find_idempotent_job(key: str) -> dict | None:
     return None
 
 
+def _concurrency_limit() -> int:
+    try:
+        return max(1, int(CONFIG.get("max_concurrent_jobs", 1)))
+    except (TypeError, ValueError):
+        return 1
+
+
+def _managed_running_count() -> int:
+    return sum(1 for proc in _PROCS.values() if proc.poll() is None)
+
+
 def start_job(job_type: str, engine: str, params: dict, idempotency_key: str = "") -> dict:
     if job_type not in JOB_TYPES:
         raise ValueError(f"job type must be one of {sorted(JOB_TYPES)}")
@@ -229,6 +275,9 @@ def start_job(job_type: str, engine: str, params: dict, idempotency_key: str = "
                 if existing.get("idempotency_fingerprint") != fingerprint:
                     raise ValueError("Idempotency-Key was already used for a different job request")
                 return existing
+
+        if _managed_running_count() >= _concurrency_limit():
+            raise PermissionError("runner capacity is full; wait for the active job to finish")
 
         job_id = dt.datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + secrets.token_hex(2)
         log_handle = _log_path(job_id).open("w", encoding="utf-8")

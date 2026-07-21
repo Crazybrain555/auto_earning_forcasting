@@ -55,11 +55,11 @@ The backend is read-only over case data; its only writes are
 
 ## Jobs (launch agent runs)
 
-- `GET /api/engines` — `[{engine: "claude", available: true}, {engine: "codex", available: true, note, models, default_model, default_effort}]` in the local dual-engine deployment. Render availability from the response rather than hard-coding an engine policy.
+- `GET /api/engines` — `[{engine: "claude", available: true}, {engine: "codex", available: true, note, models, default_model, default_effort}]` in local and hosted dual-engine deployments. An engine is available only when enabled and its executable is present; render availability from the response rather than hard-coding a policy.
 - `POST /api/jobs` — body `{"type", "engine": "claude"|"codex", "params": {...}}` → 201 job record. Optional `X-Idempotency-Key` (8–128 safe characters) replays the original record instead of launching a second process.
-  - `type: "live_forecast"` — params `{entity, security?, as_of?, extra?}`; workspace `training-runs/live/<security>@<as_of>/`.
-  - `type: "training_case"` — params `{entity, security?, as_of, round_id, case_role: development|validation|regression, extra?}`.
-  - `type: "training_round"` — params `{round_id, group_a:[{entity, security?, as_of}...], group_b:[...], extra?}` — the full autonomous round (this is the "start auto-optimization" button; "stop" = POST pause + stop the job).
+  - `type: "live_forecast"` — params `{entity, security?, as_of?, extra?}`; workspace `training-runs/live/<security>@<as_of>/`. Here `as_of` names the snapshot/workspace only: production research uses all current evidence available through bundle freeze.
+  - `type: "training_case"` — params `{entity, security?, as_of, round_id, case_role: development|validation|regression, extra?}`. Historical training alone treats `as_of` as an evidence cutoff and seals before retrieving Actuals.
+  - `type: "training_round"` — params `{round_id, group_a:[{entity, security?, as_of}...], group_b:[...], extra?}` — a case-selected autonomous round. Each group must contain at least one case; identities must be unique within and across groups. Omit both groups to load the saved round plan. "Stop" = POST pause + stop the job.
   - Errors: 422 bad params, 501 only when the selected engine is disabled in deployment configuration.
 - `GET /api/jobs` — newest-first job records `{id, type, engine, params, pid, status: running|finished|failed|stopped|running_detached|interrupted, started_at, ended_at, returncode}`.
 - `GET /api/jobs/{id}` — one record.
@@ -74,10 +74,10 @@ The backend is read-only over case data; its only writes are
 
 ## Curriculum & round plans (自训练)
 
-- `GET /api/curriculum` — trainer skill's bundled plan: `[{wave, pairs:[{pair_id, cases:[{company, security, proposed_as_of, role, mechanism, case_key}]}]}]`. A default round = two pairs (2 development -> Group A, 2 holdouts -> Group B).
-- `POST /api/rounds` `{round_id, group_a[], group_b[], notes?}` — save/update a round plan (writes `round.json`, status `planned`); group entries need `entity` + `as_of` (+`security`).
+- `GET /api/curriculum` — trainer skill's candidate library: `[{wave, pairs:[{pair_id, cases:[{company, security, proposed_as_of, role, mechanism, case_key}]}]}]`. Planners select the smallest sufficient development/untouched-validation set for the named failure hypothesis; curriculum pairing is context, not a fixed quota.
+- `POST /api/rounds` `{round_id, group_a[], group_b[], notes?}` — save/update a case-selected round plan (writes `round.json`, status `planned`). Group entries need `entity` + `as_of` (+`security`); each group needs at least one case and case identities must be unique within/across groups. Re-planning preserves unrelated top-level fields and retained cases' extension fields.
 - `DELETE /api/rounds/{round_id}` / `DELETE /api/cases/{round_id}/{case_id}` — soft delete: moves into `training-runs/_trash/` (recoverable by hand).
-- Job type `plan_round` (POST /api/jobs) — an agent reads the curriculum + past rounds and writes the next planned round.json itself.
+- Job type `plan_round` (POST /api/jobs) — an agent reads the curriculum + past rounds and writes the next case-selected `round.json`, including its failure hypothesis, rival explanations and stopping rule.
 - Job type `training_round` now accepts `params:{round_id}` alone — groups load from the saved round plan.
 - `DELETE /api/jobs/{job_id}` — remove a finished job record+log (409 while running).
 

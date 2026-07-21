@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily Forecast Ops replica bundle
+
+[Timer]
+OnCalendar=*-*-* 19:00:00 UTC
+RandomizedDelaySec=900
+Persistent=true
+
+[Install]
+WantedBy=timers.target

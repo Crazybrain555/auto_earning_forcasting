@@ -1,0 +1,32 @@
+[Unit]
+Description=Forecast Ops Sites command bridge
+After=network-online.target
+After=forecast-ops-backend.service
+Wants=network-online.target
+Requires=forecast-ops-backend.service
+
+[Service]
+Type=simple
+User=@RUNNER_USER@
+Group=@RUNNER_USER@
+WorkingDirectory=@RUNNER_ROOT@/sites/forecast-ops-console
+EnvironmentFile=@BRIDGE_ENV_FILE@
+Environment=HOME=@RUNNER_ROOT@/home
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/node scripts/bridge-local.mjs
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=45s
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadOnlyPaths=@RUNNER_ROOT@
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target
