@@ -25,6 +25,7 @@ backend/jobs/
 backend/state/*.db
 backend/state/*.db-*
 backend/state/watch_suggestions.json
+backend/state/watchlist.json
 replica/
 
 # Local junk
