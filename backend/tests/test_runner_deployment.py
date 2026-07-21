@@ -128,6 +128,7 @@ class RunnerServiceAssetTests(unittest.TestCase):
             "dist",
             "auth.json",
             ".claude/settings.local.json",
+            ".claude/agents",
             ".git/sg-hook*",
             "pkcs11.txt",
             "validator_stderr.txt",

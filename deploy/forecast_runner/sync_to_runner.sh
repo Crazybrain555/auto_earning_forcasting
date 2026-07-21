@@ -53,6 +53,9 @@ rsync_args=(
   --exclude=/backend/jobs
   --exclude=/backend/state
   --exclude=.claude/settings.local.json
+  # Local agent experiments must never reach production implicitly; the
+  # runner's agent surface stays git-controlled (currently: none).
+  --exclude=.claude/agents
   "--exclude=.git/sg-hook*"
   "--exclude=*/__pycache__"
   "--exclude=*.pyc"

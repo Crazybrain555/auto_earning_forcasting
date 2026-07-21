@@ -17,6 +17,9 @@
         "json"
       ],
       "note": "Headless Claude Code. Skills auto-load from .claude/skills; project CLAUDE.md supplies the operating notes. Tighten --permission-mode to acceptEdits if full autonomy is not wanted.",
+      "env": {
+        "CLAUDE_CODE_SUBAGENT_MODEL": "opus"
+      },
       "default_model": "opus",
       "model_args": [
         "--model",
@@ -27,6 +30,17 @@
         "{effort}"
       ],
       "models": [
+        {
+          "id": "claude-fable-5",
+          "label": "Fable 5 · 最强(Mythos 级)",
+          "efforts": [
+            "low",
+            "medium",
+            "high",
+            "max"
+          ],
+          "default_effort": "high"
+        },
         {
           "id": "opus",
           "label": "Opus 4.8 · 旗舰推理",

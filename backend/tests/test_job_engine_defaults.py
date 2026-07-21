@@ -51,10 +51,38 @@ def test_compose_cmd_explicit_model_and_effort_override_engine_defaults(
     assert cmd[prompt_index - 4 : prompt_index] == model_args + effort_args
 
 
+def test_claude_jobs_force_subagents_to_opus_mechanically():
+    """The planning model (Fable/Opus per job) may vary, but execution
+    subagents always run Opus via CLAUDE_CODE_SUBAGENT_MODEL — the top of the
+    official subagent model resolution order. Injected per-engine through
+    spec.env so the Mac backend and the AWS runner behave identically, with
+    no routing prose reaching forecast prompts."""
+    assert jobs.engines()["claude"]["env"]["CLAUDE_CODE_SUBAGENT_MODEL"] == "opus"
+    codex_env = jobs.engines()["codex"].get("env") or {}
+    assert "CLAUDE_CODE_SUBAGENT_MODEL" not in codex_env
+
+
+def test_claude_engine_offers_fable_with_the_cli_recognized_id():
+    """The dashboard can pick Fable for forecasts. The CLI only accepts the
+    full model id (the `fable` alias is rejected), so the registry id must be
+    `claude-fable-5` and compose_cmd must pass it through verbatim."""
+    spec = jobs.engines()["claude"]
+    ids = [m["id"] for m in spec["models"]]
+    assert "claude-fable-5" in ids
+    assert "fable" not in ids  # alias is not CLI-recognized; guard against a regression
+
+    cmd = jobs.compose_cmd(spec, "forecast prompt", {"model": "claude-fable-5"})
+    prompt_index = cmd.index("forecast prompt")
+    assert cmd[prompt_index - 4 : prompt_index] == [
+        "--model", "claude-fable-5", "--effort", "high",
+    ]
+
+
 @pytest.mark.parametrize(
     ("engine", "model", "expected_effort_args"),
     [
         ("claude", "sonnet", ["--effort", "high"]),
+        ("claude", "claude-fable-5", ["--effort", "high"]),
         ("codex", "gpt-5.6-terra", ["-c", 'model_reasoning_effort="high"']),
     ],
 )
