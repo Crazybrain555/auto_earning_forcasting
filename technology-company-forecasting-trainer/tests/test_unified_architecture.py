@@ -22,7 +22,7 @@ COORDINATOR_SKILLS = {
 }
 GENERAL_CORE = {
     "analysis-kernel.md",
-    "causal-modeling-kernel.md",
+    "accounting-diagnosis.md",
     "equation-primitives.md",
     "industry-economics-and-cycle.md",
     "technology-commercialization-and-ip.md",

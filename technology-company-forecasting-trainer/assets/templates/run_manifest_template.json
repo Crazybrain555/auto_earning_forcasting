@@ -1,6 +1,6 @@
 {
   "contract_version": "2.0",
-  "method_version": "10.0.0+git:UNSET",
+  "method_version": "11.0.0+git:UNSET",
   "run_id": "run://technology/EXAMPLE/20260720/v2",
   "entity": "EXAMPLE",
   "security": "EXAMPLE",
@@ -11,7 +11,9 @@
   "currency": "USD",
   "accounting_basis": {
     "forecast_basis_id": "REPLACE",
-    "historical_basis_ids": ["REPLACE"],
+    "historical_basis_ids": [
+      "REPLACE"
+    ],
     "bases": [
       {
         "basis_id": "REPLACE",
@@ -25,41 +27,69 @@
             "policy_id": "REPLACE",
             "policy_area": "REPLACE",
             "choice": "REPLACE",
-            "source_ids": ["REPLACE"]
+            "source_ids": [
+              "REPLACE"
+            ]
           }
         ]
       }
     ],
     "comparability_bridges": []
   },
-  "horizons": {"quarterly_year_1": true, "annual_years": 5, "long_term": true},
+  "horizons": {
+    "quarterly_year_1": true,
+    "annual_years": 5,
+    "long_term": true
+  },
   "intended_decision": "research, valuation and capital-allocation decision",
   "analysis_primitives": [],
   "materiality_routes": {},
   "optional_calibration_packs": [],
   "readiness_target": "research-grade",
   "required_artifacts": [
-    "run_manifest.json", "mode_config.json", "source_manifest.json",
-    "assumption_register.csv", "claim_ledger.jsonl", "data_series_register.csv",
+    "run_manifest.json",
+    "mode_config.json",
+    "source_manifest.json",
+    "assumption_register.csv",
+    "claim_ledger.jsonl",
+    "data_series_register.csv",
     "financial_fact_ledger.csv",
-    "source_independence_map.csv", "research_coverage_matrix.csv",
-    "forward_signal_cards.csv", "research_quality_review.json",
-    "historical_segment_bridge.csv", "company_quality_moat_register.csv",
-    "product_customer_driver_schedule.csv", "material_assumption_support.csv",
+    "source_independence_map.csv",
+    "research_coverage_matrix.csv",
+    "forward_signal_cards.csv",
+    "research_quality_review.json",
+    "historical_segment_bridge.csv",
+    "company_quality_moat_register.csv",
+    "product_customer_driver_schedule.csv",
+    "material_assumption_support.csv",
     "industry_profit_pool.csv",
-    "model_graph.json", "scenario_set.json", "model_checks.json",
-    "driver_monitoring.csv", "earnings_power_bridge.csv", "red_team.md",
-    "forecast_snapshot.json", "report.md", "delivery_quality_rubric.json",
-    "model/model.xlsx", "research_completeness.json",
+    "model_graph.json",
+    "scenario_set.json",
+    "model_checks.json",
+    "driver_monitoring.csv",
+    "earnings_power_bridge.csv",
+    "red_team.md",
+    "forecast_snapshot.json",
+    "report.md",
+    "delivery_quality_rubric.json",
+    "model/model.xlsx",
+    "research_completeness.json",
     "delivery_validation.json",
     "forecast_seal.json"
   ],
   "phase_status": {
-    "decision_contract": "pending", "evidence_system": "pending",
-    "causal_graph": "pending", "operating_model": "pending",
-    "integrated_statements": "pending", "value_creation": "pending",
-    "valuation": "pending", "scenarios_and_red_team": "pending",
-    "validation_and_readiness": "pending", "publish_monitor_version": "pending"
+    "decision_contract": "pending",
+    "evidence_system": "pending",
+    "accounting_diagnosis": "pending",
+    "historical_statements": "pending",
+    "causal_graph": "pending",
+    "operating_model": "pending",
+    "integrated_statements": "pending",
+    "value_creation": "pending",
+    "valuation": "pending",
+    "scenarios_and_red_team": "pending",
+    "validation_and_readiness": "pending",
+    "publish_monitor_version": "pending"
   },
   "human_required": [],
   "validation_results": {},
@@ -71,10 +101,15 @@
     "scope_type": null,
     "scope_description": null,
     "materiality_test": {
-      "affected_metric": null, "unit": null, "baseline_value": null,
-      "perturbation_name": null, "perturbation_value": null,
-      "perturbed_value": null, "impact_value": null,
-      "decision_threshold": null, "result": null
+      "affected_metric": null,
+      "unit": null,
+      "baseline_value": null,
+      "perturbation_name": null,
+      "perturbation_value": null,
+      "perturbed_value": null,
+      "impact_value": null,
+      "decision_threshold": null,
+      "result": null
     },
     "affected_statement_links": [],
     "blocked_full_company_conclusions": [],
@@ -85,7 +120,7 @@
   "run_mode": "live_forecast",
   "artifact_profile": "live",
   "time_boundary_enforced": false,
-  "baseline_skill_version": "10.0.0",
+  "baseline_skill_version": "11.0.0",
   "training_iteration_id": null,
   "training_pair_id": null,
   "training_case_role": null

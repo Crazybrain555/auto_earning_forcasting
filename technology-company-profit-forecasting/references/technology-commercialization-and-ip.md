@@ -1,14 +1,20 @@
 # Technology Commercialization and IP
 
-Treat science, engineering, manufacturing, qualification, commercial adoption,
-accounting revenue and cash as distinct gates. A strong technology claim can
-fail economically at any later gate.
-
-Route this reference only when technology/IP is explicitly requested, a
+This file is an optional cross-validation input for the `operating_model` and
+`causal_graph` stages. A technology, science or IP judgment enters the forecast
+only by changing the value or a named scenario of a specific financial driver —
+the "From technology to the financial model" gate below — and must rest on
+evidence an independent reviewer can re-check; it never independently constitutes
+a conclusion, and the value-investing view of normalized earning power owns the
+answer. Route this reference only when technology/IP is explicitly requested, a
 technology claim is material to the requested revenue or operating-profit
 output, or the gates distinguish a named rival. Otherwise omit the gate
 register; do not make a non-technology or immaterial branch complete a generic
 technology checklist.
+
+Treat science, engineering, manufacturing, qualification, commercial adoption,
+accounting revenue and cash as distinct gates. A strong technology claim can
+fail economically at any later gate.
 
 ## Independent gates
 

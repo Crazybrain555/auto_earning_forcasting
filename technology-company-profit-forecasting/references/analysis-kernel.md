@@ -7,19 +7,25 @@ module names and familiar ratios are aids; none may replace the causal chain.
 
 Every conclusion must be traceable in both directions through:
 
-dated evidence → causal DAG → operating equations → integrated three
-statements → ROIC, reinvestment and fade → valuation and reverse-implied
-expectations → red team → monitoring.
+dated evidence → accounting credibility diagnosis → reconstructed statement
+skeleton (operating/financing split, closed by construction) → statement-line
+decomposition into typed drivers → driver equations → integrated three
+statements → normalized earning power, reinvestment and fade → valuation and
+reverse-implied expectations → red team → monitoring.
 
 Forward tracing asks what a fact changes in the model. Reverse tracing starts
-from value per share or a key forecast and walks back to the evidence and
-assumptions that caused it. A link that cannot be traversed is an unresolved
-model risk, not an invitation to fill a cell with an analyst plug.
+from value per share or a key forecast and walks back through the statement
+line to the evidence and assumptions that caused it. A link that cannot be
+traversed is an unresolved model risk, not an invitation to fill a cell with
+an analyst plug.
 
 ## Typed causal graph
 
-Represent the company as a directed acyclic graph unrolled through time. Each
-node records:
+The graph is rooted in the reconstructed statements: its target nodes are the
+statement lines the case ranked material, and construction proceeds by
+decomposing those lines downward into drivers - not by drafting a narrative
+and then searching for lines to attach it to. Represent the company as a
+directed acyclic graph unrolled through time. Each node records:
 
 - stable node ID, entity and segment;
 - node type: observed fact, derived fact, analyst assumption, state,
@@ -37,6 +43,7 @@ Each edge records:
 - evidence permission;
 - falsification condition.
 
+<!-- canonical: reported_profit_chain -->
 Financial nodes use statement roles, not the generic label `profit`.  Every
 full-company main line contains typed nodes for `revenue`,
 `operating_profit`, `pretax_profit`, `tax_expense`,
@@ -102,11 +109,12 @@ Inside each scenario, arithmetic and accounting remain deterministic.
 Use the only canonical stage order in `references/research-sop.md` and
 `assets/method_system.json`.  This document defines the reasoning spine, not a
 second workflow.  In particular, do not begin with a forecast template: close
-`decision_contract` and historical reconstruction inside `evidence_system`,
-then progress through `causal_graph`, `operating_model`,
-`integrated_statements`, `value_creation`, `valuation`,
+`decision_contract` and `evidence_system`, diagnose reported credibility in
+`accounting_diagnosis`, rebuild and close the skeleton in
+`historical_statements`, then progress through `causal_graph`,
+`operating_model`, `integrated_statements`, `value_creation`, `valuation`,
 `scenarios_and_red_team`, `validation_and_readiness` and
-`freeze_monitor_learn`.
+`publish_monitor_version`.
 
 ## Hard gates
 

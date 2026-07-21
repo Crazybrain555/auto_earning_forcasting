@@ -139,6 +139,7 @@ independent cross-check; `financial_fact_ledger.csv` preserves filing/accession,
 fact dimensions and restatement lineage.  Do not put all three levels into one
 confidence score.
 
+<!-- canonical: independence_and_corroboration -->
 ## Minimum SourceRecord
 
 - `source_id`

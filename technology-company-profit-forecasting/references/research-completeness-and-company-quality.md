@@ -29,8 +29,9 @@ strict mode it enforces only:
 7. the reviewer is not the builder, covers the frozen graph's principal
    contradiction and does not authorize readiness above its stated cap.
 
-The validator reuses the shared provenance and data-series primitives. It does
-not maintain a second definition of independence or comparability.
+The validator reuses the shared provenance and data-series primitives; the
+independence and corroboration rules are defined once in
+`core-source-and-evidence.md`, never redefined here.
 
 ## What the validator does not judge
 

@@ -3,7 +3,7 @@
   "schema_version": "2.0",
   "forecast_id": "fcst://technology/EXAMPLE/20260720/v2",
   "as_of": "2026-07-20T00:00:00Z",
-  "model_version": "10.0.0+git:UNSET",
+  "model_version": "11.0.0+git:UNSET",
   "accounting_basis_id": "REPLACE",
   "source_pack_hash": "sha256:REPLACE",
   "publication": null,
@@ -128,7 +128,9 @@
     },
     "cross_check_views": []
   },
-  "integrated_model": {"periods": []},
+  "integrated_model": {
+    "periods": []
+  },
   "value_creation": {
     "wacc": null,
     "periods": [
@@ -245,20 +247,48 @@
     "action": "watch",
     "one_line_thesis": ""
   },
-  "monitoring": {"driver_ids": [], "last_updated_at": null},
+  "monitoring": {
+    "driver_ids": [],
+    "last_updated_at": null
+  },
   "breakpoints": [],
   "human_required": [],
-  "confidence_and_limits": ["not-decision-ready until every v2 validator passes"],
-  "horizon_contracts": {"FY+1": "point-and-interval", "FY+2": "scenario-or-distribution", "FY+3": "distribution-only"},
+  "confidence_and_limits": [
+    "not-decision-ready until every v2 validator passes"
+  ],
+  "horizon_contracts": {
+    "FY+1": "point-and-interval",
+    "FY+2": "scenario-or-distribution",
+    "FY+3": "distribution-only"
+  },
   "process_integrity": "pending",
   "research_sufficiency": "pending",
   "run_mode": "live_forecast",
   "forecast_sealed_before_actuals": false,
-  "historical_base": {"trailing_organic_growth_pct": null, "base_period": null, "note": null},
+  "historical_base": {
+    "trailing_organic_growth_pct": null,
+    "base_period": null,
+    "note": null
+  },
   "error_budget": {
-    "year_1": {"expected_revenue_error_pct": null, "expected_margin_error_pp": null, "dominant_risk": null, "why": null},
-    "year_2": {"expected_revenue_error_pct": null, "expected_margin_error_pp": null, "dominant_risk": null, "why": null},
-    "year_3_distribution": {"expected_revenue_error_pct": null, "expected_margin_error_pp": null, "dominant_risk": null, "why": null}
+    "year_1": {
+      "expected_revenue_error_pct": null,
+      "expected_margin_error_pp": null,
+      "dominant_risk": null,
+      "why": null
+    },
+    "year_2": {
+      "expected_revenue_error_pct": null,
+      "expected_margin_error_pp": null,
+      "dominant_risk": null,
+      "why": null
+    },
+    "year_3_distribution": {
+      "expected_revenue_error_pct": null,
+      "expected_margin_error_pp": null,
+      "dominant_risk": null,
+      "why": null
+    }
   },
   "persistence_analysis": {
     "mean_reversion": {

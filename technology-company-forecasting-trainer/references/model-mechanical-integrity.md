@@ -102,6 +102,7 @@ parent. Partial top-customer disclosures and overlapping analytical cuts are
 not failed for summing below or above 100%; they are barred only from claiming
 a parent reconciliation.
 
+<!-- canonical: integrated_three_statement_minimum -->
 ## Integrated three statements
 
 The income statement drives retained earnings and operating cash. Working
@@ -183,8 +184,9 @@ differences through units, scope, timing, price and accounting basis.
 
 ## Conditional value-creation identities
 
-When earnings-power, capital-allocation or valuation analysis is in scope, the
-workbook must also reconcile:
+These are the mechanical closure checks for the value-creation identity defined
+in `core-output-and-valuation.md`. When earnings-power, capital-allocation or
+valuation analysis is in scope, the workbook must also reconcile:
 
 - ROIC = NOPAT / average invested capital;
 - incremental ROIC = change in NOPAT / change in invested capital;

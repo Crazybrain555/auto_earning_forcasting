@@ -1,20 +1,28 @@
 {
   "schema_version": "forecast-method-system/v1",
   "method_id": "technology-company-causal-value-system",
-  "method_version": "10.0.0",
-  "title": "Evidence-to-Value Technology Company Forecasting System",
-  "title_zh": "从证据到价值的科技公司预测系统",
+  "method_version": "11.0.0",
+  "title": "Statement-Decomposition Value Forecasting System",
+  "title_zh": "以财报拆解为骨架的价值预测系统",
   "canonical_flow": [
     "dated_evidence",
-    "causal_dag",
-    "operating_equations",
+    "accounting_credibility_diagnosis",
+    "reconstructed_statement_skeleton",
+    "line_decomposition_and_thesis",
+    "driver_equations",
     "integrated_three_statements",
-    "conditional_earnings_persistence_bridge",
-    "roic_reinvestment_fade",
+    "normalized_earning_power_and_fade",
     "valuation_reverse_implied_expectations",
     "red_team",
     "monitoring"
   ],
+  "canonical_definitions": {
+    "independence_and_corroboration": "references/core-source-and-evidence.md",
+    "reported_profit_chain": "references/analysis-kernel.md",
+    "value_creation_identity": "references/core-output-and-valuation.md",
+    "integrated_three_statement_minimum": "references/model-mechanical-integrity.md",
+    "normalized_earnings_views": "references/earnings-power-and-mean-reversion.md"
+  },
   "judgment_boundary": {
     "allowed": [
       "main_line_and_rival_hypothesis_selection",
@@ -160,16 +168,12 @@
       "id": "evidence_system",
       "name": "Evidence, claims and research coverage",
       "name_zh": "证据、主张与研究覆盖",
-      "purpose": "Build dated source lineage, bounded claims, independence clusters, conflicts, missing evidence and permitted uses.",
+      "purpose": "Build dated source lineage, bounded claims, independence clusters, conflicts, missing evidence and permitted uses; filings custody comes first because the statement skeleton is rebuilt from it.",
       "gates": [
         "dated_source_lineage",
         "observation_value_definition_scope_availability_and_vintage_chain",
         "financial_fact_restatement_lineage",
-        "historical_to_forecast_accounting_basis_reconciliation",
-        "three_year_complete_comparable_historical_base",
         "latest_interim_or_typed_unavailability",
-        "historical_profit_chain_and_segment_reconciliation",
-        "latest_actual_to_first_forecast_numeric_bridge",
         "claimed_corroboration_has_independent_root_method_and_definition_bridge",
         "controlled_source_origin_ceiling_and_epistemic_class",
         "model_changing_external_evidence_binds_observation_record_and_frozen_fingerprint",
@@ -186,11 +190,51 @@
     },
     {
       "no": 3,
-      "id": "causal_graph",
-      "name": "Causal DAG and thesis carriers",
-      "name_zh": "因果图与投资主线",
-      "purpose": "Convert accepted claims into typed, falsifiable causal edges and name the smallest causally sufficient set of paths carrying the investment thesis; common counts are not validator caps.",
+      "id": "accounting_diagnosis",
+      "name": "Accounting credibility diagnosis",
+      "name_zh": "会计体检与可信度诊断",
+      "purpose": "Before any reported number becomes model input: review accounting policies and their flexibility, screen the red-flag list (restructuring charges, pension assumptions, stock-based compensation treatment, pro-forma emphasis, one-offs), map management incentives to the statement lines they touch, and quantify the historical guidance-versus-actual bias that discounts forward statements.",
       "gates": [
+        "accounting_policy_and_flexibility_reviewed",
+        "red_flags_screened_and_normalization_agenda_recorded",
+        "incentive_map_binds_compensation_to_statement_lines",
+        "guidance_bias_track_record_quantified_or_typed_unavailable"
+      ],
+      "files": [
+        "references/accounting-diagnosis.md"
+      ]
+    },
+    {
+      "no": 4,
+      "id": "historical_statements",
+      "name": "Historical statement skeleton",
+      "name_zh": "历史报表重构与勾稽骨架",
+      "purpose": "Reconstruct at least three comparable annual periods plus the latest interim on an operating/financing split, close every identity by construction, record look-through adjustments for material equity-method earnings, fence estimates such as maintenance capex out of closure and into sensitivity, and rank the lines by materiality. The reconstructed skeleton organizes the whole case; everything later decomposes it.",
+      "gates": [
+        "three_year_complete_comparable_historical_base",
+        "historical_to_forecast_accounting_basis_reconciliation",
+        "historical_profit_chain_and_segment_reconciliation",
+        "latest_actual_to_first_forecast_numeric_bridge",
+        "operating_financing_split_closes",
+        "look_through_adjustments_recorded_or_na",
+        "estimates_fenced_out_of_closure",
+        "line_materiality_ranked_for_decomposition"
+      ],
+      "files": [
+        "references/model-mechanical-integrity.md",
+        "references/earnings-power-and-mean-reversion.md"
+      ]
+    },
+    {
+      "no": 5,
+      "id": "causal_graph",
+      "name": "Statement-line decomposition and thesis carriers",
+      "name_zh": "科目拆解与投资主线",
+      "purpose": "Decompose the material reconstructed lines into typed, falsifiable driver paths - revenue into product/customer and volume/price, volume into demand and supply, price into commodity/rate/supply-demand/product-iteration, costs into their bearing resources - exactly as deep as each path can be reasoned cleanly. Mark every driver computable, fat-tailed (scenario-only) or outside the circle of competence; immaterial residual lines follow history or stated experience. Name the smallest set of decomposed paths carrying the thesis plus a serious rival.",
+      "gates": [
+        "lines_ranked_by_materiality",
+        "decomposition_depth_matches_computability",
+        "fat_tail_drivers_marked_scenario_only",
         "typed_nodes_and_edges",
         "units_periods_signs_and_lags",
         "main_line_declared",
@@ -203,7 +247,7 @@
       ]
     },
     {
-      "no": 4,
+      "no": 6,
       "id": "operating_model",
       "name": "Operating equations, industry state and commercialization",
       "name_zh": "经营方程、行业状态与商业化",
@@ -235,7 +279,7 @@
       ]
     },
     {
-      "no": 5,
+      "no": 7,
       "id": "integrated_statements",
       "name": "Integrated statements and roll-forwards",
       "name_zh": "三表联动与滚动勾稽",
@@ -260,11 +304,11 @@
       ]
     },
     {
-      "no": 6,
+      "no": 8,
       "id": "value_creation",
-      "name": "ROIC, reinvestment, growth and fade",
-      "name_zh": "资本回报、再投资、增长与衰减",
-      "purpose": "Explain whether growth creates value and how competitive response changes incremental economics over time.",
+      "name": "Normalized earning power, reinvestment and fade",
+      "name_zh": "正常化盈利能力、再投资与衰减",
+      "purpose": "Separate reported, normalized and owner-cash earnings over a window that covers a full cycle; state zero-growth earning power before any growth value; then explain whether growth creates value and how competitive response fades incremental economics, using the cross-sectional mean-reversion prior unless company evidence justifies a slower fade.",
       "gates": [
         "normalized_nopat_identity",
         "average_invested_capital_and_roic_identity",
@@ -285,7 +329,7 @@
       ]
     },
     {
-      "no": 7,
+      "no": 9,
       "id": "valuation",
       "name": "Valuation and market-implied expectations",
       "name_zh": "估值与市场隐含预期",
@@ -304,7 +348,7 @@
       ]
     },
     {
-      "no": 8,
+      "no": 10,
       "id": "scenarios_and_red_team",
       "name": "Named scenarios and independent red team",
       "name_zh": "命名情景与独立红队",
@@ -323,7 +367,7 @@
       ]
     },
     {
-      "no": 9,
+      "no": 11,
       "id": "validation_and_readiness",
       "name": "Mechanical, research and decision-readiness validation",
       "name_zh": "机械、研究与决策就绪校验",
@@ -343,7 +387,7 @@
       ]
     },
     {
-      "no": 10,
+      "no": 12,
       "id": "publish_monitor_version",
       "name": "Publish, monitor and version",
       "name_zh": "发布、监测与版本化",

@@ -524,6 +524,98 @@ price, share, unit economics, reinvestment returns or cash conversion despite
 competitor response; technology change can shorten rather than lengthen the
 advantage period.
 
+## Statement-decomposition paradigm sources
+
+These are the primary sources behind the statement-decomposition skeleton the
+historical loop studies before a round (see `historical-training-loop.md`,
+"Prior-art study before the round"). Each supplies a reference-class paradigm,
+not a company parameter: the permitted use is the one operable step it licenses
+and the misuse boundary is where transferring it would overreach.
+
+### Fama and French (2000) — profitability fade as a default prior
+
+Source: [Forecasting Profitability and Earnings](https://doi.org/10.1086/209638)
+
+Permitted use: use mean reversion in profitability as the *default fade prior*
+of the reference class — profitability reverts toward the mean at roughly forty
+percent a year on average, and faster the further it starts from the mean — so a
+forecast that holds an abnormal return on capital flat must argue an explicit,
+evidenced reason. This is the decomposition-paradigm reading of the same paper
+registered under "Forecast evaluation, persistence and earnings quality"; treat
+the two entries as one source, not a second, independent authority.
+
+Misuse boundary: the ~40% population speed is a reference-class prior, never a
+company-level precise fade parameter. Contracts, capacity response, lifecycle
+and accounting facts still set the company's own path; do not paste the average
+onto the case.
+
+### Nissim and Penman (2003) — operating/financing dichotomy and RNOA decomposition
+
+Source: [Financial Statement Analysis of Leverage and How It Informs About
+Profitability and Price-to-Book Ratios](https://doi.org/10.1023/A:1027324317663)
+
+Permitted use: reformulate the statements into operating and financing
+activities as the decomposition skeleton for `historical_statements` and
+account-level build-up — RNOA = operating profit margin × asset turnover
+(PM × ATO), with financial leverage layered separately — and treat operating
+profitability as more persistent and more extrapolable than the return that only
+financial leverage amplifies. See also the sibling entry for Nissim and Penman
+(2001) under "Accounting-based valuation and growth".
+
+Misuse boundary: the reformulation reclassifies; it never changes the reported
+facts. Operating/financing splits, RNOA and its drivers are diagnostic
+decompositions reconciled to the issuer's reported totals company by company,
+not stable forecast constants.
+
+### Greenwald — earnings power value as the mechanical no-growth step
+
+Source: [Value Investing: From Graham to Buffett and Beyond (Greenwald, Kahn,
+Sonkin, van Biema)](isbn:9780471463399)
+
+Permitted use: in the value-creation stage, compute earnings power value
+mechanically as normalized after-tax operating earnings capitalized at the cost
+of capital with zero growth (EPV = normalized NOPAT / WACC), and carry any value
+attributable to growth as a *separate* line that exists only inside a defended
+competitive barrier.
+
+Misuse boundary: EPV is not a licence for a conservative discount. The
+normalization window must span a full cycle including its downturn, or the
+"normal" earnings are just a peak in disguise; growth value without an evidenced
+barrier is not added at all.
+
+### Buffett (1986 shareholder-letter appendix) — owner earnings and maintenance capital
+
+Source: [Berkshire Hathaway 1986 shareholder
+letter](https://www.berkshirehathaway.com/letters/1986.html)
+
+Permitted use: anchor the definition of owner earnings — reported earnings plus
+non-cash charges, less the *maintenance* capital expenditure (and any added
+working capital) the business needs to hold its unit volume and competitive
+position — as the source for the estimates deliberately fenced out of the
+closure identity (`estimates_fenced_out_of_closure`). Maintenance capex is
+explicitly an estimate, kept separate from the deterministic three-statement
+roll.
+
+Misuse boundary: the (a) + (b) − (c) construct is a valuation lens, not a
+reported cash-flow line. Do not present owner earnings as GAAP or IFRS operating
+cash flow, and never pass off (a) + (b) alone — omitting the maintenance-capex
+estimate (c) — as cash flow.
+
+### Graham — normalization window and margin of safety (Intelligent Investor, ch. 11 and 20)
+
+Source: [The Intelligent Investor, revised edition
+(Graham)](isbn:9780060555665)
+
+Permitted use: normalize earning power over a multi-year window — Graham's seven-
+to ten-year average (chapter 11) — before capitalizing it, and derive the margin
+of safety from the *certainty* of that earning power rather than from a fixed
+percentage discount (chapter 20).
+
+Misuse boundary: the margin of safety is not a fixed haircut applied to every
+case. A wider margin must be earned by lower earnings certainty; a fixed
+percentage discount substitutes ritual for the earning-power judgment Graham
+requires.
+
 ## Financial reporting anchors
 
 ### Applicable framework, version and issuer policy

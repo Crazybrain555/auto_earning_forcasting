@@ -119,6 +119,59 @@ may compare a forward-evidence model with an official-evidence-only challenger,
 but remain a diagnostic vector for error attribution; the live forward-evidence
 ablation itself tests causal sensitivity and decision relevance.
 
+## Prior-art study before the round
+
+Before picking groups, run a **prior-art study**: the learning phase that makes
+this loop something other than a reactive error chase. Error attribution
+(step 3) can only tell you *that* a method missed once a case has been scored;
+the study is its proactive counterpart — read what practitioners and researchers
+already established about the mechanism *before* the round exposes it, so a known
+paradigm shapes the method up front instead of being rediscovered from a
+two-case miss.
+
+Scope and cadence:
+
+- Each round begins by precisely reading **1–3 method documents** selected
+  against the round's curriculum focus (`references/training-curriculum.md` /
+  the user) and the currently open method questions — original papers,
+  primary-source chapters (an author's own book or model), or an authoritative
+  long-form treatment. Prefer the original over a summary of it, and read for
+  the bounded proposition and its boundary, not a citation count.
+- Record the result **isomorphically to the error-driven reflection**: the same
+  template (`assets/templates/method_reflection_template.md`), the same
+  validator (`python scripts/validate_method_reflection.py --reflection <path>
+  --strict`), and the same four guards named in step 3b (sample-size honesty, no
+  silent overfitting, no source laundering, no authority shortcut). Reuse that
+  contract; do not invent a parallel schema. Keep the record with the round,
+  e.g. `training-runs/<round>/prior_art_study.md`.
+- The reused fields carry their *ex-ante* reading. `error_observed` states the
+  failure mode the paradigm is expected to guard against — the recurring error
+  class, not a measured case miss; `internal_attribution` names the capability
+  owner or SOP stage the paradigm bears on. `external_sources` (with their
+  `independence_cluster` and `originality`), `outside_view`, `agreement`, the
+  bounded `method_claim` and its `misuse_boundary` are recorded exactly as in
+  step 3b. Each supported main line is also registered in
+  `methodological-foundations.md` with its one operable claim and misuse
+  boundary, so the paradigm is reusable across companies rather than trapped in
+  one round.
+
+Permission and its limit:
+
+- A study record is **one permitted source of this round's method changes**,
+  standing alongside error-driven reflection. A rule whose only support is
+  prior-art study stays `provisional` or `externally_supported`, never
+  `validated_on_holdout`: **the study does not exempt the blind holdout test.**
+  It may pre-register a `change_type: method_research` integrity change and shape
+  the Group A build, but the accuracy claim is upgraded only after untouched
+  Group B companies beat or match the named challenger for revenue, operating
+  profit and GAAP net income without new signed bias.
+- Study and reflection are **one contract with two triggers**: the study fires
+  *ex ante* from the curriculum, the reflection fires *ex post* from a measured
+  error. Both write the same bounded-claim-plus-misuse-boundary record, both
+  pass the same validator, and both stay hypotheses until untouched holdouts
+  confirm them. Where prior-art study and the round's own errors disagree,
+  record the disagreement rather than resolving it silently.
+
 ## The round
 
 ### 1. Pick the groups

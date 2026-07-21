@@ -4,29 +4,91 @@
   "title": "Technology forecast run manifest v2",
   "type": "object",
   "additionalProperties": true,
-  "required": ["contract_version", "method_version", "run_id", "entity", "security", "as_of", "purpose", "fiscal_calendar", "currency", "accounting_basis", "horizons", "analysis_primitives", "readiness_target", "phase_status"],
-  "not": {"anyOf": [{"required": ["selected_mechanisms"]}, {"required": ["company_lenses"]}]},
+  "required": [
+    "contract_version",
+    "method_version",
+    "run_id",
+    "entity",
+    "security",
+    "as_of",
+    "purpose",
+    "fiscal_calendar",
+    "currency",
+    "accounting_basis",
+    "horizons",
+    "analysis_primitives",
+    "readiness_target",
+    "phase_status"
+  ],
+  "not": {
+    "anyOf": [
+      {
+        "required": [
+          "selected_mechanisms"
+        ]
+      },
+      {
+        "required": [
+          "company_lenses"
+        ]
+      }
+    ]
+  },
   "properties": {
-    "contract_version": {"const": "2.0"},
-    "method_version": {"type": "string", "minLength": 1},
-    "run_id": {"type": "string", "minLength": 1},
-    "entity": {"type": "string", "minLength": 1},
-    "security": {"type": "string", "minLength": 1},
-    "as_of": {"type": "string", "format": "date-time"},
-    "purpose": {"type": "string"},
-    "fiscal_calendar": {"type": "string"},
-    "currency": {"type": "string"},
+    "contract_version": {
+      "const": "2.0"
+    },
+    "method_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "entity": {
+      "type": "string",
+      "minLength": 1
+    },
+    "security": {
+      "type": "string",
+      "minLength": 1
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "purpose": {
+      "type": "string"
+    },
+    "fiscal_calendar": {
+      "type": "string"
+    },
+    "currency": {
+      "type": "string"
+    },
     "accounting_basis": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["forecast_basis_id", "historical_basis_ids", "bases", "comparability_bridges"],
+      "required": [
+        "forecast_basis_id",
+        "historical_basis_ids",
+        "bases",
+        "comparability_bridges"
+      ],
       "properties": {
-        "forecast_basis_id": {"type": "string", "minLength": 1},
+        "forecast_basis_id": {
+          "type": "string",
+          "minLength": 1
+        },
         "historical_basis_ids": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": {"type": "string", "minLength": 1}
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         },
         "bases": {
           "type": "array",
@@ -35,33 +97,75 @@
             "type": "object",
             "additionalProperties": false,
             "required": [
-              "basis_id", "framework", "jurisdiction", "version", "effective_at",
-              "presentation_currency", "major_policy_choices"
+              "basis_id",
+              "framework",
+              "jurisdiction",
+              "version",
+              "effective_at",
+              "presentation_currency",
+              "major_policy_choices"
             ],
             "properties": {
-              "basis_id": {"type": "string", "minLength": 1},
-              "framework": {
-                "enum": ["US_GAAP", "IFRS", "PRC_GAAP", "OTHER_LOCAL_GAAP"]
+              "basis_id": {
+                "type": "string",
+                "minLength": 1
               },
-              "jurisdiction": {"type": "string", "minLength": 1},
-              "version": {"type": "string", "minLength": 1},
-              "effective_at": {"type": "string", "format": "date-time"},
-              "presentation_currency": {"type": "string", "minLength": 3},
+              "framework": {
+                "enum": [
+                  "US_GAAP",
+                  "IFRS",
+                  "PRC_GAAP",
+                  "OTHER_LOCAL_GAAP"
+                ]
+              },
+              "jurisdiction": {
+                "type": "string",
+                "minLength": 1
+              },
+              "version": {
+                "type": "string",
+                "minLength": 1
+              },
+              "effective_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "presentation_currency": {
+                "type": "string",
+                "minLength": 3
+              },
               "major_policy_choices": {
                 "type": "array",
                 "minItems": 1,
                 "items": {
                   "type": "object",
                   "additionalProperties": false,
-                  "required": ["policy_id", "policy_area", "choice", "source_ids"],
+                  "required": [
+                    "policy_id",
+                    "policy_area",
+                    "choice",
+                    "source_ids"
+                  ],
                   "properties": {
-                    "policy_id": {"type": "string", "minLength": 1},
-                    "policy_area": {"type": "string", "minLength": 1},
-                    "choice": {"type": "string", "minLength": 1},
+                    "policy_id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "policy_area": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "choice": {
+                      "type": "string",
+                      "minLength": 1
+                    },
                     "source_ids": {
                       "type": "array",
                       "minItems": 1,
-                      "items": {"type": "string", "minLength": 1}
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      }
                     }
                   }
                 }
@@ -75,17 +179,37 @@
             "type": "object",
             "additionalProperties": false,
             "required": [
-              "bridge_id", "from_basis_id", "to_basis_id", "period", "source_ids", "adjustments"
+              "bridge_id",
+              "from_basis_id",
+              "to_basis_id",
+              "period",
+              "source_ids",
+              "adjustments"
             ],
             "properties": {
-              "bridge_id": {"type": "string", "minLength": 1},
-              "from_basis_id": {"type": "string", "minLength": 1},
-              "to_basis_id": {"type": "string", "minLength": 1},
-              "period": {"type": "string", "minLength": 1},
+              "bridge_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "from_basis_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "to_basis_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "period": {
+                "type": "string",
+                "minLength": 1
+              },
               "source_ids": {
                 "type": "array",
                 "minItems": 1,
-                "items": {"type": "string", "minLength": 1}
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
               },
               "adjustments": {
                 "type": "array",
@@ -93,13 +217,33 @@
                 "items": {
                   "type": "object",
                   "additionalProperties": false,
-                  "required": ["adjustment_id", "line_item", "amount", "currency", "explanation"],
+                  "required": [
+                    "adjustment_id",
+                    "line_item",
+                    "amount",
+                    "currency",
+                    "explanation"
+                  ],
                   "properties": {
-                    "adjustment_id": {"type": "string", "minLength": 1},
-                    "line_item": {"type": "string", "minLength": 1},
-                    "amount": {"type": "number"},
-                    "currency": {"type": "string", "minLength": 3},
-                    "explanation": {"type": "string", "minLength": 1}
+                    "adjustment_id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "line_item": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "amount": {
+                      "type": "number"
+                    },
+                    "currency": {
+                      "type": "string",
+                      "minLength": 3
+                    },
+                    "explanation": {
+                      "type": "string",
+                      "minLength": 1
+                    }
                   }
                 }
               }
@@ -108,65 +252,258 @@
         }
       }
     },
-    "horizons": {"type": "object"},
-    "analysis_primitives": {"type": "array", "items": {"type": "string"}},
+    "horizons": {
+      "type": "object"
+    },
+    "analysis_primitives": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "materiality_routes": {
       "description": "Case-selected specialist routes; the artifact registry resolves their conditional artifacts.",
-      "type": ["object", "array", "string"]
+      "type": [
+        "object",
+        "array",
+        "string"
+      ]
     },
-    "optional_calibration_packs": {"type": "array", "items": {"type": "string"}},
-    "readiness_target": {"type": "string"},
+    "optional_calibration_packs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "readiness_target": {
+      "type": "string"
+    },
     "phase_status": {
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "decision_contract", "evidence_system", "causal_graph",
-        "operating_model", "integrated_statements", "value_creation",
-        "valuation", "scenarios_and_red_team", "validation_and_readiness",
+        "decision_contract",
+        "evidence_system",
+        "accounting_diagnosis",
+        "historical_statements",
+        "causal_graph",
+        "operating_model",
+        "integrated_statements",
+        "value_creation",
+        "valuation",
+        "scenarios_and_red_team",
+        "validation_and_readiness",
         "publish_monitor_version"
       ],
       "properties": {
-        "decision_contract": {"enum": ["pending", "in_progress", "complete", "blocked"]},
-        "evidence_system": {"enum": ["pending", "in_progress", "complete", "blocked"]},
-        "causal_graph": {"enum": ["pending", "in_progress", "complete", "blocked"]},
-        "operating_model": {"enum": ["pending", "in_progress", "complete", "blocked"]},
-        "integrated_statements": {"enum": ["pending", "in_progress", "complete", "blocked"]},
-        "value_creation": {"enum": ["pending", "in_progress", "complete", "blocked"]},
-        "valuation": {"enum": ["pending", "in_progress", "complete", "blocked"]},
-        "scenarios_and_red_team": {"enum": ["pending", "in_progress", "complete", "blocked"]},
-        "validation_and_readiness": {"enum": ["pending", "in_progress", "complete", "blocked"]},
-        "publish_monitor_version": {"enum": ["pending", "in_progress", "complete", "blocked"]}
+        "decision_contract": {
+          "enum": [
+            "pending",
+            "in_progress",
+            "complete",
+            "blocked"
+          ]
+        },
+        "evidence_system": {
+          "enum": [
+            "pending",
+            "in_progress",
+            "complete",
+            "blocked"
+          ]
+        },
+        "accounting_diagnosis": {
+          "enum": [
+            "pending",
+            "in_progress",
+            "complete",
+            "blocked"
+          ]
+        },
+        "historical_statements": {
+          "enum": [
+            "pending",
+            "in_progress",
+            "complete",
+            "blocked"
+          ]
+        },
+        "causal_graph": {
+          "enum": [
+            "pending",
+            "in_progress",
+            "complete",
+            "blocked"
+          ]
+        },
+        "operating_model": {
+          "enum": [
+            "pending",
+            "in_progress",
+            "complete",
+            "blocked"
+          ]
+        },
+        "integrated_statements": {
+          "enum": [
+            "pending",
+            "in_progress",
+            "complete",
+            "blocked"
+          ]
+        },
+        "value_creation": {
+          "enum": [
+            "pending",
+            "in_progress",
+            "complete",
+            "blocked"
+          ]
+        },
+        "valuation": {
+          "enum": [
+            "pending",
+            "in_progress",
+            "complete",
+            "blocked"
+          ]
+        },
+        "scenarios_and_red_team": {
+          "enum": [
+            "pending",
+            "in_progress",
+            "complete",
+            "blocked"
+          ]
+        },
+        "validation_and_readiness": {
+          "enum": [
+            "pending",
+            "in_progress",
+            "complete",
+            "blocked"
+          ]
+        },
+        "publish_monitor_version": {
+          "enum": [
+            "pending",
+            "in_progress",
+            "complete",
+            "blocked"
+          ]
+        }
       }
     },
-    "human_required": {"type": "array"},
-    "validation_results": {"type": "object"},
-    "timezone": {"type": "string"},
-    "intended_decision": {"type": "string"},
-    "required_artifacts": {"type": "array", "items": {"type": "string"}},
-    "notes": {"type": "array"},
-    "forward_evidence_required": {"type": "boolean"},
-    "research_completeness_required": {"type": "boolean"},
+    "human_required": {
+      "type": "array"
+    },
+    "validation_results": {
+      "type": "object"
+    },
+    "timezone": {
+      "type": "string"
+    },
+    "intended_decision": {
+      "type": "string"
+    },
+    "required_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": "array"
+    },
+    "forward_evidence_required": {
+      "type": "boolean"
+    },
+    "research_completeness_required": {
+      "type": "boolean"
+    },
     "narrow_scope_exception": {
       "type": "object",
-      "required": ["status"],
+      "required": [
+        "status"
+      ],
       "properties": {
-        "status": {"enum": ["not_applicable", "active"]},
-        "scope_type": {"type": ["string", "null"]},
-        "scope_description": {"type": ["string", "null"]},
-        "materiality_test": {"type": "object"},
-        "affected_statement_links": {"type": "array", "items": {"type": "string"}},
-        "blocked_full_company_conclusions": {"type": "array", "items": {"type": "string"}},
-        "readiness_cap": {"type": ["string", "null"]}
+        "status": {
+          "enum": [
+            "not_applicable",
+            "active"
+          ]
+        },
+        "scope_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scope_description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "materiality_test": {
+          "type": "object"
+        },
+        "affected_statement_links": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "blocked_full_company_conclusions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "readiness_cap": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       }
     },
-    "material_revenue_impact_pct": {"type": "number"},
-    "material_profit_impact_pct": {"type": "number"},
-    "run_mode": {"type": "string"},
-    "artifact_profile": {"type": "string", "minLength": 1},
-    "time_boundary_enforced": {"type": "boolean"},
-    "baseline_skill_version": {"type": "string"},
-    "training_iteration_id": {"type": ["string", "null"]},
-    "training_pair_id": {"type": ["string", "null"]},
-    "training_case_role": {"type": ["string", "null"]}
+    "material_revenue_impact_pct": {
+      "type": "number"
+    },
+    "material_profit_impact_pct": {
+      "type": "number"
+    },
+    "run_mode": {
+      "type": "string"
+    },
+    "artifact_profile": {
+      "type": "string",
+      "minLength": 1
+    },
+    "time_boundary_enforced": {
+      "type": "boolean"
+    },
+    "baseline_skill_version": {
+      "type": "string"
+    },
+    "training_iteration_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "training_pair_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "training_case_role": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
   }
 }

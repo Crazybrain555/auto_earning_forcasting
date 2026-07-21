@@ -3,13 +3,15 @@
 Valuation translates operating economics and capital allocation into expected
 return. It is not a multiple pasted onto an earnings estimate.
 
-## Reported, analytical and cash views
+## Reported, normalized and owner-cash views
 
-Reconcile reported GAAP or IFRS results to an analytical operating view and to
-cash. Adjustments must be line-specific, sourced and reversible. Stock
-compensation, restructuring, acquisition accounting, tax benefits, leases,
-capitalized development, recurring acquisition spend and dilution cannot be
-removed merely because management calls them non-GAAP.
+Use the reported, normalized and owner-cash views defined in
+`earnings-power-and-mean-reversion.md`. Reconcile reported GAAP or IFRS results
+to a normalized operating view and to an owner-cash view. Adjustments must be
+line-specific, sourced and reversible. Stock compensation, restructuring,
+acquisition accounting, tax benefits, leases, capitalized development, recurring
+acquisition spend and dilution cannot be removed merely because management calls
+them non-GAAP.
 
 Normalize only to expose economics. Always retain the reported view and show
 the value effect of disputed adjustments.

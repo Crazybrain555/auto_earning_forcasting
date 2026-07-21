@@ -1,9 +1,17 @@
 # Industry Economics and Cycle
 
+This file is an optional cross-validation input for the `operating_model` and
+`causal_graph` stages. Its industry-structure, cycle and profit-pool judgments
+enter the forecast only by changing the value or a named scenario of a specific
+financial driver; they never independently constitute a conclusion. The
+value-investing view of normalized earning power owns the answer, and every
+claim admitted from this file must name the financial line and driver it moves
+and rest on evidence an independent reviewer can re-check. It is not a sector
+scorecard and it does not substitute an industry growth rate for a company
+model.
+
 Industry work explains who captures the profit pool, why returns persist or
-fade, and which state variables lead the financial statements. It is not a
-sector scorecard and it does not substitute an industry growth rate for a
-company model.
+fade, and which state variables lead the financial statements.
 
 ## Map the economic system
 
@@ -144,6 +152,11 @@ Use cycle-normal earnings as a valuation cross-check, not an instruction to
 erase a genuine structural transition.
 
 ## Industry calibration workflow
+
+Treat these steps as optional calibration, not a required pass. Run them only
+when a specific `causal_graph` or `operating_model` driver has a value or cycle
+state that industry evidence can discipline, and route each result into that
+named driver rather than a standalone industry verdict.
 
 1. Reconstruct historical industry demand, supply, price and inventory.
 2. Reconcile company share and mix to those totals.

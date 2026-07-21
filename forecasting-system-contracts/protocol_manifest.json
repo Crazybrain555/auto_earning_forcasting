@@ -168,6 +168,11 @@
       "blocker_policy": "author_once_then_reference",
       "originating_blocker_id_field": "blockers[].blocker_id",
       "downstream_blocker_reference_field": "input_refs[]"
+    },
+    "stock_flow_attribution": {
+      "principle": "every cash flow and stock change enters valuation exactly once: a period's flow is attributed either to the opening stock it is already inside or to the forecast flow sequence, never both",
+      "failure_mode": "an interim period's cash flow counted inside the opening balance-sheet stock and again inside the forward flow sequence, inflating value",
+      "deterministic_check": "period_attribution_partition_is_exhaustive_and_disjoint"
     }
   },
   "ports": [

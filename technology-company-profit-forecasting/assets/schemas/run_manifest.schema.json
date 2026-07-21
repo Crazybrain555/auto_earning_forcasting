@@ -284,6 +284,8 @@
       "required": [
         "decision_contract",
         "evidence_system",
+        "accounting_diagnosis",
+        "historical_statements",
         "causal_graph",
         "operating_model",
         "integrated_statements",
@@ -303,6 +305,22 @@
           ]
         },
         "evidence_system": {
+          "enum": [
+            "pending",
+            "in_progress",
+            "complete",
+            "blocked"
+          ]
+        },
+        "accounting_diagnosis": {
+          "enum": [
+            "pending",
+            "in_progress",
+            "complete",
+            "blocked"
+          ]
+        },
+        "historical_statements": {
           "enum": [
             "pending",
             "in_progress",

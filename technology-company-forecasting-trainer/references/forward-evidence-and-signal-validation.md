@@ -35,17 +35,14 @@ Identity, `source_id`, `claim_ids`, publication/event/version/retrieval times, s
 
 ## Independence rules
 
-1. Reports quoting the same original company, expert, TrendForce, Gartner, IDC or channel count as one cluster.
-2. A company statement and a sell-side note repeating it are not independent.
-3. Customer and supplier disclosures may be independent when each describes its own facts.
-4. A paper and a product announcement are different evidence types, but neither proves customer adoption alone.
-5. Do not increase weight because many articles repeat the same original source.
-
-Cluster labels are indexing aids, not proof.  A purported independent pair must
-have different resolved roots, originating organizations/teams and measurement
-methods. `derived_from_source_id` and `common_origin` survive republication,
-translation, chart extraction and database resale; renaming a cluster cannot
-turn one observation into two.
+Full independence and corroboration rules live in
+`core-source-and-evidence.md`; this layer only applies them to SignalCards.
+Reports that quote the same company, expert, dataset (TrendForce, Gartner, IDC)
+or channel are one cluster, and a company statement plus a sell-side note
+repeating it are not independent; customer and supplier disclosures may be
+independent only for their own facts. A paper and a product announcement are
+different evidence types and neither proves customer adoption alone. Do not add
+weight because many articles repeat one original source.
 
 ## Permission gates
 
@@ -74,11 +71,10 @@ permission rule.
 ### Base point change
 
 A direct, definition-compatible measurement or official operating observation
-may be a hard anchor by itself.  When corroboration is claimed, the observations
-must resolve to genuinely independent roots, originating teams and measurement
-methods.  In either case require a causal path from claim to driver to financial
-line, an adjustment cap and a falsification trigger.  A pile of secondary links
-cannot repair a weak anchor.
+may be a hard anchor by itself.  Claimed corroboration must be genuinely
+independent per `core-source-and-evidence.md`.  In either case require a causal
+path from claim to driver to financial line, an adjustment cap and a
+falsification trigger.  A pile of secondary links cannot repair a weak anchor.
 
 ### Scenario probability change
 

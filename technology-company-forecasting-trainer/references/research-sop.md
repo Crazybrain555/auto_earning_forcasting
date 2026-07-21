@@ -22,16 +22,23 @@ they do not create a second constitution.
    who pays, what is delivered, the scarce resource, the unit of demand, the
    unit of capacity, the price-setting mechanism, the cost-bearing resources,
    the accounting recognition event and the cash-conversion path.
-2. **A forecast is an executable causal argument.**  Every material forecast
+2. **The reconstructed statements are the case's skeleton.**  Audited history,
+   diagnosed for credibility and closed by construction on an
+   operating/financing split, organizes everything that follows: material
+   lines are decomposed into drivers exactly as deep as they can be reasoned
+   cleanly, immaterial residuals follow history or stated experience, and
+   external papers or expert views cross-check the decomposition instead of
+   becoming a parallel method.
+3. **A forecast is an executable causal argument.**  Every material forecast
    number is either a dated observation, a declared scenario assumption or the
    result of a typed equation.  Narrative cannot be used as a hidden numeric
    input.
-3. **Accounting is conservation, not decoration.**  Revenue, operating profit,
+4. **Accounting is conservation, not decoration.**  Revenue, operating profit,
    pretax profit, tax, NCI and attributable net income must be produced by the
    same model path. Stocks roll and statements reconcile by construction; the
    earnings-power view also closes NOPAT to after-tax operating cash flow plus
    the change in net operating assets rather than adding an accrual score.
-4. **Uncertainty belongs at the uncertain cause.**  The reference path and
+5. **Uncertainty belongs at the uncertain cause.**  The reference path and
    case-selected material rival states change named demand, price, mix, cost,
    timing, capacity, cycle or accounting-state inputs and then re-execute the
    model. Encode exactly one path as `role=reference` and each authored rival
@@ -39,19 +46,19 @@ they do not create a second constitution.
    reference may have no shock, while every alternative names the causal shock
    that distinguishes it. No fixed number of alternatives or naming taxonomy
    is required. Scenarios are not independent edits to output rows.
-5. **Value investing asks about normalized earning power and its duration.**
+6. **Value investing asks about normalized earning power and its duration.**
    Current earnings are decomposed into cash/accrual, cycle, temporary
    investment, accounting and structural components.  Mean reversion is a
    reference-class prior; company evidence determines the departure and fade.
-6. **Complexity has to earn its place.**  Add a source, branch, schedule or
+7. **Complexity has to earn its place.**  Add a source, branch, schedule or
    parameter only if it can materially change the distribution of revenue,
    operating profit or attributable net income, distinguish a rival
    hypothesis, or prevent a known accounting/data error.  Otherwise keep it as
    optional research context.
-7. **Unknown is a valid state; zero is a number.**  Missing disclosure never
+8. **Unknown is a valid state; zero is a number.**  Missing disclosure never
    becomes zero, a carried ratio or a precise useful life without an explicit
    limitation and scenario consequence.
-8. **Authority attaches to a proposition, not a logo.**  Audited filings anchor
+9. **Authority attaches to a proposition, not a logo.**  Audited filings anchor
    reported financial facts; management directly establishes its own view and
    intent; customers and regulators establish facts within their boundary.
    None may silently prove a different external state or future outcome.
@@ -71,13 +78,15 @@ stage but must not invent another numbered workflow.
 | Stage ID | Work | Required exit question | Canonical authored state |
 |---|---|---|---|
 | `decision_contract` | Define entity, security, consolidation perimeter, accounting basis, fiscal calendar, currency, horizons and decision. Pre-register the initial view, rival explanations and largest unknowns before broad research. The runtime records a snapshot identity automatically; it does not close research or limit which current evidence may enter. | What exactly is being forecast, for whom, and on which accounting/perimeter basis? | contract and hypothesis register |
-| `evidence_system` | Reproduce at least three comparable annual periods and the latest interim when disclosed, then search specifically for uncertain nodes and rival hypotheses. Preserve each quantitative observation's value, observed construct, actual availability time, vintage/revision chain, definition, scope, conflicts and failed searches. Current evidence continues to enter until publication freeze. | Can the system explain the historical profit chain, and is every material input definition-compatible, dated and traceable to its origin? | source, claim, observation and financial-fact ledgers |
-| `causal_graph` | Map the industry/company boundary and select the smallest causally sufficient set of thesis-carrying paths plus a serious rival. One to three is common, never a hard cap. | Which few causal changes explain most of future revenue and operating-profit variation, and what would refute them? | typed causal graph and thesis/rival register |
-| `operating_model` | Choose the smallest unit/price/cost, cohort, capacity, order-recognition or other equations for each material branch; represent demand, supply, stocks, cycle and commercialization gates. | Do the equations represent how the company earns money and where the industry profit pool moves? | assumptions and executable operating equations |
-| `integrated_statements` | Execute the operating model by period into revenue, costs, operating profit, pretax, tax, NCI, attributable net income, cash, capital and shares. | Does one causal path mechanically produce the complete statements without plugs? | accounting equations and reconciled statement views |
-| `value_creation` | Separate reported/normalized/cash earnings; close the NOPAT/operating-FCF/ΔNOA bridge; estimate reinvestment, incremental ROIC, competitive response, conditional mean reversion and fade. Preserve an unavailable reference class as a limitation instead of fabricating a peer set or fixed horizon. | Which earnings are sustainable, what capital produces them, and why should excess returns persist or decay? | earnings-power, reinvestment and fade equations |
-| `valuation` | Value the resulting cash flows/residual income and reverse the market price into named operating drivers. | What future earning power and duration does the price require? | valuation equations and price-implied expectations |
-| `scenarios_and_red_team` | Change named causal inputs, re-execute joint paths, attack the main line first and record independent disagreements. | What credible state breaks the thesis, and does it propagate through revenue, operating profit and net income? | scenario overrides and frozen independent review |
+| `evidence_system` | Take custody of the filings, releases and datasets the case rests on - filings first, because the statement skeleton is rebuilt from them - then search specifically for uncertain drivers and rival hypotheses as later stages name them. Preserve each quantitative observation's value, observed construct, actual availability time, vintage/revision chain, definition, scope, conflicts and failed searches. Current evidence continues to enter until publication freeze. | Is every material input definition-compatible, dated and traceable to its origin? | source, claim, observation and financial-fact ledgers |
+| `accounting_diagnosis` | Review accounting policies and their flexibility, screen the red-flag list, map management incentives to the statement lines they touch, and quantify the guidance-versus-actual bias record. Findings become the normalization agenda; uncleared flags become typed limitations. | Which reported lines can be trusted as-is, which need adjustment, and how much is management's forward view worth? | policy review, red-flag screen, incentive map and guidance-bias record |
+| `historical_statements` | Reconstruct at least three comparable annual periods plus the latest interim on an operating/financing split; close every identity by construction; record look-through adjustments for material equity-method earnings; fence estimates such as maintenance capex out of closure and into sensitivity; rank the lines by materiality. This reconstructed skeleton organizes the whole case. | Does history close by construction on the operating/financing split, and which lines matter enough to decompose? | reconstructed statement skeleton and materiality ranking |
+| `causal_graph` | Decompose the material lines into typed, falsifiable driver paths - revenue into product/customer and volume/price, volume into demand and supply, price into commodity/rate/supply-demand/product-iteration, costs into their bearing resources - exactly as deep as each path can be reasoned cleanly. Mark every driver computable, fat-tailed (scenario-only) or outside the circle of competence; immaterial residual lines follow history or stated experience. Name the smallest set of decomposed paths carrying the thesis plus a serious rival. | Which decomposed statement lines explain most of future revenue and operating-profit variation, and what would refute their drivers? | typed line-decomposition graph and thesis/rival register |
+| `operating_model` | Choose the smallest unit/price/cost, cohort, capacity, order-recognition or other equations for each decomposed driver; represent demand, supply, stocks, cycle and commercialization gates. Material drivers need two independent evidence roots or a recorded limitation. | Do the equations represent how the company earns money along each material line? | assumptions and executable operating equations |
+| `integrated_statements` | Execute the driver equations by period into revenue, costs, operating profit, pretax, tax, NCI, attributable net income, cash, capital and shares, reconciling forward statements to the historical skeleton. | Does one causal path mechanically produce the complete statements without plugs? | accounting equations and reconciled statement views |
+| `value_creation` | Separate reported, normalized and owner-cash earnings over a window covering a full cycle; state zero-growth earning power before growth value; close the NOPAT/operating-FCF/ΔNOA bridge; estimate reinvestment, incremental ROIC, competitive response and fade, defaulting to the cross-sectional mean-reversion prior unless company evidence justifies a departure. | Which earnings are sustainable with zero growth, what capital produces them, and why should excess returns persist or decay? | earnings-power, reinvestment and fade equations |
+| `valuation` | Value the resulting cash flows/residual income and reverse the market price into named operating drivers. Margin of safety follows from driver evidence strength plus an explicit unmodeled-uncertainty allowance, never a fixed discount. | What future earning power and duration does the price require? | valuation equations and price-implied expectations |
+| `scenarios_and_red_team` | Change named causal inputs, re-execute joint paths, attack the main line first with inversion - write the paths on which the thesis breaks badly - and record independent disagreements. | What credible state breaks the thesis, and does it propagate through revenue, operating profit and net income? | scenario overrides and frozen independent review |
 | `validation_and_readiness` | Apply the orthogonal assurance portfolio and resolve or disclose material conflicts. | Are logic, evidence, execution and investment relevance jointly adequate without metric gaming? | review decisions and readiness limits |
 | `publish_monitor_version` | Generate workbook/snapshot/report from canonical state, validate the final input pack, atomically commit a registry-bound seal, and bind decisive future observations to model actions. Material updates create a new forecast identity that explicitly supersedes the prior publication. | Is the result reproducible and immutable now, and which evidence would require a new version? | published bundle hashes, atomic seal and executable monitors |
 
@@ -245,8 +254,8 @@ scores.
 
 ## Stop and loop rules
 
-- If `evidence_system` does not reconcile history, do not forecast; return to accounting scope,
-  facts and restatement lineage.
+- If `historical_statements` does not close by construction, do not forecast; return to
+  `accounting_diagnosis`, accounting scope, facts and restatement lineage.
 - If `causal_graph` needs many unrelated drivers to explain the thesis, compress the
   thesis or admit that the edge is weak.
 - If the evidence cannot distinguish the main line from its rival, keep the
@@ -260,8 +269,14 @@ scores.
 
 ## What specialist references are for
 
-Equation modules explain how to implement one branch.  Industry lenses suggest
-useful variables, failure modes and sources.  Accounting, paper, patent, cycle
-and intangible-investment references deepen a material issue.  None is a
-mandatory checklist for every company.  Route by the company's economics and
-material uncertainty, not its sector label.
+Equation modules are implementation tools for line decomposition: each one shows
+how to turn a specific statement line into typed drivers and equations inside the
+`causal_graph` and `operating_model` stages.  They add no stage and no second
+method.  Industry lenses and cycle, technology, paper, patent and
+intangible-investment references are optional cross-validation: their structural
+and trend judgments may discipline a driver only by changing the value or a named
+scenario of a specific financial line, and each must rest on evidence an
+independent reviewer can re-check.  None independently constitutes a conclusion,
+and none is a mandatory checklist for every company.  Route by the company's
+economics and the statement lines that carry the forecast, not by a sector or
+trend label.

@@ -3,7 +3,7 @@
   "schema_version": "2.0",
   "forecast_id": "fcst://technology/EXAMPLE/20260720/v2",
   "as_of": "2026-07-20T00:00:00Z",
-  "model_version": "10.0.0+git:UNSET",
+  "model_version": "11.0.0+git:UNSET",
   "accounting_basis_id": "REPLACE",
   "source_pack_hash": "sha256:REPLACE",
   "publication": null,

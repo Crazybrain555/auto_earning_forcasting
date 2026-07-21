@@ -6,70 +6,26 @@ a list of themes or a weighted blend of mechanisms.
 
 ## Historical base
 
-Reconstruct at least three comparable fiscal years plus the latest interim
-period before forecasting. A period label is not a historical base. For every
-annual consolidated period preserve numeric revenue, cost, gross profit,
-operating profit and GAAP net income attributable, with the currency, statement
-scope and source IDs. Reconcile revenue less cost to gross profit, and reconcile
-the signed sum of reported segments and eliminations to consolidated revenue.
-Before summing customer, product, geography or segment rows, declare the
-partition ID, dimension, whether the members are exhaustive, and whether they
-are mutually exclusive. Only a partition declared both exhaustive and mutually
-exclusive may reconcile to its parent. Historical-base rows use one explicit
-period-state contract: `annual` and `interim` rows are `actual`, while
-`first_forecast` rows are `forecast`; another combination is a data-contract
-error, not an unvalidated extra row. Every input row is validated: a blank,
-`TBD` or `PENDING` period is an input error and cannot disappear before the
-partition check. Period, period type, actual/forecast state
-and currency form a stable period identity: every segment or elimination row
-must resolve to exactly one consolidated parent with that identity. Every
-member must resolve its declared `partition_dimension` to exactly one explicit,
-non-placeholder member-ID field. The existing reported-segment view maps
-`reported_operating_segment` to `reported_segment`; the normalized economics
-view maps `normalized_economic_branch` to `normalized_segment`; every other
-dimension uses the general `partition_member_id` field. There is no fallback
-to whichever alias happens to be populated. Uniqueness and error display use
-only that resolved member ID, so changing `row_type`, another alias or another
-descriptive field cannot create a second member. A full-partition member also
-has a numeric revenue value.
-A consolidated-only first forecast remains valid; an orphan
-forecast member, unnamed segment or unnamed elimination cannot disappear from
-the sum. A
-disclosed top-customer table or an overlapping product/geography view is a
-cross-check, not a 100% decomposition.
-The runtime recomputes the signed member residual; a typed zero or a green
-status cannot substitute for the member values.  For a numeric consolidated
-actual, `segment_reconciliation_status=not_applicable` is a narrow exception
-only when the period has no segment or elimination partition rows.  Once such
-numeric rows exist, use `reconciled` or `single_segment` and recompute their
-signed sum, or use `disclosure_limited` with a company-specific reason and cap
-readiness at `screen-grade`.  A partial Top-N customer disclosure remains a
-non-exhaustive cross-check under the limited route; it is not forced to 100%.
-Use one marked `latest_actual` row so the forecast bridge has an unambiguous
-starting point.
+The reconstructed statement skeleton — at least three comparable annual periods
+plus the latest interim, closed by construction, with segment/elimination and
+comparability bridges reconciled and the lines ranked by materiality — is built
+and checked in the `historical_statements` stage, not here. See the stage table
+in references/research-sop.md and references/model-mechanical-integrity.md for
+that construction and its identities; the driver tree consumes the finished
+skeleton rather than rebuilding it.
 
-Preserve reported segment totals and build explicit bridges for recasts,
-acquisitions, disposals, FX, accounting-policy changes and share-count changes.
-Every period states its perimeter and accounting bridge; `none_no_change` is a
-valid finding, while `bridged` requires both a substantive explanation and a
-metric-level `reported + comparability_delta = comparable` reconciliation for
-revenue, cost, gross profit, operating profit and GAAP net income attributable.
-If that adjustment cannot be quantified, use the limited route; narrative alone
-does not create comparability. Do not manufacture zeroes for an undisclosed line. Use the typed
-`disclosure_limited` state, state the company-specific reason and cap readiness
-at `screen-grade`. Use `not_applicable` with a reason when no interim period has
-yet ended since the annual filing; that calendar fact does not by itself lower
-readiness. Keep a latest-interim status row in either case so absence is
-auditable rather than silently omitted.
-
-Forecast columns continue to the right of history using the same definitions.
-The first forecast period must name the marked latest-actual period and show
-numeric deltas for revenue, cost, gross profit, operating profit and GAAP net
-income attributable. Those deltas reconcile latest actual plus change to the
-first forecast and map to named causal driver nodes; a prose CAGR is not a
-bridge. A new business may lack its own history, but its addressable demand,
-capacity, qualification, unit economics and capital needs still require a
-historical or externally measured base.
+The driver tree grows downward from those skeleton lines. Take the reconciled
+revenue, cost, gross profit, operating profit and GAAP net income attributable
+lines in materiality order and decompose each material line into typed drivers
+exactly as deep as it can be reasoned cleanly; immaterial residual lines follow
+history or stated experience. Forecast columns continue to the right of history
+using the same line definitions: the first forecast period names the marked
+latest-actual period and shows numeric deltas for revenue, cost, gross profit,
+operating profit and GAAP net income attributable that reconcile latest actual
+plus change to the first forecast and map to named causal driver nodes. A prose
+CAGR is not a bridge. A new business may lack its own history, but its
+addressable demand, capacity, qualification, unit economics and capital needs
+still require a historical or externally measured base.
 
 ## From causal graph to arithmetic tree
 

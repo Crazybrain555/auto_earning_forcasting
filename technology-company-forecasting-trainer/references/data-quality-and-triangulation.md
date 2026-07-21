@@ -279,10 +279,10 @@ channel:  sell-through + change in customer/channel inventory -> sell-in
 company:  production + change in company inventory -> shipments * realized price
 ```
 
-Independence requires a different resolved root original, originating
-organization/team and measurement method. Two brokers quoting the same
-consultant, two publishers using the same panel, and market size derived from
-the same shipment series are one measurement cluster.
+Per `core-source-and-evidence.md`, a valid cross-check needs a different resolved
+root original, originating organization/team and measurement method. Two brokers
+quoting the same consultant, two publishers using the same panel, and market size
+derived from the same shipment series are one measurement cluster.
 
 Operationally, every cross-check names a `source_id`, `original_source_id`,
 `independence_cluster` and `measurement_method_id`. The shared provenance graph

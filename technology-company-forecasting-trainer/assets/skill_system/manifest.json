@@ -50,6 +50,8 @@
   "stage_owners": {
     "decision_contract": "technology-company-profit-forecasting",
     "evidence_system": "company-evidence-research",
+    "accounting_diagnosis": "company-financial-forecasting",
+    "historical_statements": "company-financial-forecasting",
     "causal_graph": "company-operating-modeling",
     "operating_model": "company-operating-modeling",
     "integrated_statements": "company-financial-forecasting",

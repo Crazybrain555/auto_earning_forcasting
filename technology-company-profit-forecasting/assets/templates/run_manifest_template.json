@@ -1,6 +1,6 @@
 {
   "contract_version": "2.0",
-  "method_version": "10.0.0+git:UNSET",
+  "method_version": "11.0.0+git:UNSET",
   "run_id": "run://technology/EXAMPLE/20260720/v2",
   "entity": "EXAMPLE",
   "security": "EXAMPLE",
@@ -79,6 +79,8 @@
   "phase_status": {
     "decision_contract": "pending",
     "evidence_system": "pending",
+    "accounting_diagnosis": "pending",
+    "historical_statements": "pending",
     "causal_graph": "pending",
     "operating_model": "pending",
     "integrated_statements": "pending",

@@ -18,6 +18,9 @@ calculate with documented definitions:
 - dilution and per-share compounding;
 - balance-sheet resilience.
 
+The fundamental-growth identity is defined in `core-output-and-valuation.md`;
+this schedule computes the historical base only.
+
 Bridge goodwill, acquired intangibles, leases, customer prepayments, capitalized
 development and expensed R&D when material. Show results both with and without
 disputed analytical adjustments.

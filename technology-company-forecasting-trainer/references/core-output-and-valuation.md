@@ -54,18 +54,15 @@ Use one row per period and show, at minimum,
 `period | opening balance | movements | P&L link | CFS link | closing balance-sheet amount | check residual | source/status`
 for each required roll.
 
-The minimum rolls and identities are:
+The authoritative minimum roll list, closure identities and zero-valued checks
+live in `references/model-mechanical-integrity.md`. The memo renders period rows
+for each roll, in particular the share and cash denominators (bases never reused):
 
 ```text
-net PPE: opening + capex - depreciation - disposals/impairments +/- perimeter/FX = closing
-operating working capital: opening + change = closing
-debt: opening + borrowings - repayments +/- non-cash/perimeter/FX = closing
 ending basic shares: opening basic shares + basic issuance - repurchases +/- other basic-share changes = ending basic shares
 period weighted-average basic/diluted EPS shares: time-weighted in-period basic shares + GAAP incremental dilution for the period
 valuation-date fully diluted shares: valuation-date basic shares + economically dilutive awards/options/convertibles on the stated basis
 cash: opening + CFO + CFI + CFF + FX = closing = balance-sheet cash
-balance sheet: assets = liabilities + equity
-free cash flow: CFO - capex - other capitalized investment = FCF
 ```
 
 Show receivables, inventory, payables and other material working-capital
@@ -107,6 +104,7 @@ When patents or IP are material, show one row per material family with:
 Unknown claim text, ownership, family, citation or FTO evidence is recorded as
 an explicit diligence gap; a filing count never substitutes for the table.
 
+<!-- canonical: value_creation_identity -->
 ### Conditional value-creation identity
 
 Activate this schedule when normalized earning power, capital allocation,
@@ -239,7 +237,8 @@ Show:
 - reported-to-normalized and GAAP/non-GAAP bridges;
 - zero-valued mechanical checks.
 
-Reported profit, analytical operating profit and cash remain separate.
+Reported profit, normalized operating profit and owner cash remain separate
+(views defined in `references/earnings-power-and-mean-reversion.md`).
 
 ## Value-creation outputs
 

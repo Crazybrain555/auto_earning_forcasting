@@ -87,6 +87,7 @@ and current cash flow can be lifted by cutting investment.  The question is
 whether the balance represents supported growth, timing, a low-reliability
 estimate, a reserve release, a perimeter change or deterioration.
 
+<!-- canonical: normalized_earnings_views -->
 ## Separate reported, normalized and owner cash views
 
 Keep three views and reconcile them; never overwrite GAAP:
@@ -210,8 +211,10 @@ Reconcile operating returns as:
 ```text
 RNOA = operating margin * net operating asset turnover
 change in RNOA = margin contribution + turnover contribution + interaction
-fundamental growth ~= reinvestment rate * incremental return on investment
 ```
+
+The fundamental-growth identity (reinvestment rate × incremental ROIC) is
+defined in `core-output-and-valuation.md`.
 
 Ask separately whether price/mix/unit cost changed margin, whether working
 capital or utilization changed turnover, and whether new investment has matured.

@@ -42,20 +42,13 @@ cross-check. Several lanes repeating one root observation remain one origin.
 
 ## Independence is about origin and method
 
-Collapse sources into one independence cluster when they share the same
-originating dataset, interview, press release, analyst note, expert or
-measurement method. Syndication and citation chains do not create
-corroboration.
-
-Two sources are useful corroboration when failure modes are meaningfully
-different. Record:
-
-- original producer and funding or incentive;
-- collection and estimation method;
-- sample, geography, population and period;
-- unit and definition;
-- transformations and revisions;
-- dependence on other accepted sources.
+Full independence and corroboration rules live in
+`core-source-and-evidence.md`; this document only applies them across the eight
+lanes. Sources that share an originating dataset, interview, press release,
+analyst note, expert or measurement method are one cluster, and syndication or
+citation chains do not create corroboration. Two sources corroborate only when
+their failure modes genuinely differ across producer, method, sample, unit,
+definition, transformation and dependence on other accepted sources.
 
 ## Claim-level corroboration
 
@@ -68,19 +61,15 @@ Each conclusion-critical claim requires:
 5. conflicting evidence and rival explanation;
 6. falsification condition and monitor.
 
-A reference-path thesis carrier needs evidence appropriate to its failure risk. When a
-row is labeled `corroborated`, the referenced sources must include a genuinely
-independent root, originating team and measurement method. A single direct hard
-anchor can remain labeled as such; the independent reviewer decides whether its
-failure risk requires another method or a readiness cap. Do not manufacture
-confidence by adding distant sources or relabeling a single-origin chain.
-
-The machine does not infer a corroboration claim merely because a series is
-`accepted` or `conclusion_critical`. Empty cross-check fields preserve the
-single-anchor state for review. Populating a cross-check series, result or basis
-bridge is an explicit corroboration claim; the validator then verifies that the
-claim is complete, independent and definition-compatible. Whether another
-method should have been sought remains reviewer judgment.
+A reference-path thesis carrier needs evidence appropriate to its failure risk.
+A `corroborated` label requires a genuinely independent root, originating team
+and measurement method (defined in `core-source-and-evidence.md`); a single
+direct hard anchor may stay labeled as such, and the independent reviewer
+decides whether its failure risk requires another method or a readiness cap.
+Empty cross-check fields preserve the single-anchor state for review; populating
+a cross-check series, result or basis bridge is an explicit corroboration claim
+that the validator then checks for completeness, independence and definition
+compatibility.
 
 Technical feasibility, manufacturing readiness, qualification, commercial
 commitment and revenue recognition require different evidence. Sources that
