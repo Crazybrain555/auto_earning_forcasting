@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { createYtDlpService, type YtDlpRunner } from "../src/service.js";
+import { createYtDlpService, YtDlpError, type YtDlpRunner } from "../src/service.js";
 
 test("searchVideos requests one extra result and returns a stable page", async () => {
   const calls: string[][] = [];
@@ -134,22 +134,112 @@ test("getTranscriptArtifact saves clean text derived only from the public VTT", 
   }
 });
 
-test("Chrome cookie mode adds only yt-dlp browser-cookie arguments", async () => {
-  let received: readonly string[] = [];
+test("search stays anonymous even when a cookie source is configured", async () => {
+  const calls: string[][] = [];
   const runner: YtDlpRunner = async (args) => {
-    received = args;
+    calls.push([...args]);
     return JSON.stringify({ entries: [] });
   };
-  const service = createYtDlpService({ runner, cookiesFromBrowser: "chrome" });
+  const service = createYtDlpService({
+    runner,
+    cookiesFromBrowser: "chrome",
+    cookieMode: "always",
+  });
 
   await service.searchVideos("semiconductors", 1, 0);
 
-  const cookieIndex = received.indexOf("--cookies-from-browser");
-  assert.notEqual(cookieIndex, -1);
-  assert.equal(received[cookieIndex + 1], "chrome");
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0]?.includes("--cookies-from-browser"), false);
+});
+
+test("cookie mode 'always' sends the cookie file on the first player request", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "youtube-mcp-cookie-test-"));
+  const cookiesFile = path.join(root, "cookies.txt");
+  await writeFile(cookiesFile, "# Netscape HTTP Cookie File\n", { mode: 0o600 });
+  const calls: string[][] = [];
+  const runner: YtDlpRunner = async (args) => {
+    calls.push([...args]);
+    return JSON.stringify({ id: "video123", title: "Example" });
+  };
+
+  try {
+    const service = createYtDlpService({ runner, cookiesFile, cookieMode: "always" });
+    await service.getVideoMetadata("https://www.youtube.com/watch?v=video123");
+
+    assert.equal(calls.length, 1);
+    const cookieIndex = calls[0]?.indexOf("--cookies") ?? -1;
+    assert.notEqual(cookieIndex, -1);
+    assert.equal(calls[0]?.[cookieIndex + 1], cookiesFile);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("cookie mode 'fallback' retries with cookies only after a sign-in challenge", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "youtube-mcp-fallback-test-"));
+  const cookiesFile = path.join(root, "cookies.txt");
+  await writeFile(cookiesFile, "# Netscape HTTP Cookie File\n", { mode: 0o600 });
+  const calls: string[][] = [];
+  const runner: YtDlpRunner = async (args) => {
+    calls.push([...args]);
+    if (!args.includes("--cookies")) {
+      throw new YtDlpError("Sign in to confirm you're not a bot", true);
+    }
+    return JSON.stringify({ id: "video123", title: "Example" });
+  };
+
+  try {
+    const service = createYtDlpService({ runner, cookiesFile, cookieMode: "fallback" });
+    const result = await service.getVideoMetadata("https://www.youtube.com/watch?v=video123");
+
+    assert.equal(result.id, "video123");
+    assert.equal(calls.length, 2);
+    assert.equal(calls[0]?.includes("--cookies"), false);
+    assert.equal(calls[1]?.includes("--cookies"), true);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("cookie mode 'never' refuses to spend cookies and surfaces the block", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "youtube-mcp-never-test-"));
+  const cookiesFile = path.join(root, "cookies.txt");
+  await writeFile(cookiesFile, "# Netscape HTTP Cookie File\n", { mode: 0o600 });
+  const calls: string[][] = [];
+  const runner: YtDlpRunner = async (args) => {
+    calls.push([...args]);
+    throw new YtDlpError("Sign in to confirm you're not a bot", true);
+  };
+
+  try {
+    const service = createYtDlpService({ runner, cookiesFile, cookieMode: "never" });
+    await assert.rejects(
+      () => service.getVideoMetadata("https://www.youtube.com/watch?v=video123"),
+      /Sign in to confirm/,
+    );
+    assert.equal(calls.length, 1);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("cookie configuration is validated", async () => {
+  const runner: YtDlpRunner = async () => JSON.stringify({ entries: [] });
+
   assert.throws(
     () => createYtDlpService({ runner, cookiesFromBrowser: "../../browser-profile" }),
     /Only the Chrome browser cookie source is supported/,
+  );
+  assert.throws(
+    () => createYtDlpService({
+      runner,
+      cookiesFile: path.join(tmpdir(), "definitely-absent-cookies.txt"),
+    }),
+    /does not exist/,
+  );
+  assert.throws(
+    () => createYtDlpService({ runner, cookiesFile: "/etc/hosts", cookiesFromBrowser: "chrome" }),
+    /not both/,
   );
 });
 

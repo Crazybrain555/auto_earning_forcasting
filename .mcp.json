@@ -24,7 +24,10 @@
         "scripts/mcp/youtube-transcript.sh"
       ],
       "env": {
-        "YOUTUBE_COOKIES_FROM_BROWSER": "${YOUTUBE_COOKIES_FROM_BROWSER:-}"
+        "YOUTUBE_COOKIES_FILE": "${YOUTUBE_COOKIES_FILE:-}",
+        "YOUTUBE_COOKIE_MODE": "${YOUTUBE_COOKIE_MODE:-}",
+        "YOUTUBE_COOKIES_FROM_BROWSER": "${YOUTUBE_COOKIES_FROM_BROWSER:-}",
+        "YOUTUBE_MCP_SLEEP_REQUESTS": "${YOUTUBE_MCP_SLEEP_REQUESTS:-}"
       }
     }
   }

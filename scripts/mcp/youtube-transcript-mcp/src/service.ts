@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { accessSync, constants, statSync } from "node:fs";
 import {
   mkdir,
   mkdtemp,
@@ -8,7 +9,7 @@ import {
   rm,
   writeFile,
 } from "node:fs/promises";
-import { tmpdir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import path from "node:path";
 
 import {
@@ -21,17 +22,38 @@ import {
   validateYouTubeUrl,
   type SearchResult,
   type SearchVideo,
+  type SelectedSubtitleTrack,
   type SubtitleInventory,
   type SubtitleSource,
 } from "./ytdlp.js";
 
-export type YtDlpRunner = (args: readonly string[]) => Promise<string>;
+export interface YtDlpResult {
+  stdout: string;
+  stderr: string;
+}
+
+/**
+ * Runners may return stdout alone. The record form additionally carries stderr,
+ * which is required to diagnose the yt-dlp runs that exit 0 but write no subtitles.
+ */
+export type YtDlpRunner = (args: readonly string[]) => Promise<string | YtDlpResult>;
+
+/**
+ * How the server may spend the configured YouTube account cookies:
+ * - "fallback": anonymous first, retry once with cookies when YouTube demands sign-in
+ * - "always": send cookies on every player request (right when the egress IP is known-blocked)
+ * - "never": never send cookies, even if a cookie source is configured
+ */
+export type CookieMode = "fallback" | "always" | "never";
 
 export interface YtDlpServiceOptions {
   runner?: YtDlpRunner;
   cacheDir?: string;
   maxContentChars?: number;
   cookiesFromBrowser?: string;
+  cookiesFile?: string;
+  cookieMode?: CookieMode;
+  sleepRequests?: number;
 }
 
 export interface VideoMetadata {
@@ -125,6 +147,65 @@ function optionalNumber(value: unknown): number | undefined {
   return typeof value === "number" && Number.isFinite(value) ? value : undefined;
 }
 
+function normalizeResult(value: string | YtDlpResult): YtDlpResult {
+  return typeof value === "string" ? { stdout: value, stderr: "" } : value;
+}
+
+/**
+ * yt-dlp exits 0 when it silently drops a caption track, so a missing VTT is ambiguous.
+ * The PO-token case is the misleading one: YouTube withholds the track and yt-dlp reports
+ * it at debug level for its default clients, which otherwise reads as "no captions exist".
+ */
+function describeMissingSubtitle(track: SelectedSubtitleTrack, output: string): string {
+  if (/po token/i.test(output)) {
+    return `YouTube demanded a PO token for the '${track.language}' (${track.source}) caption track, so yt-dlp discarded it. The track exists; this is a YouTube-side restriction. Note that YouTube Premium sessions always require a PO token for subtitles, so a non-Premium cookie source usually avoids this.`;
+  }
+  if (/no subtitles for the requested languages/i.test(output)) {
+    return `yt-dlp found no '${track.language}' subtitles even though the track was listed. Re-check with youtube_list_subtitle_languages; the track may have been withdrawn since.`;
+  }
+  return `yt-dlp did not produce a VTT file for '${track.language}' (${track.source}).`;
+}
+
+/**
+ * Resolves and sanity-checks a Netscape cookie jar path. yt-dlp's YouTube guidance
+ * mandates a file exported from a throwaway account's private-window session rather
+ * than live browser cookies, which YouTube rotates while a YouTube tab stays open.
+ */
+function resolveCookiesFile(candidate: string): string {
+  const resolved = candidate.startsWith("~/")
+    ? path.join(homedir(), candidate.slice(2))
+    : path.resolve(candidate);
+
+  let stats;
+  try {
+    stats = statSync(resolved);
+  } catch {
+    throw new Error(`YOUTUBE_COOKIES_FILE does not exist: ${resolved}`);
+  }
+  if (!stats.isFile()) {
+    throw new Error(`YOUTUBE_COOKIES_FILE is not a regular file: ${resolved}`);
+  }
+  try {
+    accessSync(resolved, constants.R_OK);
+  } catch {
+    throw new Error(`YOUTUBE_COOKIES_FILE is not readable: ${resolved}`);
+  }
+  if ((stats.mode & 0o077) !== 0) {
+    console.error(
+      `youtube-transcript MCP: ${resolved} is group/world readable. Run 'chmod 600' on it.`,
+    );
+  }
+  return resolved;
+}
+
+function parseCookieMode(value: string | undefined): CookieMode {
+  if (value === undefined || value === "") return "fallback";
+  if (value === "fallback" || value === "always" || value === "never") return value;
+  throw new Error(
+    `Invalid YOUTUBE_COOKIE_MODE '${value}'. Use 'fallback', 'always', or 'never'.`,
+  );
+}
+
 function parseJsonRecord(stdout: string): UnknownRecord {
   let parsed: unknown;
   try {
@@ -136,26 +217,48 @@ function parseJsonRecord(stdout: string): UnknownRecord {
   return parsed;
 }
 
-function actionableYtDlpError(stderr: string): Error {
-  if (/sign in to confirm you.?re not a bot/i.test(stderr)) {
-    return new Error(
-      "YouTube blocked anonymous access. With explicit permission, enable the project's Chrome cookie mode and retry.",
-    );
-  }
-  if (/requested format is not available|no subtitles/i.test(stderr)) {
-    return new Error("The requested public subtitle track is not available for this video.");
-  }
-  const concise = stderr.trim().split("\n").slice(-6).join("\n");
-  return new Error(`yt-dlp failed: ${concise || "unknown error"}`);
+export function isSignInChallenge(output: string): boolean {
+  return /sign in to confirm you.?re not a bot|confirm your age|this video is only available to/i
+    .test(output);
 }
 
-export async function runYtDlpCommand(args: readonly string[]): Promise<string> {
+export class YtDlpError extends Error {
+  readonly signInChallenge: boolean;
+
+  constructor(message: string, signInChallenge: boolean) {
+    super(message);
+    this.name = "YtDlpError";
+    this.signInChallenge = signInChallenge;
+  }
+}
+
+function actionableYtDlpError(output: string, cookiesAttempted: boolean): YtDlpError {
+  if (isSignInChallenge(output)) {
+    return new YtDlpError(
+      cookiesAttempted
+        ? "YouTube rejected the request even with the configured cookies. The cookie file is most likely expired — re-export it (see the MCP README), or the egress IP has been blocked outright."
+        : "YouTube blocked anonymous access from this egress IP. Configure YOUTUBE_COOKIES_FILE (see the MCP README) or route this host through an IP YouTube has not flagged.",
+      true,
+    );
+  }
+  if (/requested format is not available|no subtitles/i.test(output)) {
+    return new YtDlpError(
+      "The requested public subtitle track is not available for this video.",
+      false,
+    );
+  }
+  const concise = output.trim().split("\n").slice(-6).join("\n");
+  return new YtDlpError(`yt-dlp failed: ${concise || "unknown error"}`, false);
+}
+
+export async function runYtDlpCommand(args: readonly string[]): Promise<YtDlpResult> {
   const configuredTimeout = Number.parseInt(process.env.YOUTUBE_MCP_TIMEOUT_MS ?? "180000", 10);
   const timeoutMs = Number.isFinite(configuredTimeout) && configuredTimeout > 0
     ? configuredTimeout
     : 180_000;
+  const cookiesAttempted = args.includes("--cookies") || args.includes("--cookies-from-browser");
 
-  return new Promise<string>((resolve, reject) => {
+  return new Promise<YtDlpResult>((resolve, reject) => {
     const child = spawn("yt-dlp", [...args], {
       shell: false,
       stdio: ["ignore", "pipe", "pipe"],
@@ -199,8 +302,8 @@ export async function runYtDlpCommand(args: readonly string[]): Promise<string> 
     });
     child.on("close", (code) => {
       finish(() => {
-        if (code === 0) resolve(stdout);
-        else reject(actionableYtDlpError(`${stderr}\n${stdout}`));
+        if (code === 0) resolve({ stdout, stderr });
+        else reject(actionableYtDlpError(`${stderr}\n${stdout}`, cookiesAttempted));
       });
     });
   });
@@ -252,25 +355,65 @@ export function createYtDlpService(options: YtDlpServiceOptions = {}): YtDlpServ
   if (cookiesFromBrowser && cookiesFromBrowser !== "chrome") {
     throw new Error("Only the Chrome browser cookie source is supported by this project MCP.");
   }
+  const configuredCookiesFile = options.cookiesFile ?? process.env.YOUTUBE_COOKIES_FILE;
+  if (configuredCookiesFile && cookiesFromBrowser) {
+    throw new Error("Set either YOUTUBE_COOKIES_FILE or YOUTUBE_COOKIES_FROM_BROWSER, not both.");
+  }
+  const cookiesFile = configuredCookiesFile ? resolveCookiesFile(configuredCookiesFile) : undefined;
+  const cookieMode = options.cookieMode ?? parseCookieMode(process.env.YOUTUBE_COOKIE_MODE);
+  const cookiesUsable = Boolean(cookiesFile ?? cookiesFromBrowser) && cookieMode !== "never";
 
-  const commonArgs = (): string[] => [
+  const configuredSleep = Number.parseFloat(process.env.YOUTUBE_MCP_SLEEP_REQUESTS ?? "0.75");
+  const sleepRequests = options.sleepRequests
+    ?? (Number.isFinite(configuredSleep) && configuredSleep >= 0 ? configuredSleep : 0.75);
+
+  const cookieArgs = (): string[] => {
+    if (cookiesFile) return ["--cookies", cookiesFile];
+    if (cookiesFromBrowser) return ["--cookies-from-browser", "chrome"];
+    return [];
+  };
+
+  const commonArgs = (useCookies: boolean): string[] => [
     "--ignore-config",
     "--js-runtimes",
     "deno",
-    ...(cookiesFromBrowser ? ["--cookies-from-browser", "chrome"] : []),
+    ...(sleepRequests > 0 ? ["--sleep-requests", String(sleepRequests)] : []),
+    ...(useCookies ? cookieArgs() : []),
   ];
+
+  /**
+   * Runs one yt-dlp invocation, spending account cookies only as the mode allows.
+   * "always" sends them on the first player attempt, because when the egress IP is
+   * already blocked the anonymous attempt is a guaranteed round trip to a sign-in
+   * challenge. Search stays anonymous-first in every mode: the search endpoint is not
+   * gated like the player endpoint, so cookies there would add account exposure for
+   * nothing.
+   */
+  const run = async (
+    buildArgs: (useCookies: boolean) => string[],
+    kind: "search" | "player",
+  ): Promise<YtDlpResult> => {
+    const cookiesFirst = cookiesUsable && cookieMode === "always" && kind === "player";
+    try {
+      return normalizeResult(await runner(buildArgs(cookiesFirst)));
+    } catch (error) {
+      const challenged = error instanceof YtDlpError && error.signInChallenge;
+      if (!challenged || cookiesFirst || !cookiesUsable) throw error;
+      return normalizeResult(await runner(buildArgs(true)));
+    }
+  };
 
   const getRawMetadata = async (url: string): Promise<UnknownRecord> => {
     if (!validateYouTubeUrl(url)) {
       throw new Error("Invalid YouTube video URL. Use a youtube.com or youtu.be video URL.");
     }
-    const stdout = await runner([
-      ...commonArgs(),
+    const { stdout } = await run((useCookies) => [
+      ...commonArgs(useCookies),
       "--no-playlist",
       "--skip-download",
       "--dump-single-json",
       url,
-    ]);
+    ], "player");
     return parseJsonRecord(stdout);
   };
 
@@ -280,13 +423,13 @@ export function createYtDlpService(options: YtDlpServiceOptions = {}): YtDlpServ
     offset: number,
   ): Promise<SearchResult> => {
     const fetchCount = Math.min(100, offset + maxResults + 1);
-    const stdout = await runner([
-      ...commonArgs(),
+    const { stdout } = await run((useCookies) => [
+      ...commonArgs(useCookies),
       "--flat-playlist",
       "--skip-download",
       "--dump-single-json",
       `ytsearch${fetchCount}:${query}`,
-    ]);
+    ], "search");
     return parseSearchResults(parseJsonRecord(stdout), offset, maxResults);
   };
 
@@ -309,22 +452,19 @@ export function createYtDlpService(options: YtDlpServiceOptions = {}): YtDlpServ
     const tempDir = await mkdtemp(path.join(tmpdir(), "youtube-transcript-mcp-"));
     try {
       const outputTemplate = path.join(tempDir, "subtitle.%(ext)s");
-      const baseArgs = buildSubtitleDownloadArgs(url, selected, outputTemplate);
-      const downloadArgs = cookiesFromBrowser
-        ? [
-            ...baseArgs.slice(0, -1),
-            "--cookies-from-browser",
-            "chrome",
-            baseArgs.at(-1)!,
-          ]
-        : baseArgs;
-      await runner(downloadArgs);
+      // --verbose costs no extra request but is the only way to see a PO-token track drop,
+      // which yt-dlp otherwise logs at debug level for its default clients.
+      const { stdout, stderr } = await run(
+        (useCookies) => buildSubtitleDownloadArgs(url, selected, outputTemplate, [
+          ...commonArgs(useCookies),
+          "--verbose",
+        ]),
+        "player",
+      );
 
       const subtitleFile = (await readdir(tempDir)).sort().find((name) => name.endsWith(".vtt"));
       if (!subtitleFile) {
-        throw new Error(
-          `yt-dlp did not produce a VTT file for '${selected.language}' (${selected.source}).`,
-        );
+        throw new Error(describeMissingSubtitle(selected, `${stderr}\n${stdout}`));
       }
       const fullContent = await readFile(path.join(tempDir, subtitleFile), "utf8");
       await mkdir(cacheDir, { recursive: true });

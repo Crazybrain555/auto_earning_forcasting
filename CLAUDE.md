@@ -26,6 +26,8 @@ The project-scoped `youtube-transcript` MCP is a subtitle-only research source s
 4. Use `youtube_get_subtitles` for timestamped WebVTT evidence and `youtube_get_transcript` for reading or text analysis.
 5. Skip videos that have no public subtitle track. Do not download video/audio and do not fall back to speech-to-text.
 
+Authentication is already provisioned; it is not something to negotiate per session. This host's egress IP is blocked by YouTube's player endpoint, and the MCP answers that with a throwaway-account cookie jar at `~/.config/youtube-transcript-mcp/cookies.txt` (outside the repo, never committed). Search still runs anonymously. Do not switch `player_client`, add `--impersonate`, or reach for live browser cookies as a workaround — all three were measured against this IP and none defeat an IP-level block. If a call reports the jar as expired, report that and stop: re-exporting it is the operator's job, and `scripts/mcp/youtube-transcript-mcp/README.md` has the procedure.
+
 Full `.vtt` and `.txt` artifacts are cached under `.cache/youtube-transcripts/`; copy research evidence into the active forecast case workspace when it belongs in that case's source pack. Preserve timestamps for quotations. Treat exact figures, product names, and proper nouns from automatic captions as noisy evidence and corroborate them with another source before using them in a forecast.
 
 ## Forecasting-system development constitution

@@ -132,9 +132,10 @@ export function buildSubtitleDownloadArgs(
   url: string,
   track: SelectedSubtitleTrack,
   outputTemplate: string,
+  baseArgs: readonly string[] = ["--ignore-config", "--js-runtimes", "deno"],
 ): string[] {
   return [
-    "--ignore-config",
+    ...baseArgs,
     "--no-playlist",
     "--skip-download",
     track.source === "manual" ? "--write-subs" : "--write-auto-subs",
@@ -144,8 +145,6 @@ export function buildSubtitleDownloadArgs(
     "vtt",
     "--output",
     outputTemplate,
-    "--js-runtimes",
-    "deno",
     url,
   ];
 }
