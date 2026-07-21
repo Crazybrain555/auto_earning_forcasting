@@ -11,7 +11,7 @@ from typing import Literal
 from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -45,6 +45,13 @@ def require_dashboard(x_dashboard: str | None = Header(None)):
 
 
 MUTATING = dict(dependencies=[Depends(require_dashboard)])
+
+
+@app.on_event("startup")
+def _start_job_scheduler() -> None:
+    # Promotes queued jobs left over from a previous backend process and keeps
+    # the FIFO draining when detached jobs or replica pulls finish.
+    jobs.start_scheduler()
 
 
 class ControlRequest(BaseModel):
@@ -266,6 +273,7 @@ def export_snapshot():
         "status": {
             "control": control.read_control(),
             "running_jobs": running,
+            "capacity": jobs.capacity(),
             "latest_case_activity": data.latest_activity(),
         },
     }
@@ -276,6 +284,7 @@ def status():
     return {
         "control": control.read_control(),
         "running_jobs": jobs.running_jobs(),
+        "capacity": jobs.capacity(),
         "latest_case_activity": data.latest_activity(),
     }
 
@@ -312,19 +321,36 @@ def all_jobs():
 
 @app.post("/api/jobs", status_code=201, **MUTATING)
 def create_job(req: JobRequest, x_idempotency_key: str | None = Header(None)):
+    """Accept a job. A busy runner is not an error: the job is created in
+    status "queued" (202) and promoted FIFO when the slot frees. Submits are
+    rejected only for invalid input (422), a disabled engine (501), a replica
+    pull in flight (409), or a full bounded queue (503 + Retry-After)."""
     try:
-        return jobs.start_job(
+        record = jobs.start_job(
             req.type,
             req.engine,
             req.params,
             idempotency_key=x_idempotency_key or "",
         )
+    except jobs.CompanyBusyError as exc:
+        raise HTTPException(409, str(exc))
+    except jobs.RateLimitError as exc:
+        raise HTTPException(429, str(exc), headers={"Retry-After": "30"})
+    except jobs.QueueFullError as exc:
+        raise HTTPException(503, str(exc), headers={"Retry-After": "60"})
     except RuntimeError as exc:          # replica pull in progress
         raise HTTPException(409, str(exc))
-    except PermissionError as exc:
+    except PermissionError as exc:       # engine disabled / not logged in
         raise HTTPException(501, str(exc))
     except ValueError as exc:
         raise HTTPException(422, str(exc))
+    if record.get("status") == "queued":
+        return JSONResponse(
+            record,
+            status_code=202,
+            headers={"Location": f"/api/jobs/{record['id']}", "Retry-After": "10"},
+        )
+    return record
 
 
 @app.get("/api/jobs/{job_id}")
@@ -382,7 +408,7 @@ def remove_watchlist(security: str):
 
 @app.get("/api/portfolio")
 def portfolio():
-    return data.portfolio(state.load_watchlist(), jobs.running_jobs())
+    return data.portfolio(state.load_watchlist(), jobs.running_jobs(), jobs.queued_jobs())
 
 
 @app.get("/api/curriculum")

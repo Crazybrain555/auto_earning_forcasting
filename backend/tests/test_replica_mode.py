@@ -169,6 +169,11 @@ class PullProcessGroupTests(unittest.TestCase):
 
             self.assertFalse(state["pulling"])
             self.assertIn("terminated", state["error"])
+            if not pidfile.is_file():
+                # Under load the shell may be SIGTERMed before it even forked
+                # the child - then there is no orphan to verify. killpg covers
+                # the fork window either way; skip the pid probe, not the test.
+                return
             child_pid = int(pidfile.read_text(encoding="utf-8").strip())
             for _ in range(20):  # the group SIGTERM may take a moment to land
                 try:

@@ -714,7 +714,7 @@ def _sec_key(value) -> str:
     return str(value or "").upper().split(":")[-1].strip()
 
 
-def portfolio(watchlist: list[dict], running_jobs: list[dict]) -> list[dict]:
+def portfolio(watchlist: list[dict], running_jobs: list[dict], queued_jobs: list[dict] | None = None) -> list[dict]:
     from . import db
     cases = list_cases()
     db.scan(lambda: cases, read_json, normalize_outputs)
@@ -724,6 +724,11 @@ def portfolio(watchlist: list[dict], running_jobs: list[dict]) -> list[dict]:
         if sec:
             running_map.setdefault(sec, job.get("id"))
     running_secs = set(running_map)
+    queued_map: dict[str, dict] = {}
+    for job in queued_jobs or []:
+        sec = _sec_key((job.get("params") or {}).get("security") or (job.get("params") or {}).get("entity"))
+        if sec:
+            queued_map.setdefault(sec, {"id": job.get("id"), "position": job.get("queue_position")})
     rows = []
     for item in watchlist:
         if not isinstance(item, dict) or not (item.get("security") or item.get("entity")):
@@ -748,6 +753,11 @@ def portfolio(watchlist: list[dict], running_jobs: list[dict]) -> list[dict]:
             "job_id": running_map.get(sec),
             "valuation": valuation,
             "job_running": sec in running_secs,
+            # A security both running and queued shows as running; its queued
+            # duplicate stays visible (and cancellable) on the jobs page.
+            "job_queued": sec in queued_map and sec not in running_secs,
+            "queued_job_id": (queued_map.get(sec) or {}).get("id") if sec not in running_secs else None,
+            "queue_position": (queued_map.get(sec) or {}).get("position") if sec not in running_secs else None,
             "cases": mine,
         })
     return rows

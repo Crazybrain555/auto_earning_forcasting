@@ -21,6 +21,9 @@ class _RunningProcess:
 
 def _prepare(monkeypatch, tmp_path):
     launches = []
+    from backend.app import db as app_db
+    # Keep the reaper's db.scan ingest away from the real runs tree in tests.
+    monkeypatch.setattr(app_db, "scan", lambda *args, **kwargs: None)
     monkeypatch.setattr(jobs, "JOBS_DIR", tmp_path)
     monkeypatch.setattr(jobs, "build_prompt", lambda job_type, params: ("safe prompt", dict(params)))
     monkeypatch.setattr(jobs, "compose_cmd", lambda spec, prompt, params: ["codex", "exec"])
@@ -84,17 +87,18 @@ def test_job_start_rejects_unsafe_idempotency_key(monkeypatch, tmp_path, key):
     assert launches == []
 
 
-def test_job_start_refuses_to_exceed_runner_concurrency(monkeypatch, tmp_path):
+def test_job_start_queues_instead_of_rejecting_at_capacity(monkeypatch, tmp_path):
     launches = _prepare(monkeypatch, tmp_path)
     monkeypatch.setitem(jobs.CONFIG, "max_concurrent_jobs", 1)
     jobs._PROCS["already-running"] = _RunningProcess()
 
-    with pytest.raises(PermissionError, match="capacity"):
-        jobs.start_job(
-            "live_forecast",
-            "codex",
-            {"entity": "Micron", "security": "MU"},
-        )
+    record = jobs.start_job(
+        "live_forecast",
+        "codex",
+        {"entity": "Micron", "security": "MU"},
+    )
 
+    assert record["status"] == "queued"
+    assert record["queue_position"] == 1
     assert launches == []
     jobs._PROCS.clear()

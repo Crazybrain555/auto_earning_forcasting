@@ -27,6 +27,10 @@ let actionToastTimer = 0;
 
 function safeActionErrorMessage(error) {
   const raw = String(error?.message || error || "").trim();
+  // 语义化的容量信息要保住,不能落进下面按状态码归一的通用文案里
+  if (/queue is full/i.test(raw)) return "任务队列已满：请先取消部分排队任务，或等队列消化后再提交。";
+  if (/too many job submissions/i.test(raw)) return "提交太频繁：请稍等片刻再试（防误触保护）。";
+  if (/company busy/i.test(raw)) return "该公司已有任务进行中：请先取消当前任务，再重新提交。";
   const status = raw.match(/\b(400|401|403|404|409|422|429|500|502|503|504)\b/)?.[1];
   if (status === "401") return "未获得控制权限，请刷新页面后重试。";
   if (status === "403") return "当前账号没有控制权限。";
@@ -55,8 +59,6 @@ function showActionToast(message, tone = "error") {
   if (!toast) {
     toast = document.createElement("div");
     toast.id = "action-toast";
-    toast.setAttribute("role", "alert");
-    toast.setAttribute("aria-live", "assertive");
 
     const text = document.createElement("div");
     text.className = "action-toast-text";
@@ -77,6 +79,9 @@ function showActionToast(message, tone = "error") {
 
   toast.__messageNode.textContent = String(message || "操作未完成，请重试。");
   toast.dataset.tone = tone;
+  // 只有真正的失败才用打断式播报;排队/完成类状态走 polite,不抢屏幕阅读器
+  toast.setAttribute("role", tone === "error" ? "alert" : "status");
+  toast.setAttribute("aria-live", tone === "error" ? "assertive" : "polite");
   toast.className = "action-toast on";
   clearTimeout(actionToastTimer);
   actionToastTimer = setTimeout(() => toast.remove(), 7000);
@@ -85,6 +90,22 @@ function showActionToast(message, tone = "error") {
 
 function reportActionError(action, error) {
   return showActionToast(`${action}失败：${safeActionErrorMessage(error)}`, "error");
+}
+
+// 提交任务后的统一反馈:排队是正常状态而不是错误——容量满时后端把任务收进
+// FIFO 队列并返回 queued,这里告诉用户排到第几位;重复提交被后端合并时也说明。
+function notifyJobAccepted(record, label) {
+  if (!record || typeof record !== "object") return;
+  if (record.deduplicated) {
+    showActionToast(`${label}已在${record.status === "queued" ? "队列" : "运行"}中,未重复提交`, "pending");
+  } else if (record.status === "queued") {
+    const pos = record.queue_position ? `排第 ${record.queue_position} 位` : "已排队";
+    showActionToast(`${label}已加入队列(${pos}),前面的任务完成后自动开始`, "pending");
+  } else if (record.status === "failed") {
+    showActionToast(`${label}启动失败:${record.error || "请到「任务」页看日志"}`, "error");
+  } else {
+    showActionToast(`${label}已启动`, "success");
+  }
 }
 
 async function runPendingButton(button, pendingLabel, action) {
@@ -133,6 +154,7 @@ const fmtDate = t => { const s = fmtTime(t); return s === "—" ? s : s.split(" 
 const STATUS_STYLE = { good: "var(--good)", warning: "var(--warning)", serious: "var(--serious)", critical: "var(--critical)", accent: "var(--accent)", muted: "var(--baseline)" };
 const statusChip = (kind, label) => `<span class="status"><span class="dot" style="background:${STATUS_STYLE[kind] || STATUS_STYLE.muted}"></span>${esc(label)}</span>`;
 const JOB_STATUS = {
+  queued: ["warning", "排队中"],
   running: ["accent", "运行中"], running_detached: ["warning", "运行中(脱管)"],
   finished: ["good", "已完成"], failed: ["critical", "失败"],
   stopped: ["serious", "已停止"], interrupted: ["serious", "已中断"],
@@ -659,7 +681,10 @@ function summaryHtml(es) {
   </div>`;
 }
 
+let pfTimer = null;
+
 async function viewPortfolio() {
+  closeEngineMenu();   // 全量重建视图前收掉菜单,保证首绘不被 paintPortfolio 的菜单守卫拦下
   pfRows = await api("/api/portfolio");
   paintPortfolio();
   api("/api/engines").then(e => {
@@ -674,9 +699,24 @@ async function viewPortfolio() {
       if ((location.hash || "#/portfolio").includes("portfolio")) paintPortfolio();
     }).catch(() => {});
   }
+  // 任务状态(排队→运行→完成)会在后台变化;定时把最新状态拉回看板,
+  // 排队中的卡片才能自己变成运行中/完成,而不是停在点击那一刻。
+  clearInterval(pfTimer);
+  pfTimer = setInterval(async () => {
+    if (!(location.hash || "#/portfolio").includes("portfolio")) { clearInterval(pfTimer); pfTimer = null; return; }
+    try {
+      const rows = await api("/api/portfolio");
+      // 请求在途时用户可能已切走;落地前再验一次,不把看板画到别的页面上
+      if (!(location.hash || "#/portfolio").includes("portfolio")) return;
+      pfRows = rows; paintPortfolio();
+    } catch {}
+  }, 15000);
 }
 
 function paintPortfolio() {
+  // 引擎菜单开着时推迟重绘:后台到达的行情/推荐数据会整页重建并孤立菜单,
+  // 让用户点到一半的菜单凭空消失。菜单只开几秒,数据下个周期再刷新。
+  if (document.getElementById("engine-menu")) return;
   const rows = pfRows;
   const keep = id => { const el = document.getElementById(id); return el ? el.value : ""; };
   const saved = { e: keep("w-entity"), s: keep("w-sec"), n: keep("w-note"), h: keep("sug-hint") };
@@ -725,7 +765,7 @@ function paintPortfolio() {
     const isOpen = expanded.has(r.security);
     html += `<div class="pcard" data-sec="${esc(r.security)}">
       <div class="pchead" data-toggle="${esc(r.security)}">
-        <div><div class="pc-name"><b>${esc(r.entity)}</b><span class="sec">${esc(r.security)}</span>${r.job_running ? statusChip("accent", "推理中") : ""}</div>
+        <div><div class="pc-name"><b>${esc(r.entity)}</b><span class="sec">${esc(r.security)}</span>${r.job_running ? statusChip("accent", "推理中") : r.job_queued ? statusChip("warning", `排队中${r.queue_position ? " #" + r.queue_position : ""}`) : ""}</div>
           <div class="pc-sub">${r.note ? esc(r.note) + " · " : ""}${latest ? "预测 " + fmtDate(latest.last_activity) + (latest.method_commit ? " · 方法 " + esc(String(latest.method_commit).slice(0, 7)) : "") : "未跑过"}</div></div>
         <div><div class="pc-price">${e.price != null ? money(e.price) : "—"}${e.live ? ` <span class="cellnote">实时</span>` : e.price != null ? ` <span class="cellnote">${esc((e.v.price_as_of || "").slice(0, 10) || "研究时点")}</span>` : ""}</div>
           ${e.distKey ? `<div class="pc-dist ${e.distKey}">${esc(e.distLabel)}</div>` : ""}</div>
@@ -734,6 +774,8 @@ function paintPortfolio() {
         <div class="pc-target"><span class="v">${money(e.base)}</span><div class="l">目标价</div></div>
         <div class="pc-act">${r.job_running
           ? `<button class="btn btn-sm" data-viewlog="${esc(r.job_id || "")}">日志</button> <button class="btn btn-sm btn-danger" data-canceljob="${esc(r.job_id || "")}" data-sec="${esc(r.security)}">取消</button>`
+          : r.job_queued
+          ? `<button class="btn btn-sm" data-cancelqueued="${esc(r.queued_job_id || "")}" data-sec="${esc(r.security)}">取消排队</button>`
           : `<button class="btn btn-sm" data-run="${esc(r.security)}" data-entity="${esc(r.entity)}">跑预测</button>`}
           <button class="btn btn-sm" data-versions="${esc(r.security)}" data-entity="${esc(r.entity)}" title="版本管理:选择看板显示哪一版 / 删除坏版本">版本</button>
           <button class="btn btn-sm btn-danger" data-unwatch="${esc(r.security)}" title="移出关注列表(历史版本保留在数据库)">移除</button></div>
@@ -799,7 +841,7 @@ function openDrawer(titleHtml, bodyHtml) {
 
 /* 日志抽屉:任何页面都能开,3 秒轮询,运行中可直接停止 */
 function openLogDrawer(jobId) {
-  if (!jobId) { alert("找不到任务 ID"); return; }
+  if (!jobId) { showActionToast("找不到任务 ID", "error"); return; }
   openDrawer(`任务日志 · <span class="mono">${esc(jobId)}</span>`,
     `<div id="log-meta" class="cellnote" style="margin-bottom:8px">加载中…</div><pre class="log drawer-log" id="drawer-log"></pre>`);
   const load = async () => {
@@ -808,13 +850,17 @@ function openLogDrawer(jobId) {
       const meta = document.getElementById("log-meta"), pre = document.getElementById("drawer-log");
       if (!meta || !pre) return;
       const isRunning = ["running", "running_detached"].includes(rec.status);
-      meta.innerHTML = `${jobTypeChip(rec.type)} ${jobChip(rec.status)} <span class="mono">${esc(rec.engine)}${rec.params && rec.params.model ? " · " + esc(rec.params.model) : ""}${rec.params && rec.params.effort ? " · " + esc(rec.params.effort) : ""}</span> <span class="cellnote">${elapsed(rec.started_at, rec.ended_at)}</span> ${isRunning ? `<button class="btn btn-sm btn-danger" id="drawer-stop">停止任务</button>` : ""}`;
+      const isQueued = rec.status === "queued";
+      meta.innerHTML = `${jobTypeChip(rec.type)} ${isQueued && rec.queue_position ? statusChip("warning", `排队中 #${rec.queue_position}`) : jobChip(rec.status)} <span class="mono">${esc(rec.engine)}${rec.params && rec.params.model ? " · " + esc(rec.params.model) : ""}${rec.params && rec.params.effort ? " · " + esc(rec.params.effort) : ""}</span> <span class="cellnote">${isQueued ? "等待运行位" : elapsed(rec.started_at, rec.ended_at)}</span> ${isRunning ? `<button class="btn btn-sm btn-danger" id="drawer-stop">停止任务</button>` : isQueued ? `<button class="btn btn-sm btn-danger" id="drawer-stop" data-queued="1">取消排队</button>` : ""}`;
       const stick = pre.scrollTop + pre.clientHeight >= pre.scrollHeight - 40;
       pre.textContent = log || "(暂无日志)";
       if (stick) pre.scrollTop = pre.scrollHeight;
       const stop = document.getElementById("drawer-stop");
-      if (stop) stop.onclick = async () => { if (!confirm("停止该任务?")) return; try { await api(`/api/jobs/${jobId}/stop`, { method: "POST" }); } catch {} load(); };
-      if (!isRunning) { clearInterval(drawerTimer); drawerTimer = null; }
+      if (stop) stop.onclick = async () => {
+        if (!stop.dataset.queued && !confirm("停止该任务?")) return;   // 取消排队无需确认
+        try { await api(`/api/jobs/${jobId}/stop`, { method: "POST" }); } catch {} load();
+      };
+      if (!isRunning && !isQueued) { clearInterval(drawerTimer); drawerTimer = null; }
     } catch (e) {
       const meta = document.getElementById("log-meta"), pre = document.getElementById("drawer-log");
       if (meta) meta.textContent = "日志暂不可用";
@@ -877,7 +923,7 @@ function openVersionDrawer(sec, entity) {
       }).join("") +
       (pinned ? `<button class="btn btn-sm" id="ver-auto" style="margin-top:10px">恢复自动(总是显示最新版)</button>` : "");
     const act = fn => async () => {
-      try { await fn(); } catch (e) { if (e.message !== "cancelled") alert("操作失败:" + e.message); }
+      try { await fn(); } catch (e) { if (e.message !== "cancelled") reportActionError("操作", e); }
       detailCache.clear(); load(); viewPortfolio();
     };
     box.querySelectorAll("[data-actrun]").forEach(r => r.onchange = act(() => api(`/api/runs/${r.dataset.actrun}/activate`, { method: "POST" })));
@@ -954,10 +1000,11 @@ function bindPortfolio() {
     const hint = (document.getElementById("sug-hint") || {}).value || "";
     openEngineMenu(sugRun, "AI 推荐关注", async (engine, model, effort) => {
       try {
-        await post("/api/jobs", { type: "suggest_watch", engine, params: { hint: hint.trim(), model, effort } });
+        const rec = await post("/api/jobs", { type: "suggest_watch", engine, params: { hint: hint.trim(), model, effort } });
+        notifyJobAccepted(rec, "AI 推荐");
         startSugPoll((sugData || {}).generated_at || null);
         paintPortfolio();
-      } catch (e) { const m = document.getElementById("sug-msg"); if (m) m.textContent = e.message; }
+      } catch (e) { const m = document.getElementById("sug-msg"); if (m) m.textContent = safeActionErrorMessage(e); }
     });
   };
   const sugClear = document.getElementById("sug-clear");
@@ -975,18 +1022,49 @@ function bindPortfolio() {
   $view.querySelectorAll("[data-run]").forEach(b => b.onclick = ev => {
     ev.stopPropagation();
     openEngineMenu(b, `${b.dataset.run} 跑预测`, async (engine, model, effort) => {
-      b.disabled = true; b.textContent = "启动中…";
-      try { await post("/api/jobs", { type: "live_forecast", engine, params: { entity: b.dataset.entity, security: b.dataset.run, model, effort } }); viewPortfolio(); }
-      catch (e) { alert("启动失败:" + e.message); viewPortfolio(); }
+      b.disabled = true; b.textContent = "提交中…"; b.setAttribute("aria-busy", "true");
+      const body = { type: "live_forecast", engine, params: { entity: b.dataset.entity, security: b.dataset.run, model, effort } };
+      try {
+        const rec = await post("/api/jobs", body);
+        notifyJobAccepted(rec, `${b.dataset.run} 预测`);
+        viewPortfolio();
+      } catch (e) {
+        // 一家公司同时只允许一个任务:后端拒绝时给出「取消并重跑」的出口
+        const busy = String(e.message || "").match(/company busy:.*job ([A-Za-z0-9-]+), (queued|running)/);
+        if (busy) {
+          const [, jobId, state] = busy;
+          if (confirm(`${b.dataset.run} 已有任务${state === "queued" ? "在排队" : "在运行"}。\n取消当前任务并重新提交这次预测?`)) {
+            try {
+              showActionToast(`正在取消 ${b.dataset.run} 的当前任务…`, "pending");
+              await api(`/api/jobs/${jobId}/stop`, { method: "POST" });
+              const rec = await post("/api/jobs", body);
+              notifyJobAccepted(rec, `${b.dataset.run} 预测`);
+            } catch (e2) { reportActionError(`重新提交 ${b.dataset.run} 预测`, e2); }
+          }
+          viewPortfolio();
+          return;
+        }
+        reportActionError(`启动 ${b.dataset.run} 预测`, e); viewPortfolio();
+      }
     });
+  });
+  $view.querySelectorAll("[data-cancelqueued]").forEach(b => b.onclick = async ev => {
+    ev.stopPropagation();
+    if (!b.dataset.cancelqueued) { showActionToast("找不到排队任务 ID,请到「任务」页取消", "error"); return; }
+    // 排队任务还没开始跑,取消只是移出队列,无需二次确认
+    try {
+      await runPendingButton(b, "取消中…", () => api(`/api/jobs/${b.dataset.cancelqueued}/stop`, { method: "POST" }));
+      showActionToast(`已从队列移除 ${b.dataset.sec}`, "success");
+    } catch (error) { reportActionError(`取消排队 ${b.dataset.sec}`, error); }
+    viewPortfolio();
   });
   $view.querySelectorAll("[data-viewlog]").forEach(b => b.onclick = ev => { ev.stopPropagation(); openLogDrawer(b.dataset.viewlog); });
   $view.querySelectorAll("[data-versions]").forEach(b => b.onclick = ev => { ev.stopPropagation(); openVersionDrawer(b.dataset.versions, b.dataset.entity); });
   $view.querySelectorAll("[data-canceljob]").forEach(b => b.onclick = async ev => {
     ev.stopPropagation();
-    if (!b.dataset.canceljob) { alert("找不到任务 ID,请到「任务」页停止"); return; }
+    if (!b.dataset.canceljob) { showActionToast("找不到任务 ID,请到「任务」页停止", "error"); return; }
     if (!confirm(`取消 ${b.dataset.sec} 正在进行的推理?`)) return;
-    try { await api(`/api/jobs/${b.dataset.canceljob}/stop`, { method: "POST" }); } catch (e) { alert("取消失败:" + e.message); }
+    try { await api(`/api/jobs/${b.dataset.canceljob}/stop`, { method: "POST" }); } catch (e) { reportActionError(`取消 ${b.dataset.sec}`, e); }
     viewPortfolio();
   });
   $view.querySelectorAll("[data-unwatch]").forEach(b => b.onclick = async ev => {
@@ -1091,7 +1169,7 @@ async function renderDetail(sec, rows) {
     const [r, c] = b.dataset.delcase.split("|");
     if (!confirm(`删除运行记录 ${c}(移入回收站 training-runs/_trash,可手动恢复)?`)) return;
     try { await del(`/api/cases/${encodeURIComponent(r)}/${encodeURIComponent(c)}`); }
-    catch (e) { alert("删除失败:" + e.message); }
+    catch (e) { reportActionError("删除运行记录", e); }
     detailCache.clear(); viewPortfolio();
   });
 }
@@ -1295,17 +1373,23 @@ function bindTraining(paused) {
       if (plan.a.length && plan.b.length) await post("/api/rounds", { round_id: rid, group_a: plan.a, group_b: plan.b, notes: "dashboard 计划" });
       const c = planChoice();
       const rec = await post("/api/jobs", { type: "training_round", engine: c.engine, params: { round_id: rid, model: c.model, effort: c.effort } });
-      msg.textContent = `整轮任务已启动 ${rec.id}`; viewTraining();
+      msg.textContent = rec.status === "queued"
+        ? `整轮任务已入队(排第 ${rec.queue_position || "?"} 位),前面的任务完成后自动开始`
+        : rec.deduplicated ? `该轮任务已在队列或运行中,未重复提交` : `整轮任务已启动 ${rec.id}`;
+      viewTraining();
     } catch (e) { msg.textContent = e.message; }
   };
   document.getElementById("plan-agent").onclick = async () => {
     try {
       const c = planChoice();
       const rec = await post("/api/jobs", { type: "plan_round", engine: c.engine, params: { model: c.model, effort: c.effort } });
-      msg.textContent = `已让 agent 规划下一轮(任务 ${rec.id},完成后轮次记录里会出现新计划)`; viewTraining();
+      msg.textContent = rec.status === "queued"
+        ? `规划任务已入队(排第 ${rec.queue_position || "?"} 位),完成后轮次记录里会出现新计划`
+        : rec.deduplicated ? `规划任务已在队列或运行中,未重复提交` : `已让 agent 规划下一轮(任务 ${rec.id},完成后轮次记录里会出现新计划)`;
+      viewTraining();
     } catch (e) { msg.textContent = e.message; }
   };
-  const guarded = fn => async (...args) => { try { await fn(...args); } catch (e) { alert("操作失败:" + e.message); } finally { detailCache.clear(); viewTraining(); } };
+  const guarded = fn => async (...args) => { try { await fn(...args); } catch (e) { reportActionError("操作", e); } finally { detailCache.clear(); viewTraining(); } };
   $view.querySelectorAll("[data-loadplan]").forEach(b => b.onclick = guarded(async () => {
     const rounds = await api("/api/rounds");
     const meta = (rounds.find(r => r.round_id === b.dataset.loadplan) || {}).round || {};
@@ -1316,7 +1400,8 @@ function bindTraining(paused) {
   $view.querySelectorAll("[data-launchround]").forEach(b => b.onclick = guarded(async () => {
     if (!confirm(`启动整轮训练 ${b.dataset.launchround}?耗时数小时。`)) return;
     const c = planChoice();
-    await post("/api/jobs", { type: "training_round", engine: c.engine, params: { round_id: b.dataset.launchround, model: c.model, effort: c.effort } });
+    const rec = await post("/api/jobs", { type: "training_round", engine: c.engine, params: { round_id: b.dataset.launchround, model: c.model, effort: c.effort } });
+    notifyJobAccepted(rec, `整轮训练 ${b.dataset.launchround} `);
   }));
   $view.querySelectorAll("[data-delround]").forEach(b => b.onclick = guarded(async () => {
     if (!confirm(`删除整轮 ${b.dataset.delround}(连同其案例移入回收站)?`)) return;
@@ -1341,41 +1426,58 @@ const elapsed = (start, end) => {
 
 async function viewJobs() {
   clearInterval(logTimer); clearInterval(boardTimer);
-  const jobsList = await api("/api/jobs");
+  const [jobsList, statusInfo] = await Promise.all([api("/api/jobs"), api("/api/status").catch(() => ({}))]);
+  const cap = Number(((statusInfo || {}).capacity || {}).max_concurrent_jobs) || 0;
   const running = jobsList.filter(j => ["running", "running_detached"].includes(j.status));
+  const queued = jobsList.filter(j => j.status === "queued")
+    .sort((a, b) => (a.queue_position || 9e9) - (b.queue_position || 9e9));
+  const trainingActive = running.some(j => TRAINING_TYPES.has(j.type));
+  const trainingQueued = !trainingActive && queued.some(j => TRAINING_TYPES.has(j.type));
   const totalCost = jobsList.reduce((s, j) => s + (Number(j.cost_usd) || 0), 0);
   let html = `
     <div class="tile-row">
-      <div class="tile"><div class="t-label">运行中</div><div class="t-value">${running.length}</div>
+      <div class="tile"><div class="t-label">运行中${cap ? ` · 容量 ${cap}` : ""}</div><div class="t-value">${running.length}${cap ? ` / ${cap}` : ""}</div>
         <div class="t-note">推理 ${running.filter(j => j.type === "live_forecast").length} · 训练 ${running.filter(j => TRAINING_TYPES.has(j.type)).length}</div></div>
+      <div class="tile"><div class="t-label">排队中</div><div class="t-value">${queued.length}</div>
+        <div class="t-note">${queued.length ? "完成后按顺序自动开始" : "队列空闲"}</div></div>
       <div class="tile"><div class="t-label">历史任务</div><div class="t-value">${jobsList.length}</div></div>
       <div class="tile"><div class="t-label">推理 / 训练</div><div class="t-value">${jobsList.filter(j => j.type === "live_forecast").length} / ${jobsList.filter(j => TRAINING_TYPES.has(j.type)).length}</div></div>
       <div class="tile"><div class="t-label">总成本</div><div class="t-value">${totalCost ? "$" + totalCost.toFixed(2) : "—"}</div></div>
     </div>
+    ${trainingActive ? `<div class="notice">训练任务会修改方法库,独占全部运行位;其余任务已排队,训练完成后按顺序开始。</div>` : ""}
+    ${trainingQueued ? `<div class="notice">队列中有训练任务:它会先等当前任务全部结束,再独占运行;排在它后面的任务在训练完成后开始。</div>` : ""}
+    ${queued.length && !trainingActive && !trainingQueued ? `<div class="notice">${running.length}${cap ? `/${cap}` : ""} 个运行位使用中 · ${queued.length} 个任务排队等待。运行位空出后按提交顺序自动开始;同一家公司同时只跑一个任务;排队任务可随时「取消排队」。</div>` : ""}
     <div class="card"><h2>任务看板</h2>
-      <div class="card-sub">推理任务从「投资看板」发起;训练任务从「自训练」发起;这里统一查看、看日志、停止、删记录。</div>`;
+      <div class="card-sub">推理任务从「投资看板」发起;训练任务从「自训练」发起;这里统一查看、看日志、停止、删记录。排队中的任务显示队列位置。</div>`;
   if (!jobsList.length) html += `<div class="empty">还没有任务记录。</div>`;
   else {
     html += `<table class="grid"><thead><tr><th>类型</th><th>对象</th><th>状态</th><th>引擎</th><th>开始</th><th>耗时</th><th class="num">成本</th><th></th></tr></thead><tbody>`;
     for (const j of jobsList) {
       const isRunning = ["running", "running_detached"].includes(j.status);
+      const isQueued = j.status === "queued";
       html += `<tr><td>${jobTypeChip(j.type)}</td><td><b>${esc(jobTarget(j))}</b><div class="mono cellnote">${esc(j.id)}</div></td>
-        <td>${jobChip(j.status)}</td><td>${esc(j.engine)}${(j.params || {}).model ? `<div class="mono cellnote">${esc(j.params.model)}${j.params.effort ? " · " + esc(j.params.effort) : ""}</div>` : ""}</td>
-        <td class="mono cellnote">${fmtTime(j.started_at)}</td>
+        <td>${isQueued && j.queue_position ? statusChip("warning", `排队中 #${j.queue_position}`) : jobChip(j.status)}</td><td>${esc(j.engine)}${(j.params || {}).model ? `<div class="mono cellnote">${esc(j.params.model)}${j.params.effort ? " · " + esc(j.params.effort) : ""}</div>` : ""}</td>
+        <td class="mono cellnote">${isQueued ? "等待运行位" : fmtTime(j.started_at)}</td>
         <td class="mono cellnote">${elapsed(j.started_at, j.ended_at)}</td>
         <td class="num cellnote">${j.cost_usd != null ? "$" + Number(j.cost_usd).toFixed(2) : "—"}</td>
         <td><button class="btn btn-sm" data-log="${esc(j.id)}">日志</button>
-        ${isRunning ? `<button class="btn btn-sm btn-danger" data-stop="${esc(j.id)}">停止</button>` : `<button class="btn btn-sm" data-deljob="${esc(j.id)}">删记录</button>`}</td></tr>`;
+        ${isQueued ? `<button class="btn btn-sm btn-danger" data-cancelqueued="${esc(j.id)}">取消排队</button>`
+          : isRunning ? `<button class="btn btn-sm btn-danger" data-stop="${esc(j.id)}">停止</button>` : `<button class="btn btn-sm" data-deljob="${esc(j.id)}">删记录</button>`}</td></tr>`;
     }
     html += `</tbody></table>`;
   }
   html += `<div id="logbox" style="display:none;margin-top:12px"><div class="card-sub" id="logtitle"></div><pre class="log" id="logpre"></pre></div></div>`;
   $view.innerHTML = html;
 
-  const guarded = fn => async (...args) => { try { await fn(...args); } catch (e) { alert("操作失败:" + e.message); } finally { viewJobs(); } };
+  const guarded = fn => async (...args) => { try { await fn(...args); } catch (e) { reportActionError("操作", e); } finally { viewJobs(); } };
   $view.querySelectorAll("[data-stop]").forEach(b => b.onclick = guarded(async () => {
     if (!confirm(`停止任务 ${b.dataset.stop}?运行中的研究会被终止。`)) return;
     await api(`/api/jobs/${b.dataset.stop}/stop`, { method: "POST" });
+  }));
+  $view.querySelectorAll("[data-cancelqueued]").forEach(b => b.onclick = guarded(async () => {
+    // 排队任务还没开始跑,取消只是移出队列,无需二次确认
+    await api(`/api/jobs/${b.dataset.cancelqueued}/stop`, { method: "POST" });
+    showActionToast(`已从队列移除任务 ${b.dataset.cancelqueued}`, "success");
   }));
   $view.querySelectorAll("[data-deljob]").forEach(b => b.onclick = guarded(async () => {
     if (!confirm("删除该任务记录和日志?(移入 jobs/_trash)")) return;
@@ -1384,7 +1486,8 @@ async function viewJobs() {
   $view.querySelectorAll("[data-log]").forEach(b => b.onclick = () => openLogDrawer(b.dataset.log));
   const wantLog = (window.__routeQuery || new URLSearchParams()).get("log");
   if (wantLog) openLogDrawer(wantLog);
-  if (running.length && !document.getElementById("logbox").style.display) {
+  // 注意:logbox 初始 inline display:none,旧守卫 !style.display 恒为假,定时器从未生效
+  if ((running.length || queued.length) && document.getElementById("logbox").style.display === "none") {
     boardTimer = setInterval(() => { if ((location.hash || "").includes("jobs") && document.getElementById("logbox").style.display === "none") viewJobs(); }, 15000);
   }
 }
@@ -1522,7 +1625,8 @@ async function viewMethod() {
 
 /* ---------- router ---------- */
 async function route() {
-  clearInterval(logTimer); clearInterval(boardTimer);
+  clearInterval(logTimer); clearInterval(boardTimer); clearInterval(pfTimer); pfTimer = null;
+  closeEngineMenu();   // 菜单挂在 body 上,切页必须收掉,否则会拦住新页面的重绘
   const hash = location.hash || "#/portfolio";
   const qIndex = hash.indexOf("?");
   window.__routeQuery = new URLSearchParams(qIndex === -1 ? "" : hash.slice(qIndex + 1));

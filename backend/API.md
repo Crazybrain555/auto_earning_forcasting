@@ -49,24 +49,30 @@ The backend is read-only over case data; its only writes are
 
 ## Status and control
 
-- `GET /api/status` — `{control, running_jobs, latest_case_activity}`.
+- `GET /api/status` — `{control, running_jobs, capacity: {max_concurrent_jobs, max_queued_jobs, submit_rate_max, submit_rate_window_s}, latest_case_activity}`.
 - `POST /api/control` — body `{"auto_training": "run"|"pause", "note": "..."}`;
   writes `training-runs/control.json` (the pause switch training sessions obey).
 
 ## Jobs (launch agent runs)
 
 - `GET /api/engines` — `[{engine: "claude", available: true}, {engine: "codex", available: true, note, models, default_model, default_effort}]` in local and hosted dual-engine deployments. An engine is available only when enabled and its executable is present; render availability from the response rather than hard-coding a policy.
-- `POST /api/jobs` — body `{"type", "engine": "claude"|"codex", "params": {...}}` → 201 job record. Optional `X-Idempotency-Key` (8–128 safe characters) replays the original record instead of launching a second process.
+- `POST /api/jobs` — body `{"type", "engine": "claude"|"codex", "params": {...}}` → 201 job record when a runner slot is free (`status: "running"`), or 202 + `Location`/`Retry-After` when all slots are busy (`status: "queued"`, with 1-based `queue_position`). A busy runner is never an error: queued jobs are promoted FIFO as slots free (on job completion plus a background scheduler tick that also covers backend restarts, detached-job completion and replica-pull end). Optional `X-Idempotency-Key` (8–128 safe characters) replays the original record instead of launching a second process. Independent of the key, an identical pending request (same type/engine/params fingerprint already queued or running locally) is returned with `"deduplicated": true` instead of creating a duplicate job; uniqueness lapses once the earlier job reaches a terminal state.
+  - One company, one job: a `live_forecast`/`training_case` submit for a company (normalized security) that already has a queued or running job returns **409** `company busy: {SEC} ... (job {id}, {state}); cancel it first to rerun` — never queued or merged. The dashboard turns this into a cancel-and-resubmit prompt.
+  - Scheduling: up to `max_concurrent_jobs` (config, currently 1) forecast/assistant jobs run in parallel; at most one job per workspace at a time. Training-lane types (`training_case`, `training_round`, `plan_round`) mutate the shared method state, so they run EXCLUSIVELY: a queued training job first drains the runner (nothing may jump past it), then runs alone.
+  - Abuse guard: at most `submit_rate_max` job creations per `submit_rate_window_s` (config, default 20/60s) → 429 + `Retry-After`. Idempotent replays and dedup hits are never counted or blocked; a dedup hit additionally records the caller's key as an alias on the surviving job so later replays of the same command keep mapping to it after it finishes.
   - `type: "live_forecast"` — params `{entity, security?, as_of?, extra?}`; workspace `training-runs/live/<security>@<as_of>/`. Here `as_of` names the snapshot/workspace only: production research uses all current evidence available through bundle freeze.
   - `type: "training_case"` — params `{entity, security?, as_of, round_id, case_role: development|validation|regression, extra?}`. Historical training alone treats `as_of` as an evidence cutoff and seals before retrieving Actuals.
   - `type: "training_round"` — params `{round_id, group_a:[{entity, security?, as_of}...], group_b:[...], extra?}` — a case-selected autonomous round. Each group must contain at least one case; identities must be unique within and across groups. Omit both groups to load the saved round plan. "Stop" = POST pause + stop the job.
   - Errors: 422 bad params; 409 while a replica pull is in progress (retry after it
-    finishes) or when runner capacity is full; 501 when the selected engine is
-    disabled or not logged in on this runner.
-- `GET /api/jobs` — newest-first job records `{id, type, engine, params, pid, status: running|finished|failed|stopped|running_detached|interrupted, started_at, ended_at, returncode}`.
+    finishes); 501 when the selected engine is disabled or not logged in on this
+    runner; 429 + `Retry-After` on the submit-rate ceiling; 503 + `Retry-After` only
+    when the bounded queue itself is full (`max_queued_jobs`, default 20).
+    Capacity-full is NOT an error anymore — it queues.
+- `GET /api/jobs` — newest-first job records `{id, type, engine, params, pid, status: queued|running|finished|failed|stopped|running_detached|interrupted, created_at, started_at, ended_at, returncode, error?}`. Queued records carry a live `queue_position`; a job that could not launch (engine gone at promotion time) becomes `failed` with the reason in `error`.
 - `GET /api/jobs/{id}` — one record.
 - `GET /api/jobs/{id}/log?tail=200` — `text/plain` log tail (poll this for live progress). Add `safe=1` for remote synchronization: the backend removes the exact stored prompt prefix and fails closed if it cannot verify that boundary.
-- `POST /api/jobs/{id}/stop` — SIGTERM the process group.
+- `POST /api/jobs/{id}/stop` — SIGTERM the process group; on a `queued` job this is a cheap dequeue (record becomes `stopped`, nothing was started).
+- `DELETE /api/jobs/{job_id}` — refused (409) while running OR queued; cancel queued jobs via stop first.
 
 ## Replica (local mirror mode only)
 
@@ -76,7 +82,7 @@ The backend is read-only over case data; its only writes are
 ## Watchlist & portfolio (投资看板)
 
 - `GET /api/watchlist` / `POST /api/watchlist` `{entity, security?, note?}` / `DELETE /api/watchlist/{security}`.
-- `GET /api/portfolio` — watchlist joined with cases: each row adds `case_count`, `latest`, `latest_live`, `valuation` (`{current_price, price_as_of, price_currency, current_valuation_note, fair_value{bear,base,bull}, recommended_buy_price, action, one_line_thesis}`), `job_running`, `cases[]`. For v2, structured `valuation.per_share`, `market_implied_expectations`, and `investment_case` take priority over the compatibility `valuation_summary`; v1 continues to use `valuation_summary` unchanged.
+- `GET /api/portfolio` — watchlist joined with cases: each row adds `case_count`, `latest`, `latest_live`, `valuation` (`{current_price, price_as_of, price_currency, current_valuation_note, fair_value{bear,base,bull}, recommended_buy_price, action, one_line_thesis}`), `job_running`, `job_queued`/`queued_job_id`/`queue_position` (a queued forecast for that security, cancellable via the stop endpoint), `cases[]`. For v2, structured `valuation.per_share`, `market_implied_expectations`, and `investment_case` take priority over the compatibility `valuation_summary`; v1 continues to use `valuation_summary` unchanged.
 - `GET /api/quotes?symbols=MU,NVDA` — best-effort live quotes (Yahoo; config `quotes.proxy` if blocked). Values: `{price, currency, market_time, previous_close}` or `{error}` — always fall back to `valuation.current_price` + `price_as_of`.
 
 ## Curriculum & round plans (自训练)

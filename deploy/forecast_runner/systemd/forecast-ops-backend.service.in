@@ -16,7 +16,10 @@ Environment=PATH=@RUNNER_ROOT@/.runtime/codex/node_modules/.bin:@RUNNER_ROOT@/.r
 ExecStart=@RUNNER_ROOT@/backend/run.sh
 Restart=on-failure
 RestartSec=5s
-KillMode=control-group
+# process, not control-group: agent jobs are detached (start_new_session) and
+# must survive backend restarts/deploys; the backend reconciles them as
+# running_detached on startup. control-group here once killed a live forecast.
+KillMode=process
 TimeoutStopSec=90s
 UMask=0077
 NoNewPrivileges=true
