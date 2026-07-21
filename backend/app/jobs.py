@@ -50,12 +50,27 @@ def engines() -> dict:
     return CONFIG.get("engines", {})
 
 
+def _claude_token_path() -> Path:
+    return Path.home() / ".claude" / "oauth-token"
+
+
+def _claude_oauth_token() -> str:
+    # A 0600 operator-written file (claude setup-token output). Injected only
+    # into claude jobs so codex processes never see the subscription token.
+    try:
+        return _claude_token_path().read_text(encoding="utf-8").strip()
+    except OSError:
+        return ""
+
+
 def _claude_login_missing() -> bool:
     # macOS keeps Claude Code credentials in the keychain; Linux runners expose
-    # login state only as this file, so its absence means jobs cannot start.
+    # login state as the credentials file or the operator-provided token file.
     if sys.platform == "darwin":
         return False
-    return not (Path.home() / ".claude" / ".credentials.json").is_file()
+    if (Path.home() / ".claude" / ".credentials.json").is_file():
+        return False
+    return not _claude_oauth_token()
 
 
 def engine_status() -> list[dict]:
@@ -268,6 +283,10 @@ def start_job(job_type: str, engine: str, params: dict, idempotency_key: str = "
 
     env = dict(os.environ)
     env.update(spec.get("env") or {})
+    if engine == "claude":
+        token = _claude_oauth_token()
+        if token:
+            env.setdefault("CLAUDE_CODE_OAUTH_TOKEN", token)
     with _LOCK:
         if idempotency_key:
             existing = _find_idempotent_job(idempotency_key)
