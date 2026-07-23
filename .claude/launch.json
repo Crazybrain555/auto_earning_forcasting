@@ -5,7 +5,8 @@
       "name": "forecast-backend",
       "runtimeExecutable": "sh",
       "runtimeArgs": ["backend/run.sh"],
-      "port": 8787
+      "port": 8787,
+      "autoPort": false
     },
     {
       "name": "forecast-replica",

@@ -381,19 +381,26 @@ def history(security: str) -> list[dict]:
 def effective_valuation(security: str) -> dict | None:
     """The version the dashboard should show: pinned first, else the newest
     delivered one. In-progress workspaces are ingested for history, but a
-    half-built snapshot must never surface as the board's conclusion, so the
-    fallback only considers sealed or delivery-validated versions."""
+    half-built snapshot must never surface as the board's conclusion - not even
+    when a user pins it active (a version switch can activate an unsealed
+    intermediate snapshot). Both the pinned and the fallback path therefore
+    require the same completion predicate; an unsealed active version is skipped
+    and the newest genuinely delivered version surfaces instead."""
     sec = _sec_key(security)
+    # Board-eligible = a completed delivery carrying a valuation. Applied to the
+    # pinned (is_active) path too, so activating a half-built run cannot put it
+    # on the board; it stays visible in version history only.
+    eligible = ("deleted_at IS NULL AND has_valuation = 1 "
+                "AND (sealed = 1 OR delivery_passed = 1)")
     with _connect() as conn:
         row = conn.execute(
-            """SELECT valuation_json FROM runs
-               WHERE security = ? AND deleted_at IS NULL AND is_active = 1
+            f"""SELECT valuation_json FROM runs
+               WHERE security = ? AND is_active = 1 AND {eligible}
                ORDER BY captured_at DESC LIMIT 1""", (sec,)).fetchone()
         if row is None:
             row = conn.execute(
-                """SELECT valuation_json FROM runs
-                   WHERE security = ? AND deleted_at IS NULL AND has_valuation = 1
-                     AND (sealed = 1 OR delivery_passed = 1)
+                f"""SELECT valuation_json FROM runs
+                   WHERE security = ? AND {eligible}
                    ORDER BY captured_at DESC, id DESC LIMIT 1""", (sec,)).fetchone()
     if row is None:
         return None

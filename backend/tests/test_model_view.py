@@ -394,6 +394,33 @@ def test_effective_valuation_ignores_undelivered_drafts(monkeypatch, tmp_path: P
     assert len(db.history("TEST")) == 2
 
 
+def test_effective_valuation_skips_an_activated_undelivered_draft(monkeypatch, tmp_path: Path) -> None:
+    """A version switch can pin an unsealed half-built run (MRVL 2026-07-21):
+    it must still not become the board conclusion; the newest delivered version
+    surfaces instead."""
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "forecast.db")
+    db.init()
+    db.ingest_case(
+        {"round_id": "live", "case_id": "MRVL@2026-07-20", "security": "MRVL",
+         "entity": "Marvell", "sealed": True, "delivery_passed": True},
+        _v2_snapshot(), {})
+
+    draft_snapshot = _v2_snapshot()
+    draft_snapshot["valuation"]["per_share"]["value_per_share"] = 85.83
+    db.ingest_case(
+        {"round_id": "live", "case_id": "MRVL@2026-07-21", "security": "MRVL",
+         "entity": "Marvell", "sealed": False, "delivery_passed": None},
+        draft_snapshot, {})
+
+    # Pin the unsealed draft, exactly like the version-switch that polluted the board.
+    draft_id = next(h["id"] for h in db.history("MRVL") if h["case_id"] == "MRVL@2026-07-21")
+    assert db.activate(draft_id) is True
+
+    effective = db.effective_valuation("MRVL")
+    assert effective is not None
+    assert effective["fair_value"]["base"] == 9.10  # the delivered 07-20, not the 85.83 draft
+
+
 def test_db_reference_dialect_surfaces_reference_value_without_faking_a_base(
     monkeypatch, tmp_path: Path
 ) -> None:

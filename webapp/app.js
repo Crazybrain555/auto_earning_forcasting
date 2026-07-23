@@ -128,7 +128,7 @@ async function runPendingButton(button, pendingLabel, action) {
 if (typeof globalThis.addEventListener === "function") {
   globalThis.addEventListener("forecast-command-state", event => {
     const status = event?.detail?.status;
-    if (status === "queued") showActionToast("命令已进入队列，本地 Codex 正在执行…", "pending");
+    if (status === "queued") showActionToast("命令已提交，等待本地执行…（需本地桥在线）", "pending");
     if (status === "timeout") showActionToast("命令仍在队列中，完成后会自动同步；请勿重复点击。", "pending");
   });
 }
@@ -933,14 +933,22 @@ function openVersionDrawer(sec, entity) {
       return;
     }
     if (!hist.length) { box.innerHTML = `<div class="empty">还没有入库版本——跑一次预测后这里会出现。</div>`; return; }
+    // Board-eligible = a completed delivery (sealed or delivery-validated) that
+    // carries a valuation. A half-built run stays visible here but must never
+    // become the board conclusion, even if a user pins it (matches the backend
+    // effective_valuation gate). So an unsealed pin falls through to the newest
+    // completed version.
+    const boardOk = h => !h.deleted && h.has_valuation && (h.sealed || h.delivery_passed);
     const pinned = hist.find(h => h.is_active && !h.deleted);
-    const effective = pinned || hist.find(h => h.has_valuation && !h.deleted) || null;
-    box.innerHTML = `<div class="cellnote" style="margin-bottom:10px">选中的版本就是投资看板显示的结论。默认自动跟随最新有估值版本;手动选中后固定不动。删除是软删除,可恢复;数据在 backend/state/forecast.db,工作区被覆盖也不丢。</div>` +
+    const effective = (pinned && boardOk(pinned)) ? pinned : (hist.find(boardOk) || null);
+    const pinnedButUnsealed = pinned && !boardOk(pinned);
+    box.innerHTML = `<div class="cellnote" style="margin-bottom:10px">选中的版本就是投资看板显示的结论。默认自动跟随最新有估值版本;手动选中后固定不动。<b>未封存/未通过交付校验的运行只能查看,不能设为看板结论</b>。删除是软删除,可恢复;数据在 backend/state/forecast.db,工作区被覆盖也不丢。</div>` +
+      (pinnedButUnsealed ? `<div class="notice" style="margin-bottom:10px">你固定的版本尚未封存,看板不会显示它,而是回退到最近一个已完成版本。</div>` : "") +
       hist.map(h => {
         const val = h.valuation || {}, fv = val.fair_value || {};
         const isEff = effective && effective.id === h.id;
         return `<div class="vercard ${h.deleted ? "ver-del" : ""} ${isEff ? "ver-eff" : ""}">
-          <div class="ver-pick">${h.deleted || !h.has_valuation ? "" : `<input type="radio" name="verpick" ${isEff ? "checked" : ""} data-actrun="${h.id}" title="设为看板显示版本">`}</div>
+          <div class="ver-pick">${boardOk(h) ? `<input type="radio" name="verpick" ${isEff ? "checked" : ""} data-actrun="${h.id}" title="设为看板显示版本">` : (!h.deleted && h.has_valuation ? `<span class="cellnote" title="未封存/未通过交付校验,可查看但不能设为看板结论">未封存</span>` : "")}</div>
           <div class="ver-main">
             <div><b class="mono" style="font-size:14px">${money(fv.base ?? val.reference_fair_value)}</b>${val.reference_fair_value != null && fv.base == null ? ` <span class="cellnote">参考情景</span>` : ""} ${h.has_valuation ? actionChip(val.action) : statusChip("muted", "无估值")}
               ${isEff ? statusChip("good", pinned ? "当前显示 · 手动固定" : "当前显示 · 自动") : ""} ${h.deleted ? statusChip("critical", "已删除") : ""}</div>
